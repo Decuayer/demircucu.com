@@ -1,0 +1,118 @@
+{
+  "nav": {
+    "home": "Ana Sayfa",
+    "about": "Hakkımda",
+    "experience": "Deneyimlerim",
+    "projects": "Projelerim",
+    "blog": "Blog",
+    "contact": "İletişim",
+    "login": "Giriş Yap",
+    "register": "Kayıt Ol",
+    "logout": "Çıkış Yap",
+    "profile": "Profil",
+    "admin": "Admin Panel",
+    "changePassword": "Şifre Değiştir",
+    "myLikes": "Beğenilerim",
+    "myComments": "Yorumlarım",
+    "likes": "Beğenilerim"
+  },
+  "home": {
+    "heroTitle": "Merhaba, Ben Demircucu",
+    "heroSub": "Full-Stack Geliştirici & Yazılım Mühendisi",
+    "heroCta": "Benimle İletişime Geç",
+    "featuredProjects": "Öne Çıkan Projeler",
+    "latestPosts": "Son Blog Yazıları",
+    "aboutPreview": "Hakkımda",
+    "viewAll": "Tümünü Gör",
+    "readMore": "Devamını Oku"
+  },
+  "about": {
+    "title": "Hakkımda",
+    "bio": "Biyografi",
+    "hobbies": "Hobiler",
+    "skills": "Teknik Yetkinlikler",
+    "github": "GitHub Profili",
+    "gallery": "Fotoğraf Galerisi"
+  },
+  "experience": {
+    "title": "Deneyimlerim",
+    "present": "Devam Ediyor",
+    "details": "Detaylar",
+    "technologies": "Kullanılan Teknolojiler"
+  },
+  "projects": {
+    "title": "Projelerim",
+    "viewProject": "Projeyi Görüntüle",
+    "viewGithub": "GitHub'da Gör",
+    "liveSite": "Canlı Site",
+    "techStack": "Teknoloji Stack'i",
+    "allProjects": "Tüm Projeler"
+  },
+  "blog": {
+    "title": "Blog",
+    "mostRead": "En Çok Okunanlar",
+    "latest": "Son Paylaşılanlar",
+    "readTime": "dk okuma",
+    "views": "görüntülenme",
+    "comments": "Yorumlar",
+    "writeComment": "Yorum yaz...",
+    "submitComment": "Yorum Gönder",
+    "loginToComment": "Yorum yapmak için giriş yapın",
+    "noComments": "Henüz yorum yapılmamış",
+    "like": "Beğen",
+    "liked": "Beğenildi",
+    "commentSuccess": "Yorumunuz eklendi"
+  },
+  "contact": {
+    "title": "İletişim",
+    "name": "Ad Soyad",
+    "email": "E-posta",
+    "subject": "Konu",
+    "message": "Mesajınız",
+    "send": "Mesaj Gönder",
+    "success": "Mesajınız başarıyla gönderildi!",
+    "error": "Bir hata oluştu, lütfen tekrar deneyin.",
+    "info": "İletişim Bilgileri",
+    "social": "Sosyal Medya"
+  },
+  "auth": {
+    "loginTitle": "Giriş Yap",
+    "registerTitle": "Kayıt Ol",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifre Tekrar",
+    "name": "Ad Soyad",
+    "loginButton": "Giriş Yap",
+    "registerButton": "Kayıt Ol",
+    "noAccount": "Hesabınız yok mu?",
+    "hasAccount": "Zaten hesabınız var mı?",
+    "forgotPassword": "Şifremi Unuttum"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "experiences": "Deneyimler",
+    "projects": "Projeler",
+    "blog": "Blog Yazıları",
+    "messages": "Mesajlar",
+    "settings": "Ayarlar",
+    "add": "Yeni Ekle",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "publish": "Yayınla",
+    "unpublish": "Yayından Kaldır",
+    "totalPosts": "Toplam Yazı",
+    "totalViews": "Toplam Görüntülenme",
+    "totalComments": "Toplam Yorum",
+    "totalMessages": "Toplam Mesaj",
+    "recentMessages": "Son Mesajlar",
+    "recentComments": "Son Yorumlar"
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "notFound": "Sayfa bulunamadı",
+    "backToHome": "Ana Sayfaya Dön"
+  }
+}

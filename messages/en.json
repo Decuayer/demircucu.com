@@ -1,0 +1,118 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "experience": "Experience",
+    "projects": "Projects",
+    "blog": "Blog",
+    "contact": "Contact",
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Sign Out",
+    "profile": "Profile",
+    "admin": "Admin Panel",
+    "changePassword": "Change Password",
+    "myLikes": "My Likes",
+    "myComments": "My Comments",
+    "likes": "Likes"
+  },
+  "home": {
+    "heroTitle": "Hello, I'm Demircucu",
+    "heroSub": "Full-Stack Developer & Software Engineer",
+    "heroCta": "Get In Touch",
+    "featuredProjects": "Featured Projects",
+    "latestPosts": "Latest Blog Posts",
+    "aboutPreview": "About Me",
+    "viewAll": "View All",
+    "readMore": "Read More"
+  },
+  "about": {
+    "title": "About Me",
+    "bio": "Biography",
+    "hobbies": "Hobbies",
+    "skills": "Technical Skills",
+    "github": "GitHub Profile",
+    "gallery": "Photo Gallery"
+  },
+  "experience": {
+    "title": "Experience",
+    "present": "Present",
+    "details": "Details",
+    "technologies": "Technologies Used"
+  },
+  "projects": {
+    "title": "Projects",
+    "viewProject": "View Project",
+    "viewGithub": "View on GitHub",
+    "liveSite": "Live Site",
+    "techStack": "Tech Stack",
+    "allProjects": "All Projects"
+  },
+  "blog": {
+    "title": "Blog",
+    "mostRead": "Most Read",
+    "latest": "Latest Posts",
+    "readTime": "min read",
+    "views": "views",
+    "comments": "Comments",
+    "writeComment": "Write a comment...",
+    "submitComment": "Submit Comment",
+    "loginToComment": "Sign in to leave a comment",
+    "noComments": "No comments yet",
+    "like": "Like",
+    "liked": "Liked",
+    "commentSuccess": "Comment added"
+  },
+  "contact": {
+    "title": "Contact",
+    "name": "Full Name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Your Message",
+    "send": "Send Message",
+    "success": "Your message has been sent successfully!",
+    "error": "An error occurred, please try again.",
+    "info": "Contact Information",
+    "social": "Social Media"
+  },
+  "auth": {
+    "loginTitle": "Sign In",
+    "registerTitle": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Full Name",
+    "loginButton": "Sign In",
+    "registerButton": "Sign Up",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "forgotPassword": "Forgot Password"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "experiences": "Experiences",
+    "projects": "Projects",
+    "blog": "Blog Posts",
+    "messages": "Messages",
+    "settings": "Settings",
+    "add": "Add New",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "totalPosts": "Total Posts",
+    "totalViews": "Total Views",
+    "totalComments": "Total Comments",
+    "totalMessages": "Total Messages",
+    "recentMessages": "Recent Messages",
+    "recentComments": "Recent Comments"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "notFound": "Page not found",
+    "backToHome": "Back to Home"
+  }
+}

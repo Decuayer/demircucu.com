@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Profile {
+  id        String   @id // matches Supabase auth.users.id
+  email     String   @unique
+  name      String?
+  avatar    String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  comments Comment[]
+  likes    Like[]
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  experiences Experience[]
+  projects    Project[]
+  blogPosts   BlogPost[]
+}
+
+model Experience {
+  id          String    @id @default(cuid())
+  company     String
+  position    String
+  description String
+  details     String?   @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  tags        Tag[]
+  logo        String?
+  images      String[]
+  files       Json?     // Array of { name: string, url: string, type: string }
+  githubUrl   String?
+  order       Int       @default(0)
+  published   Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  summary     String
+  description String?  @db.Text
+  tags        Tag[]
+  files       Json?    // Array of { name: string, url: string, type: string }
+  logo        String?
+  images      String[]
+  githubUrl   String?
+  liveUrl     String?
+  featured    Boolean  @default(false)
+  published   Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BlogPost {
+  id         String   @id @default(cuid())
+  title      String
+  slug       String   @unique
+  excerpt    String
+  content    String   @db.Text
+  coverImage String?
+  tags       Tag[]
+  files      Json?    // Array of { name: string, url: string, type: string }
+  published  Boolean  @default(false)
+  featured   Boolean  @default(false)
+  viewCount  Int      @default(0)
+  authorId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  comments Comment[]
+  likes    Like[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  postId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author Profile  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model MediaFile {
+  id        String   @id @default(cuid())
+  name      String
+  url       String   @unique
+  type      String
+  size      Int
+  bucket    String   @default("media")
+  path      String
+  usedIn    String?
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id              String   @id @default("main")
+  // Hero
+  heroTitle       String?
+  heroSub         String?
+  // About
+  aboutBio        String?  @db.Text
+  aboutPhoto      String?
+  aboutLocation   String?
+  aboutExperience String?
+  skills          Json?
+  hobbies         Json?
+  // Contact
+  contactEmail    String?
+  contactPhone    String?
+  contactAddress  String?
+  // Social
+  socialGithub    String?
+  socialLinkedin  String?
+  socialTwitter   String?
+  // CTA
+  ctaTitle        String?
+  ctaDescription  String?  @db.Text
+  // Meta
+  updatedAt       DateTime @updatedAt
+}
