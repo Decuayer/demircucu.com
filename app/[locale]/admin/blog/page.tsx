@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 export default async function AdminBlogPage() {
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect("/auth/login");
+  if (!user || user.role !== "ADMIN") redirect("/en/auth/login");
 
   const posts = await prisma.blogPost.findMany({
     orderBy: { createdAt: "desc" }

@@ -26,7 +26,8 @@ model Profile {
 
 model Tag {
   id        String   @id @default(cuid())
-  name      String   @unique
+  nameTr    String   @unique
+  nameEn    String   @unique
   slug      String   @unique
   createdAt DateTime @default(now())
 
@@ -36,49 +37,58 @@ model Tag {
 }
 
 model Experience {
-  id          String    @id @default(cuid())
-  company     String
-  position    String
-  description String
-  details     String?   @db.Text
-  startDate   DateTime
-  endDate     DateTime?
-  tags        Tag[]
-  logo        String?
-  images      String[]
-  files       Json?     // Array of { name: string, url: string, type: string }
-  githubUrl   String?
-  order       Int       @default(0)
-  published   Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  company       String
+  positionTr    String
+  positionEn    String
+  descriptionTr String
+  descriptionEn String
+  detailsTr     String?   @db.Text
+  detailsEn     String?   @db.Text
+  startDate     DateTime
+  endDate       DateTime?
+  tags          Tag[]
+  logo          String?
+  images        String[]
+  files         Json?     // Array of { name: string, url: string, type: string }
+  githubUrl     String?
+  order         Int       @default(0)
+  published     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  summary     String
-  description String?  @db.Text
-  tags        Tag[]
-  files       Json?    // Array of { name: string, url: string, type: string }
-  logo        String?
-  images      String[]
-  githubUrl   String?
-  liveUrl     String?
-  featured    Boolean  @default(false)
-  published   Boolean  @default(true)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  titleTr       String
+  titleEn       String
+  slug          String   @unique
+  summaryTr     String
+  summaryEn     String
+  descriptionTr String?  @db.Text
+  descriptionEn String?  @db.Text
+  tags          Tag[]
+  files         Json?    // Array of { name: string, url: string, type: string }
+  logo          String?
+  images        String[]
+  githubUrl     String?
+  liveUrl       String?
+  featured      Boolean  @default(false)
+  published     Boolean  @default(true)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model BlogPost {
   id         String   @id @default(cuid())
-  title      String
+  titleTr    String
+  titleEn    String
   slug       String   @unique
-  excerpt    String
-  content    String   @db.Text
+  excerptTr  String
+  excerptEn  String
+  contentTr  String   @db.Text
+  contentEn  String   @db.Text
   coverImage String?
   tags       Tag[]
   files      Json?    // Array of { name: string, url: string, type: string }
@@ -140,28 +150,44 @@ model MediaFile {
 }
 
 model SiteSettings {
-  id              String   @id @default("main")
+  id                String   @id @default("main")
   // Hero
-  heroTitle       String?
-  heroSub         String?
+  heroTitleTr       String?
+  heroTitleEn       String?
+  heroSubTr         String?
+  heroSubEn         String?
   // About
-  aboutBio        String?  @db.Text
-  aboutPhoto      String?
-  aboutLocation   String?
-  aboutExperience String?
-  skills          Json?
-  hobbies         Json?
+  aboutBioTr        String?  @db.Text
+  aboutBioEn        String?  @db.Text
+  aboutPhoto        String?
+  aboutLocationTr   String?
+  aboutLocationEn   String?
+  aboutExperienceTr String?
+  aboutExperienceEn String?
+  skills            Json?
+  hobbies           Json?
   // Contact
-  contactEmail    String?
-  contactPhone    String?
-  contactAddress  String?
+  contactEmail      String?
+  contactPhone      String?
+  contactAddress    String?
   // Social
-  socialGithub    String?
-  socialLinkedin  String?
-  socialTwitter   String?
+  socialGithub        String?
+  socialLinkedin      String?
+  socialTwitter       String?
+  socialInstagram     String?
+  socialYoutube       String?
+  socialMedium        String?
+  socialStackoverflow String?
   // CTA
-  ctaTitle        String?
-  ctaDescription  String?  @db.Text
+  ctaTitleTr        String?
+  ctaTitleEn        String?
+  ctaDescriptionTr  String?  @db.Text
+  ctaDescriptionEn  String?  @db.Text
+  // Footer
+  footerTitleTr     String?
+  footerTitleEn     String?
+  footerDescriptionTr String? @db.Text
+  footerDescriptionEn String? @db.Text
   // Meta
-  updatedAt       DateTime @updatedAt
+  updatedAt         DateTime @updatedAt
 }

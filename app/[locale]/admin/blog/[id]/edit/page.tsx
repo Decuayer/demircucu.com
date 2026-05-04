@@ -9,7 +9,7 @@ interface PageProps {
 
 export default async function EditBlogPostPage({ params }: PageProps) {
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect("/auth/login");
+  if (!user || user.role !== "ADMIN") redirect("/en/auth/login");
 
   const { id } = await params;
   const post = await getBlogPostById(id);

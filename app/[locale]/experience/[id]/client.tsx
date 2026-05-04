@@ -8,16 +8,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Building2 } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
 import { Link } from "@/i18n/navigation";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 import { Experience } from "@prisma/client";
 import { FileIcon } from "lucide-react";
 
 interface ExperienceDetailClientProps {
-  experience: Experience & { tags: { name: string }[] };
+  experience: Experience & { tags: { id: string; nameTr: string; nameEn: string }[] };
 }
 
 export default function ExperienceDetailClient({ experience }: ExperienceDetailClientProps) {
   const t = useTranslations("experience");
+  const params = useParams();
+  const locale = params.locale as string;
 
   return (
     <div className="py-16 md:py-24">
@@ -42,7 +46,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
               </div>
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold">{experience.company}</h1>
-                <p className="text-lg text-muted-foreground">{experience.position}</p>
+                <p className="text-lg text-muted-foreground">{getTranslated(experience, "position", locale)}</p>
               </div>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -58,8 +62,8 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-8">
             {experience.tags.map((tag) => (
-              <Badge key={tag.name} variant="secondary" className="bg-accent/50">
-                {tag.name}
+              <Badge key={tag.id} variant="secondary" className="bg-accent/50">
+                {getTranslated(tag, "name", locale)}
               </Badge>
             ))}
           </div>
@@ -67,7 +71,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
           {/* Details */}
           <Card className="border-border/50 bg-card/50 mb-8">
             <CardContent className="p-8 prose dark:prose-invert prose-sm max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: experience.details || "" }} />
+              <div dangerouslySetInnerHTML={{ __html: getTranslated(experience, "details", locale) || "" }} />
             </CardContent>
           </Card>
 

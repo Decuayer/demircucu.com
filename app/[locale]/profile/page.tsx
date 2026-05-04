@@ -6,7 +6,7 @@ export default async function ProfilePage() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/auth/login");
+    redirect("/en/auth/login");
   }
 
   return <ProfileClient user={user} />;

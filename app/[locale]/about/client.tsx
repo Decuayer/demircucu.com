@@ -12,15 +12,27 @@ import {
   Gamepad2,
   BookOpen,
   Music,
-  Code2,
-  Globe,
-  Coffee,
-  Heart
+  Code2, Globe, Coffee, Heart, Palette, Bike, Plane, Leaf, Zap, Sparkles, Anchor, Sun, Moon,
+  Cloud, Star, Umbrella, Tent, Mountain, Waves, Wind, Binary, Cpu, Database, Terminal, Braces, 
+  Layout, Monitor, Smartphone, Tablet, Watch, Film, Headphones, Mic, Radio, Tv, Video, 
+  Briefcase, GraduationCap, Library, School, University, Pizza, Utensils, Wine, Beer, Apple, 
+  IceCream, Dumbbell, Trophy, Flag, Medal, Timer, MessageCircle, Mail, Phone, Share2, Users, 
+  ShoppingBag, ShoppingCart, CreditCard, Wallet, Home, Building, Building2, Map, Navigation, 
+  Pen, Pencil, Eraser, Brush, Scissors, Gift, Key, Lock, Unlock, Bell, Eye, Search
 } from "lucide-react";
-import { GithubIcon } from "@/components/icons";
+import { GithubIcon, LinkedinIcon, TwitterIcon, InstagramIcon, YoutubeIcon, MediumIcon, StackOverflowIcon } from "@/components/icons";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 const ICONS: Record<string, any> = {
-  Camera, Gamepad2, BookOpen, Music, Code2, Globe, Coffee, Heart
+  Camera, Gamepad2, BookOpen, Music, Code2, Globe, Coffee, Heart, Palette, Bike, Plane, Leaf, 
+  Zap, Sparkles, Anchor, Sun, Moon, Cloud, Star, Umbrella, Tent, Mountain, Waves, Wind, 
+  Binary, Cpu, Database, Terminal, Braces, Layout, Monitor, Smartphone, Tablet, Watch, 
+  Film, Headphones, Mic, Radio, Tv, Video, Briefcase, GraduationCap, Library, School, 
+  University, Pizza, Utensils, Wine, Beer, Apple, IceCream, Dumbbell, Trophy, Flag, 
+  Medal, Timer, MessageCircle, Mail, Phone, Share2, Users, ShoppingBag, ShoppingCart, 
+  CreditCard, Wallet, Home, Building, Building2, Map, Navigation, Pen, Pencil, 
+  Eraser, Brush, Scissors, Gift, Key, Lock, Unlock, Bell, Eye, Search
 };
 
 interface AboutClientProps {
@@ -29,9 +41,14 @@ interface AboutClientProps {
 
 export default function AboutClient({ settings }: AboutClientProps) {
   const t = useTranslations("about");
+  const params = useParams();
+  const locale = params.locale as string;
 
   const skills = Array.isArray(settings?.skills) && settings.skills.length > 0 
-    ? settings.skills 
+    ? settings.skills.map((s: any) => ({
+        name: getTranslated(s, "name", locale),
+        level: s.level
+      }))
     : [
         { name: "JavaScript / TypeScript", level: 95 },
         { name: "React / Next.js", level: 92 },
@@ -39,12 +56,16 @@ export default function AboutClient({ settings }: AboutClientProps) {
       ];
 
   const hobbies = Array.isArray(settings?.hobbies) && settings.hobbies.length > 0
-    ? settings.hobbies
+    ? settings.hobbies.map((h: any) => ({
+        icon: h.icon,
+        name: getTranslated(h, "name", locale),
+        desc: getTranslated(h, "desc", locale)
+      }))
     : [
         { icon: "Camera", name: "Fotoğrafçılık", desc: "Doğa ve sokak fotoğrafçılığı" }
       ];
 
-  const bioHtml = settings?.aboutBio || `
+  const bioHtml = getTranslated(settings, "aboutBio", locale) || `
     <p>Yazılım dünyasına olan tutkumla, kullanıcı deneyimini ön planda tutan modern web uygulamaları geliştiriyorum. Next.js, TypeScript ve bulut teknolojileri konusunda uzmanlaşmış bir Full-Stack Geliştirici olarak çalışıyorum.</p>
     <p>Performans odaklı, ölçeklenebilir ve sürdürülebilir çözümler üretmeye önem veriyorum.</p>
   `;
@@ -67,11 +88,11 @@ export default function AboutClient({ settings }: AboutClientProps) {
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
             Merhaba, Ben{" "}
             <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
-              {settings?.heroTitle?.replace("Merhaba, Ben ", "") || "Demircucu"}
+              {getTranslated(settings, "heroTitle", locale).replace("Merhaba, Ben ", "").replace("Hello, I am ", "") || "Demircucu"}
             </span>
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            {settings?.heroSub || "Yazılım mühendisi olarak modern web teknolojileri ile çalışıyorum."}
+            {getTranslated(settings, "heroSub", locale) || "Yazılım mühendisi olarak modern web teknolojileri ile çalışıyorum."}
           </p>
         </motion.div>
 
@@ -82,11 +103,11 @@ export default function AboutClient({ settings }: AboutClientProps) {
           viewport={{ once: true }}
           className="mb-20"
         >
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-center">
-            {/* Photo placeholder */}
-            <div className="md:col-span-2 flex justify-center">
+          <div className="block">
+            {/* Photo */}
+            <div className="md:float-left md:mr-10 md:mb-8 mb-10 flex justify-center md:block">
               <div className="relative">
-                <div className="w-64 h-64 rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center overflow-hidden border border-border/50">
+                <div className="w-64 h-64 md:w-72 md:h-72 rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center overflow-hidden border border-border/50 shadow-2xl">
                   {settings?.aboutPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={settings.aboutPhoto} alt="Profile" className="w-full h-full object-cover" />
@@ -94,41 +115,80 @@ export default function AboutClient({ settings }: AboutClientProps) {
                     <span className="text-6xl">👨‍💻</span>
                   )}
                 </div>
-                <div className="absolute -bottom-3 -right-3 w-20 h-20 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 flex items-center justify-center shadow-lg">
-                  <Globe className="h-8 w-8 text-white" />
+                <div className="absolute -bottom-3 -right-3 w-16 h-16 md:w-20 md:h-20 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 flex items-center justify-center shadow-lg">
+                  <Globe className="h-6 w-6 md:h-8 md:w-8 text-white" />
                 </div>
               </div>
             </div>
 
-            {/* Bio text */}
-            <div className="md:col-span-3 space-y-4">
-              <h2 className="text-2xl font-bold flex items-center gap-2">
+            {/* Bio content */}
+            <div className="space-y-6">
+              <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
                 {t("bio")}
               </h2>
               <div 
-                className="space-y-3 text-muted-foreground leading-relaxed prose prose-invert max-w-none"
+                className="text-muted-foreground leading-relaxed prose prose-invert max-w-none prose-p:mb-4"
                 dangerouslySetInnerHTML={{ __html: bioHtml }}
               />
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span>{settings?.aboutLocation || "İstanbul, Türkiye"}</span>
+              
+              <div className="flex flex-wrap items-center gap-6 pt-4 border-t border-border/50">
+                <div className="flex items-center gap-2 text-sm md:text-base text-muted-foreground">
+                  <MapPin className="h-4 w-4 text-violet-400" />
+                  <span>{getTranslated(settings, "aboutLocation", locale) || "İstanbul, Türkiye"}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  <span>{settings?.aboutExperience || "5+ Yıl Deneyim"}</span>
+                <div className="flex items-center gap-2 text-sm md:text-base text-muted-foreground">
+                  <Calendar className="h-4 w-4 text-cyan-400" />
+                  <span>{getTranslated(settings, "aboutExperience", locale) || "5+ Yıl Deneyim"}</span>
                 </div>
               </div>
-              <a
-                href={settings?.socialGithub || "https://github.com/demircucu"}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button className="mt-4 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-700 hover:to-cyan-700 text-white border-0">
-                  <GithubIcon className="mr-2 h-4 w-4" />
-                  {t("github")}
-                </Button>
-              </a>
+
+              <div className="flex flex-wrap gap-3 mt-6">
+                {settings?.socialGithub && (
+                  <a href={settings.socialGithub} target="_blank" rel="noopener noreferrer">
+                    <Button className="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-700 hover:to-cyan-700 text-white border-0 shadow-lg shadow-violet-500/20">
+                      <GithubIcon className="mr-2 h-4 w-4" /> {t("github")}
+                    </Button>
+                  </a>
+                )}
+                {!settings?.socialGithub && (
+                  <a href="https://github.com/demircucu" target="_blank" rel="noopener noreferrer">
+                    <Button className="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-700 hover:to-cyan-700 text-white border-0 shadow-lg shadow-violet-500/20">
+                      <GithubIcon className="mr-2 h-4 w-4" /> {t("github")}
+                    </Button>
+                  </a>
+                )}
+                
+                {settings?.socialLinkedin && (
+                  <a href={settings.socialLinkedin} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"><LinkedinIcon className="mr-2 h-4 w-4" /> LinkedIn</Button>
+                  </a>
+                )}
+                {settings?.socialTwitter && (
+                  <a href={settings.socialTwitter} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"><TwitterIcon className="mr-2 h-4 w-4" /> Twitter / X</Button>
+                  </a>
+                )}
+                {settings?.socialInstagram && (
+                  <a href={settings.socialInstagram} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"><InstagramIcon className="mr-2 h-4 w-4" /> Instagram</Button>
+                  </a>
+                )}
+                {settings?.socialYoutube && (
+                  <a href={settings.socialYoutube} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"><YoutubeIcon className="mr-2 h-4 w-4" /> YouTube</Button>
+                  </a>
+                )}
+                {settings?.socialMedium && (
+                  <a href={settings.socialMedium} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"><MediumIcon className="mr-2 h-4 w-4" /> Medium</Button>
+                  </a>
+                )}
+                {settings?.socialStackoverflow && (
+                  <a href={settings.socialStackoverflow} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"><StackOverflowIcon className="mr-2 h-4 w-4" /> StackOverflow</Button>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </motion.section>
@@ -188,7 +248,10 @@ export default function AboutClient({ settings }: AboutClientProps) {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {hobbies.map((hobby: any, i: number) => {
-              const IconComponent = ICONS[hobby.icon] || Heart;
+              const IconComponent = ICONS[hobby.icon];
+              // If it's a single character or short string, it's likely an emoji
+              const isEmoji = !IconComponent && hobby.icon?.length <= 4;
+              
               return (
                 <motion.div
                   key={hobby.name}
@@ -197,13 +260,17 @@ export default function AboutClient({ settings }: AboutClientProps) {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05 }}
                 >
-                  <Card className="border-border/50 bg-card/50 hover:bg-card hover:border-violet-500/30 transition-all duration-300 group">
-                    <CardContent className="p-6 text-center space-y-3">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10 mx-auto group-hover:scale-110 transition-transform">
-                        <IconComponent className="h-6 w-6 text-violet-400" />
+                  <Card className="border-border/50 bg-card/50 hover:bg-card hover:border-violet-500/30 transition-all duration-300 group h-full">
+                    <CardContent className="p-6 text-center space-y-3 flex flex-col items-center justify-center h-full">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10 group-hover:scale-110 transition-transform mb-2">
+                        {IconComponent ? (
+                          <IconComponent className="h-6 w-6 text-violet-400" />
+                        ) : (
+                          <span className="text-2xl leading-none">{hobby.icon || "❤️"}</span>
+                        )}
                       </div>
-                      <h3 className="font-semibold">{hobby.name}</h3>
-                      <p className="text-xs text-muted-foreground">{hobby.desc}</p>
+                      <h3 className="font-semibold text-sm md:text-base">{hobby.name}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{hobby.desc}</p>
                     </CardContent>
                   </Card>
                 </motion.div>

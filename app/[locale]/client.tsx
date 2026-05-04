@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Code2, Briefcase, Newspaper, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -27,6 +29,8 @@ interface HomeClientProps {
 
 export default function HomeClient({ featuredProjects, latestPosts, settings }: HomeClientProps) {
   const t = useTranslations("home");
+  const params = useParams();
+  const locale = params.locale as string;
 
   return (
     <div className="relative">
@@ -60,7 +64,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                 className="px-4 py-1.5 text-xs font-medium bg-violet-500/10 text-violet-400 border-violet-500/20 hover:bg-violet-500/20"
               >
                 <Sparkles className="h-3 w-3 mr-1" />
-                Full-Stack Developer
+                 {getTranslated(settings, "heroSub", locale) || t("heroSub")}
               </Badge>
             </motion.div>
 
@@ -69,7 +73,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
               custom={1}
               className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6"
             >
-              {settings?.heroTitle || (
+              {getTranslated(settings, "heroTitle", locale) || (
                 <>
                   Merhaba, Ben{" "}
                   <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
@@ -84,7 +88,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
               custom={2}
               className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed"
             >
-              {settings?.heroSub || t("heroSub")}
+              {getTranslated(settings, "heroSub", locale) || t("heroSub")}
             </motion.p>
 
             <motion.div variants={fadeUp} custom={3} className="flex items-center justify-center gap-4 pt-4">
@@ -154,21 +158,21 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                     <CardContent className="p-6 space-y-4">
                       <div className="flex items-center justify-between">
                         <h3 className="font-semibold text-lg group-hover:text-violet-400 transition-colors">
-                          {project.title}
+                          {getTranslated(project, "title", locale)}
                         </h3>
                         <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-violet-400 group-hover:translate-x-1 transition-all" />
                       </div>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        {project.summary}
+                        {getTranslated(project, "summary", locale)}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {project.tags.map((tag) => (
                           <Badge
-                            key={tag.name}
+                            key={tag.id}
                             variant="secondary"
                             className="text-xs bg-accent/50 hover:bg-accent"
                           >
-                            {tag.name}
+                            {getTranslated(tag, "name", locale)}
                           </Badge>
                         ))}
                       </div>
@@ -221,10 +225,10 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                         <span>{Math.max(1, Math.ceil(post.content.length / 1000))} dk okuma</span>
                       </div>
                       <h3 className="font-semibold text-lg group-hover:text-cyan-400 transition-colors">
-                        {post.title}
+                        {getTranslated(post, "title", locale)}
                       </h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        {post.excerpt}
+                        {getTranslated(post, "excerpt", locale)}
                       </p>
                       <div className="flex items-center text-sm text-cyan-400 font-medium">
                         {t("readMore")} <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
@@ -256,10 +260,10 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                 </div>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold">
-                {settings?.ctaTitle || "Birlikte Çalışalım"}
+                {getTranslated(settings, "ctaTitle", locale) || "Birlikte Çalışalım"}
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed whitespace-pre-line">
-                {settings?.ctaDescription || "Yazılım geliştirme konusunda deneyimli bir geliştirici olarak,\nprojelerinize değer katmak için buradayım."}
+                {getTranslated(settings, "ctaDescription", locale) || "Yazılım geliştirme konusunda deneyimli bir geliştirici olarak,\nprojelerinize değer katmak için buradayım."}
               </p>
               <div className="flex items-center justify-center gap-4 pt-2">
                 <Link href="/contact">

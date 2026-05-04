@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
-import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/icons";
+import { GithubIcon, LinkedinIcon, TwitterIcon, InstagramIcon, YoutubeIcon, MediumIcon, StackOverflowIcon } from "@/components/icons";
 import { useState } from "react";
 import { toast } from "sonner";
 import { submitContactMessage } from "@/app/actions/contact";
@@ -52,10 +52,12 @@ export default function ContactClient({ settings }: ContactClientProps) {
 
   const socialLinks = [];
   if (settings?.socialGithub) socialLinks.push({ icon: GithubIcon, label: "GitHub", href: settings.socialGithub });
-  else socialLinks.push({ icon: GithubIcon, label: "GitHub", href: "https://github.com/demircucu" });
-  
   if (settings?.socialLinkedin) socialLinks.push({ icon: LinkedinIcon, label: "LinkedIn", href: settings.socialLinkedin });
-  if (settings?.socialTwitter) socialLinks.push({ icon: TwitterIcon, label: "Twitter", href: settings.socialTwitter });
+  if (settings?.socialTwitter) socialLinks.push({ icon: TwitterIcon, label: "Twitter / X", href: settings.socialTwitter });
+  if (settings?.socialInstagram) socialLinks.push({ icon: InstagramIcon, label: "Instagram", href: settings.socialInstagram });
+  if (settings?.socialYoutube) socialLinks.push({ icon: YoutubeIcon, label: "YouTube", href: settings.socialYoutube });
+  if (settings?.socialMedium) socialLinks.push({ icon: MediumIcon, label: "Medium", href: settings.socialMedium });
+  if (settings?.socialStackoverflow) socialLinks.push({ icon: StackOverflowIcon, label: "StackOverflow", href: settings.socialStackoverflow });
 
   return (
     <div className="py-16 md:py-24">

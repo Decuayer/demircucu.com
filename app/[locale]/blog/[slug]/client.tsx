@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Clock, Eye, Heart, MessageSquare, Calendar, User, FileIcon } from "lucide-react";
 import { useState } from "react";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -40,9 +42,13 @@ export default function BlogDetailClient({
   currentUser,
 }: BlogDetailClientProps) {
   const t = useTranslations("blog");
+  const params = useParams();
+  const locale = params.locale as string;
   const [liked, setLiked] = useState(initialUserLiked);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [isPending, startTransition] = useTransition();
+  
+  const content = getTranslated(post, "content", locale);
 
   const handleLike = async () => {
     if (!currentUser) {
@@ -99,13 +105,13 @@ export default function BlogDetailClient({
             <header className="mb-10">
               <div className="flex flex-wrap gap-2 mb-4">
                 {post.tags.map((tag) => (
-                  <Badge key={tag.name} variant="secondary" className="bg-accent/50">
-                    {tag.name}
+                  <Badge key={tag.id} variant="secondary" className="bg-accent/50">
+                    {getTranslated(tag, "name", locale)}
                   </Badge>
                 ))}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-                {post.title}
+                {getTranslated(post, "title", locale)}
               </h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
@@ -123,7 +129,7 @@ export default function BlogDetailClient({
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  <span>{Math.max(1, Math.ceil(post.content.length / 1000))} {t("readTime") || "dk"}</span>
+                  <span>{Math.max(1, Math.ceil(content.length / 1000))} {t("readTime") || "dk"}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Eye className="h-3 w-3" />
@@ -141,7 +147,7 @@ export default function BlogDetailClient({
                 prose-strong:text-foreground
                 prose-code:text-cyan-400 prose-code:bg-accent/50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
                 prose-pre:bg-accent/30 prose-pre:border prose-pre:border-border/50 prose-pre:rounded-xl"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: content }}
             />
 
             {/* Files */}

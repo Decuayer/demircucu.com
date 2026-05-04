@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { getSiteSettings } from "@/app/actions/settings";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -45,6 +46,7 @@ export default async function LocaleLayout({
   }
 
   const messages = (await import(`@/messages/${locale}.json`)).default;
+  const settings = await getSiteSettings();
 
   return (
     <html
@@ -56,7 +58,7 @@ export default async function LocaleLayout({
           <TooltipProvider>
             <Header />
             <main className="flex-1">{children}</main>
-            <Footer />
+            <Footer settings={settings} />
             <Toaster />
           </TooltipProvider>
         </NextIntlClientProvider>

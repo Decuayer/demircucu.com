@@ -7,12 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Newspaper, Eye, Clock, ArrowRight, TrendingUp } from "lucide-react";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 import { BlogPost, Tag } from "@prisma/client";
 
 type BlogPostWithTags = BlogPost & { tags: Tag[] };
 
 function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
+  const params = useParams();
+  const locale = params.locale as string;
+  const content = getTranslated(post, "content", locale);
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -26,7 +31,7 @@ function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                <span>{Math.max(1, Math.ceil(post.content.length / 1000))} dk</span>
+                <span>{Math.max(1, Math.ceil(content.length / 1000))} dk</span>
               </div>
               <span>·</span>
               <div className="flex items-center gap-1">
@@ -37,19 +42,19 @@ function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
               <time>{new Date(post.createdAt).toLocaleDateString()}</time>
             </div>
             <h3 className="font-semibold text-lg group-hover:text-cyan-400 transition-colors">
-              {post.title}
+              {getTranslated(post, "title", locale)}
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              {post.excerpt}
+              {getTranslated(post, "excerpt", locale)}
             </p>
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <Badge
-                  key={tag.name}
+                  key={tag.id}
                   variant="secondary"
                   className="text-xs bg-accent/50"
                 >
-                  {tag.name}
+                  {getTranslated(tag, "name", locale)}
                 </Badge>
               ))}
             </div>

@@ -7,7 +7,7 @@ export default async function ProfileLikesPage() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/auth/login");
+    redirect("/en/auth/login");
   }
 
   // Fetch liked posts

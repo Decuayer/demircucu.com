@@ -9,7 +9,7 @@ interface PageProps {
 
 export default async function EditProjectPage({ params }: PageProps) {
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect("/auth/login");
+  if (!user || user.role !== "ADMIN") redirect("/en/auth/login");
 
   const { id } = await params;
   const project = await getProjectById(id);

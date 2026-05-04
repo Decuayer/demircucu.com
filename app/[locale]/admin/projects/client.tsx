@@ -22,6 +22,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 interface AdminProjectsClientProps {
   initialProjects: Project[];
@@ -29,6 +31,9 @@ interface AdminProjectsClientProps {
 
 export default function AdminProjectsClient({ initialProjects }: AdminProjectsClientProps) {
   const t = useTranslations("admin");
+  const params = useParams();
+  const locale = params.locale as string;
+
   const [projects, setProjects] = useState(initialProjects);
   const [isPending, startTransition] = useTransition();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -76,7 +81,7 @@ export default function AdminProjectsClient({ initialProjects }: AdminProjectsCl
             <Card className="border-border/50 bg-card/50 hover:bg-card transition-colors">
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-start justify-between">
-                  <h3 className="font-semibold">{project.title}</h3>
+                  <h3 className="font-semibold">{getTranslated(project, "title", locale)}</h3>
                   <div className="flex gap-1">
                     <Link href={`/admin/projects/${project.id}/edit`}>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -90,11 +95,11 @@ export default function AdminProjectsClient({ initialProjects }: AdminProjectsCl
                 </div>
                 <div className="flex gap-2">
                   <Badge variant={project.published ? "default" : "secondary"} className="text-xs">
-                    {project.published ? "Yayında" : "Taslak"}
+                    {project.published ? t("published") : t("unpublished")}
                   </Badge>
                   {project.featured && (
                     <Badge variant="outline" className="text-xs text-yellow-400 border-yellow-400/30">
-                      Öne Çıkan
+                      {t("featured")}
                     </Badge>
                   )}
                 </div>

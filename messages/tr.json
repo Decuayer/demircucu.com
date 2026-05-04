@@ -14,7 +14,11 @@
     "changePassword": "Şifre Değiştir",
     "myLikes": "Beğenilerim",
     "myComments": "Yorumlarım",
-    "likes": "Beğenilerim"
+    "likes": "Beğenilerim",
+    "socialmedia": "Sosyal Medya",
+    "fastlinks": "Hızlı Linkler",
+    "copyright": "Tüm hakları saklıdır."
+
   },
   "home": {
     "heroTitle": "Merhaba, Ben Demircucu",
@@ -107,7 +111,29 @@
     "totalComments": "Toplam Yorum",
     "totalMessages": "Toplam Mesaj",
     "recentMessages": "Son Mesajlar",
-    "recentComments": "Son Yorumlar"
+    "recentComments": "Son Yorumlar",
+    "featured": "Öne Çıkan",
+    "published": "Yayında",
+    "unpublished": "Taslak",
+    "editProject": "Projeyi Düzenle",
+    "addProject": "Yeni Proje Ekle",
+    "saving": "Kaydediliyor...",
+    "generalInfo": "Genel Bilgiler",
+    "projectTitle": "Proje Başlığı",
+    "slug": "URL Slug",
+    "summary": "Kısa Özet",
+    "liveSite": "Canlı Site",
+    "coverImage": "Kapak Görseli",
+    "description": "Detaylı Açıklama",
+    "files": "Ekli Dosyalar",
+    "optional": "Opsiyonel",
+    "status": "Durum",
+    "technologies": "Kullanılan Teknolojiler"
+
+
+
+
+
   },
   "common": {
     "loading": "Yükleniyor...",

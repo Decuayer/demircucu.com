@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 export default async function AdminExperiencesPage() {
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect("/auth/login");
+  if (!user || user.role !== "ADMIN") redirect("/en/auth/login");
 
   const experiences = await prisma.experience.findMany({
     orderBy: { startDate: "desc" }

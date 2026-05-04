@@ -27,21 +27,28 @@ export async function getProjectById(id: string) {
   }
 }
 
-export async function createProject(data: Partial<Project> & { tagsList?: string[], filesList?: any[] }) {
+export async function createProject(data: any) {
   try {
     await requireAdmin();
     const project = await prisma.project.create({
       data: {
-        title: data.title!,
+        titleTr: data.titleTr!,
+        titleEn: data.titleEn!,
         slug: data.slug!,
-        summary: data.summary || "Özet",
-        description: data.description || null,
+        summaryTr: data.summaryTr || "Özet",
+        summaryEn: data.summaryEn || "Summary",
+        descriptionTr: data.descriptionTr || null,
+        descriptionEn: data.descriptionEn || null,
         logo: data.logo || null,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
         tags: data.tagsList ? {
-          connectOrCreate: data.tagsList.map(tag => ({
-            where: { name: tag },
-            create: { name: tag, slug: tag.toLowerCase().replace(/[^a-z0-9\u011f\u011e\u0131\u0130\u00f6\u00d6\u00e7\u00c7\u015f\u015e\u00fc\u00dc]+/g, '-') }
+          connectOrCreate: data.tagsList.map((tag: any) => ({
+            where: { slug: tag.slug },
+            create: { 
+              nameTr: tag.nameTr, 
+              nameEn: tag.nameEn, 
+              slug: tag.slug 
+            }
           }))
         } : undefined,
         githubUrl: data.githubUrl,
@@ -61,23 +68,30 @@ export async function createProject(data: Partial<Project> & { tagsList?: string
   }
 }
 
-export async function updateProject(id: string, data: Partial<Project> & { tagsList?: string[], filesList?: any[] }) {
+export async function updateProject(id: string, data: any) {
   try {
     await requireAdmin();
     const project = await prisma.project.update({
       where: { id },
       data: {
-        title: data.title,
+        titleTr: data.titleTr,
+        titleEn: data.titleEn,
         slug: data.slug,
-        summary: data.summary,
-        description: data.description,
+        summaryTr: data.summaryTr,
+        summaryEn: data.summaryEn,
+        descriptionTr: data.descriptionTr,
+        descriptionEn: data.descriptionEn,
         logo: data.logo,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
         tags: data.tagsList ? {
           set: [],
-          connectOrCreate: data.tagsList.map(tag => ({
-            where: { name: tag },
-            create: { name: tag, slug: tag.toLowerCase().replace(/[^a-z0-9\u011f\u011e\u0131\u0130\u00f6\u00d6\u00e7\u00c7\u015f\u015e\u00fc\u00dc]+/g, '-') }
+          connectOrCreate: data.tagsList.map((tag: any) => ({
+            where: { slug: tag.slug },
+            create: { 
+              nameTr: tag.nameTr, 
+              nameEn: tag.nameEn, 
+              slug: tag.slug 
+            }
           }))
         } : undefined,
         githubUrl: data.githubUrl,
@@ -123,23 +137,30 @@ export async function getExperienceById(id: string) {
   }
 }
 
-export async function createExperience(data: Partial<Experience> & { tagsList?: string[], filesList?: any[] }) {
+export async function createExperience(data: any) {
   try {
     await requireAdmin();
     const experience = await prisma.experience.create({
       data: {
         company: data.company!,
-        position: data.position!,
-        description: data.description!,
-        details: data.details || null,
+        positionTr: data.positionTr!,
+        positionEn: data.positionEn!,
+        descriptionTr: data.descriptionTr!,
+        descriptionEn: data.descriptionEn!,
+        detailsTr: data.detailsTr || null,
+        detailsEn: data.detailsEn || null,
         startDate: data.startDate || new Date(),
         endDate: data.endDate,
         logo: data.logo || null,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
         tags: data.tagsList ? {
-          connectOrCreate: data.tagsList.map(tag => ({
-            where: { name: tag },
-            create: { name: tag, slug: tag.toLowerCase().replace(/[^a-z0-9\u011f\u011e\u0131\u0130\u00f6\u00d6\u00e7\u00c7\u015f\u015e\u00fc\u00dc]+/g, '-') }
+          connectOrCreate: data.tagsList.map((tag: any) => ({
+            where: { slug: tag.slug },
+            create: { 
+              nameTr: tag.nameTr, 
+              nameEn: tag.nameEn, 
+              slug: tag.slug 
+            }
           }))
         } : undefined,
         order: data.order || 0,
@@ -154,25 +175,32 @@ export async function createExperience(data: Partial<Experience> & { tagsList?: 
   }
 }
 
-export async function updateExperience(id: string, data: Partial<Experience> & { tagsList?: string[], filesList?: any[] }) {
+export async function updateExperience(id: string, data: any) {
   try {
     await requireAdmin();
     const experience = await prisma.experience.update({
       where: { id },
       data: {
         company: data.company,
-        position: data.position,
-        description: data.description,
-        details: data.details,
+        positionTr: data.positionTr,
+        positionEn: data.positionEn,
+        descriptionTr: data.descriptionTr,
+        descriptionEn: data.descriptionEn,
+        detailsTr: data.detailsTr,
+        detailsEn: data.detailsEn,
         startDate: data.startDate,
         endDate: data.endDate,
         logo: data.logo,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
         tags: data.tagsList ? {
           set: [], // Clear existing relations
-          connectOrCreate: data.tagsList.map(tag => ({
-            where: { name: tag },
-            create: { name: tag, slug: tag.toLowerCase().replace(/[^a-z0-9\u011f\u011e\u0131\u0130\u00f6\u00d6\u00e7\u00c7\u015f\u015e\u00fc\u00dc]+/g, '-') }
+          connectOrCreate: data.tagsList.map((tag: any) => ({
+            where: { slug: tag.slug },
+            create: { 
+              nameTr: tag.nameTr, 
+              nameEn: tag.nameEn, 
+              slug: tag.slug 
+            }
           }))
         } : undefined,
         order: data.order,
@@ -213,21 +241,28 @@ export async function getBlogPostById(id: string) {
   }
 }
 
-export async function createBlogPost(data: Partial<BlogPost> & { tagsList?: string[], filesList?: any[] }) {
+export async function createBlogPost(data: any) {
   try {
     const admin = await requireAdmin();
     const post = await prisma.blogPost.create({
       data: {
-        title: data.title!,
+        titleTr: data.titleTr!,
+        titleEn: data.titleEn!,
         slug: data.slug!,
-        excerpt: data.excerpt!,
-        content: data.content!,
+        excerptTr: data.excerptTr!,
+        excerptEn: data.excerptEn!,
+        contentTr: data.contentTr!,
+        contentEn: data.contentEn!,
         coverImage: data.coverImage,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
         tags: data.tagsList ? {
-          connectOrCreate: data.tagsList.map(tag => ({
-            where: { name: tag },
-            create: { name: tag, slug: tag.toLowerCase().replace(/[^a-z0-9\u011f\u011e\u0131\u0130\u00f6\u00d6\u00e7\u00c7\u015f\u015e\u00fc\u00dc]+/g, '-') }
+          connectOrCreate: data.tagsList.map((tag: any) => ({
+            where: { slug: tag.slug },
+            create: { 
+              nameTr: tag.nameTr, 
+              nameEn: tag.nameEn, 
+              slug: tag.slug 
+            }
           }))
         } : undefined,
         published: data.published ?? true,
@@ -246,23 +281,30 @@ export async function createBlogPost(data: Partial<BlogPost> & { tagsList?: stri
   }
 }
 
-export async function updateBlogPost(id: string, data: Partial<BlogPost> & { tagsList?: string[], filesList?: any[] }) {
+export async function updateBlogPost(id: string, data: any) {
   try {
     await requireAdmin();
     const post = await prisma.blogPost.update({
       where: { id },
       data: {
-        title: data.title,
+        titleTr: data.titleTr,
+        titleEn: data.titleEn,
         slug: data.slug,
-        excerpt: data.excerpt,
-        content: data.content,
+        excerptTr: data.excerptTr,
+        excerptEn: data.excerptEn,
+        contentTr: data.contentTr,
+        contentEn: data.contentEn,
         coverImage: data.coverImage,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
         tags: data.tagsList ? {
           set: [],
-          connectOrCreate: data.tagsList.map(tag => ({
-            where: { name: tag },
-            create: { name: tag, slug: tag.toLowerCase().replace(/[^a-z0-9\u011f\u011e\u0131\u0130\u00f6\u00d6\u00e7\u00c7\u015f\u015e\u00fc\u00dc]+/g, '-') }
+          connectOrCreate: data.tagsList.map((tag: any) => ({
+            where: { slug: tag.slug },
+            create: { 
+              nameTr: tag.nameTr, 
+              nameEn: tag.nameEn, 
+              slug: tag.slug 
+            }
           }))
         } : undefined,
         published: data.published,

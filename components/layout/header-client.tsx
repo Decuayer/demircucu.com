@@ -136,7 +136,7 @@ export default function HeaderClient({ user }: HeaderClientProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link href="/auth/login">
+            <Link href="/en/auth/login">
               <Button
                 variant="default"
                 size="sm"
@@ -185,7 +185,7 @@ export default function HeaderClient({ user }: HeaderClientProps) {
                       Çıkış Yap
                     </Button>
                   ) : (
-                    <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
+                    <Link href="/en/auth/login" onClick={() => setMobileOpen(false)}>
                       <Button className="w-full bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
                         {t("login")}
                       </Button>

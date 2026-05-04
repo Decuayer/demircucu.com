@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Code2, ExternalLink, ArrowRight } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 import { Project, Tag } from "@prisma/client";
 
@@ -17,6 +19,8 @@ interface ProjectsClientProps {
 
 export default function ProjectsClient({ projects }: ProjectsClientProps) {
   const t = useTranslations("projects");
+  const params = useParams();
+  const locale = params.locale as string;
 
   return (
     <div className="py-16 md:py-24">
@@ -84,11 +88,11 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
                   <div className="flex-1 space-y-3">
                     <Link href={`/projects/${project.slug}`}>
                       <h3 className="font-semibold text-lg group-hover:text-cyan-400 transition-colors cursor-pointer">
-                        {project.title}
+                        {getTranslated(project, "title", locale)}
                       </h3>
                     </Link>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      {project.summary}
+                      {getTranslated(project, "summary", locale)}
                     </p>
                   </div>
 
@@ -96,11 +100,11 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
                       <Badge
-                        key={tag.name}
+                        key={tag.id}
                         variant="secondary"
                         className="text-xs bg-accent/50"
                       >
-                        {tag.name}
+                        {getTranslated(tag, "name", locale)}
                       </Badge>
                     ))}
                   </div>

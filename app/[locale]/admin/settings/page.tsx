@@ -5,7 +5,7 @@ import AdminSettingsClient from "./client";
 
 export default async function AdminSettingsPage() {
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect("/auth/login");
+  if (!user || user.role !== "ADMIN") redirect("/en/auth/login");
 
   const settings = await getSiteSettings();
 

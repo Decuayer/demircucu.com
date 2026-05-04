@@ -14,6 +14,8 @@ import { TagSelector } from "@/components/ui/tag-selector";
 import { FileUploader, FileAttachment } from "@/components/ui/file-uploader";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { createProject, updateProject } from "@/app/actions/admin";
+import { useTranslations } from "next-intl";
+
 
 interface ProjectFormClientProps {
   initialData?: any;
@@ -21,24 +23,32 @@ interface ProjectFormClientProps {
 }
 
 export default function ProjectFormClient({ initialData, isEdit }: ProjectFormClientProps) {
+
+  const t = useTranslations("admin");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale;
   const [isPending, startTransition] = useTransition();
 
   // Form State
-  const [title, setTitle] = useState(initialData?.title || "");
+  const [titleTr, setTitleTr] = useState(initialData?.titleTr || "");
+  const [titleEn, setTitleEn] = useState(initialData?.titleEn || "");
   const [slug, setSlug] = useState(initialData?.slug || "");
   const [logo, setLogo] = useState(initialData?.logo || "");
-  const [summary, setSummary] = useState(initialData?.summary || "");
-  const [description, setDescription] = useState(initialData?.description || "");
+  const [summaryTr, setSummaryTr] = useState(initialData?.summaryTr || "");
+  const [summaryEn, setSummaryEn] = useState(initialData?.summaryEn || "");
+  const [descriptionTr, setDescriptionTr] = useState(initialData?.descriptionTr || "");
+  const [descriptionEn, setDescriptionEn] = useState(initialData?.descriptionEn || "");
   const [githubUrl, setGithubUrl] = useState(initialData?.githubUrl || "");
   const [liveUrl, setLiveUrl] = useState(initialData?.liveUrl || "");
   const [published, setPublished] = useState(initialData?.published ?? true);
   const [featured, setFeatured] = useState(initialData?.featured ?? false);
 
-  // Tags (Mapping relations to string array)
-  const [tags, setTags] = useState<string[]>(initialData?.tags?.map((t: any) => t.name) || []);
+  // Tags (Mapping relations to simplified objects for the server action)
+  const [tags, setTags] = useState<string[]>(() => {
+    const initialTags = initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) || [];
+    return Array.from(new Set(initialTags));
+  });
 
   // Files
   const [files, setFiles] = useState<FileAttachment[]>(initialData?.files || []);
@@ -46,22 +56,29 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !slug || !summary) {
-      toast.error("Lütfen zorunlu alanları doldurun.");
+    if (!titleTr || !titleEn || !slug || !summaryTr || !summaryEn) {
+      toast.error("Lütfen zorunlu alanları (TR ve EN) doldurun.");
       return;
     }
 
     const payload = {
-      title,
+      titleTr,
+      titleEn,
       slug,
-      summary,
-      description,
+      summaryTr,
+      summaryEn,
+      descriptionTr,
+      descriptionEn,
       logo,
       githubUrl,
       liveUrl,
       published,
       featured,
-      tagsList: tags,
+      tagsList: tags.map(tag => ({
+        nameTr: tag,
+        nameEn: tag, // For now, we use same name for both languages for tech tags
+        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      })),
       filesList: files,
     };
 
@@ -85,11 +102,11 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{isEdit ? "Projeyi Düzenle" : "Yeni Proje Ekle"}</h1>
+        <h1 className="text-2xl font-bold">{isEdit ? t("editProject") : t("addProject")}</h1>
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()}>İptal</Button>
+          <Button type="button" variant="outline" onClick={() => router.back()}>{t("cancel")}</Button>
           <Button type="submit" disabled={isPending} className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
-            {isPending ? "Kaydediliyor..." : "Kaydet"}
+            {isPending ? t("saving") : t("save")}
           </Button>
         </div>
       </div>
@@ -99,23 +116,34 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Genel Bilgiler</CardTitle>
+              <CardTitle>{t('generalInfo')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Proje Başlığı *</Label>
-                  <Input value={title} onChange={e => setTitle(e.target.value)} required className="bg-accent/30" />
+                  <Label>{t('projectTitle')} (TR) *</Label>
+                  <Input value={titleTr} onChange={e => setTitleTr(e.target.value)} required className="bg-accent/30" />
                 </div>
                 <div className="space-y-2">
-                  <Label>URL Slug *</Label>
-                  <Input value={slug} onChange={e => setSlug(e.target.value)} required className="bg-accent/30" />
+                  <Label>{t('projectTitle')} (EN) *</Label>
+                  <Input value={titleEn} onChange={e => setTitleEn(e.target.value)} required className="bg-accent/30" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Kısa Özet (Listeleme sayfasında görünür) *</Label>
-                <Textarea value={summary} onChange={e => setSummary(e.target.value)} required className="bg-accent/30" rows={2} />
+                <Label>{t('slug')} *</Label>
+                <Input value={slug} onChange={e => setSlug(e.target.value)} required className="bg-accent/30" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>{t('summary')} (TR) *</Label>
+                  <Textarea value={summaryTr} onChange={e => setSummaryTr(e.target.value)} required className="bg-accent/30" rows={2} />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('summary')} (EN) *</Label>
+                  <Textarea value={summaryEn} onChange={e => setSummaryEn(e.target.value)} required className="bg-accent/30" rows={2} />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -124,13 +152,13 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
                   <Input value={githubUrl} onChange={e => setGithubUrl(e.target.value)} className="bg-accent/30" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Live URL (Canlı Site)</Label>
+                  <Label>Live URL ({t('liveSite')})</Label>
                   <Input value={liveUrl} onChange={e => setLiveUrl(e.target.value)} className="bg-accent/30" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Kapak Görseli / Logo</Label>
+                <Label>{t('coverImage')}</Label>
                 <ImageUpload value={logo} onChange={setLogo} folder="projects" usedIn={isEdit ? `project:${initialData?.id}` : undefined} />
               </div>
             </CardContent>
@@ -138,16 +166,25 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Detaylı Açıklama (Rich Text)</CardTitle>
+              <CardTitle>{t('description')} (TR)</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={description} onChange={setDescription} placeholder="Projenizin tüm detaylarını buraya yazabilirsiniz..." />
+              <RichTextEditor content={descriptionTr} onChange={setDescriptionTr} placeholder="Projenizin tüm detaylarını buraya yazabilirsiniz..." />
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Ekli Dosyalar (Opsiyonel)</CardTitle>
+              <CardTitle>{t('description')} (EN)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RichTextEditor content={descriptionEn} onChange={setDescriptionEn} placeholder="You can write all project details here..." />
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 bg-card/50">
+            <CardHeader>
+              <CardTitle>{t('files')} ({t('optional')})</CardTitle>
             </CardHeader>
             <CardContent>
               <FileUploader files={files} onChange={setFiles} folder="projects" usedIn={isEdit ? `project:${initialData?.id}` : undefined} />
@@ -159,23 +196,23 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
         <div className="space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Durum</CardTitle>
+              <CardTitle>{t('status')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Switch checked={published} onCheckedChange={setPublished} />
-                <Label>Yayında (Görünür)</Label>
+                <Label>{t('published')}</Label>
               </div>
               <div className="flex items-center space-x-2 pt-2">
                 <Switch checked={featured} onCheckedChange={setFeatured} />
-                <Label>Öne Çıkan (Featured)</Label>
+                <Label>{t('featured')}</Label>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Kullanılan Teknolojiler (Tags)</CardTitle>
+              <CardTitle>{t('technologies')}</CardTitle>
             </CardHeader>
             <CardContent>
               <TagSelector tags={tags} onChange={setTags} />

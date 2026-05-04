@@ -28,16 +28,22 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
 
   // Form State
   const [company, setCompany] = useState(initialData?.company || "");
-  const [position, setPosition] = useState(initialData?.position || "");
+  const [positionTr, setPositionTr] = useState(initialData?.positionTr || "");
+  const [positionEn, setPositionEn] = useState(initialData?.positionEn || "");
   const [logo, setLogo] = useState(initialData?.logo || "");
-  const [description, setDescription] = useState(initialData?.description || "");
-  const [details, setDetails] = useState(initialData?.details || "");
+  const [descriptionTr, setDescriptionTr] = useState(initialData?.descriptionTr || "");
+  const [descriptionEn, setDescriptionEn] = useState(initialData?.descriptionEn || "");
+  const [detailsTr, setDetailsTr] = useState(initialData?.detailsTr || "");
+  const [detailsEn, setDetailsEn] = useState(initialData?.detailsEn || "");
   const [startDate, setStartDate] = useState(initialData?.startDate ? new Date(initialData.startDate).toISOString().split('T')[0] : "");
   const [endDate, setEndDate] = useState(initialData?.endDate ? new Date(initialData.endDate).toISOString().split('T')[0] : "");
   const [published, setPublished] = useState(initialData?.published ?? true);
 
-  // Tags (Mapping relations to string array)
-  const [tags, setTags] = useState<string[]>(initialData?.tags?.map((t: any) => t.name) || []);
+  // Tags (Mapping relations to simplified objects for the server action)
+  const [tags, setTags] = useState<string[]>(() => {
+    const initialTags = initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) || [];
+    return Array.from(new Set(initialTags));
+  });
 
   // Files
   const [files, setFiles] = useState<FileAttachment[]>(initialData?.files || []);
@@ -45,21 +51,28 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!company || !position || !description || !startDate) {
-      toast.error("Lütfen zorunlu alanları doldurun.");
+    if (!company || !positionTr || !positionEn || !descriptionTr || !descriptionEn || !startDate) {
+      toast.error("Lütfen zorunlu alanları (TR ve EN) doldurun.");
       return;
     }
 
     const payload = {
       company,
-      position,
+      positionTr,
+      positionEn,
       logo,
-      description,
-      details,
+      descriptionTr,
+      descriptionEn,
+      detailsTr,
+      detailsEn,
       startDate: new Date(startDate),
       endDate: endDate ? new Date(endDate) : undefined,
       published,
-      tagsList: tags,
+      tagsList: tags.map(tag => ({
+        nameTr: tag,
+        nameEn: tag,
+        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      })),
       filesList: files,
     };
 
@@ -100,14 +113,19 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
               <CardTitle>Genel Bilgiler</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Şirket Adı *</Label>
+                <Input value={company} onChange={e => setCompany(e.target.value)} required className="bg-accent/30" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Şirket Adı *</Label>
-                  <Input value={company} onChange={e => setCompany(e.target.value)} required className="bg-accent/30" />
+                  <Label>Pozisyon (TR) *</Label>
+                  <Input value={positionTr} onChange={e => setPositionTr(e.target.value)} required className="bg-accent/30" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Pozisyon *</Label>
-                  <Input value={position} onChange={e => setPosition(e.target.value)} required className="bg-accent/30" />
+                  <Label>Pozisyon (EN) *</Label>
+                  <Input value={positionEn} onChange={e => setPositionEn(e.target.value)} required className="bg-accent/30" />
                 </div>
               </div>
 
@@ -116,19 +134,34 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
                 <ImageUpload value={logo} onChange={setLogo} folder="experiences" usedIn={isEdit ? `experience:${initialData?.id}` : undefined} />
               </div>
 
-              <div className="space-y-2">
-                <Label>Kısa Açıklama (Listeleme sayfasında görünür) *</Label>
-                <Textarea value={description} onChange={e => setDescription(e.target.value)} required className="bg-accent/30" rows={3} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Kısa Açıklama (TR) *</Label>
+                  <Textarea value={descriptionTr} onChange={e => setDescriptionTr(e.target.value)} required className="bg-accent/30" rows={3} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Kısa Açıklama (EN) *</Label>
+                  <Textarea value={descriptionEn} onChange={e => setDescriptionEn(e.target.value)} required className="bg-accent/30" rows={3} />
+                </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Detaylı İçerik (Rich Text)</CardTitle>
+              <CardTitle>Detaylı İçerik (TR)</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={details} onChange={setDetails} placeholder="Görevlerinizi, başarılarınızı ve detayları buraya yazabilirsiniz..." />
+              <RichTextEditor content={detailsTr} onChange={setDetailsTr} placeholder="Görevlerinizi, başarılarınızı buraya yazabilirsiniz..." />
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 bg-card/50">
+            <CardHeader>
+              <CardTitle>Detaylı İçerik (EN)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RichTextEditor content={detailsEn} onChange={setDetailsEn} placeholder="You can write your duties and achievements here..." />
             </CardContent>
           </Card>
 

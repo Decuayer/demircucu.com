@@ -7,11 +7,12 @@ import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Briefcase, ArrowRight, Calendar } from "lucide-react";
+import { getTranslated } from "@/lib/i18n-utils";
 
 import { Experience } from "@prisma/client";
 
 interface ExperienceClientProps {
-  experiences: (Experience & { tags: { name: string }[] })[];
+  experiences: (Experience & { tags: { id: string; nameTr: string; nameEn: string }[] })[];
 }
 
 export default function ExperienceClient({ experiences }: ExperienceClientProps) {
@@ -86,21 +87,21 @@ export default function ExperienceClient({ experiences }: ExperienceClientProps)
                             <h3 className="font-semibold text-lg group-hover:text-violet-400 transition-colors">
                               {exp.company}
                             </h3>
-                            <p className="text-sm text-muted-foreground">{exp.position}</p>
+                            <p className="text-sm text-muted-foreground">{getTranslated(exp, "position", locale)}</p>
                           </div>
                           <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-violet-400 group-hover:translate-x-1 transition-all" />
                         </div>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                          {exp.description}
+                          {getTranslated(exp, "description", locale)}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {exp.tags.map((tag) => (
                             <Badge
-                              key={tag.name}
+                              key={tag.id}
                               variant="secondary"
                               className="text-xs bg-accent/50"
                             >
-                              {tag.name}
+                              {getTranslated(tag, "name", locale)}
                             </Badge>
                           ))}
                         </div>

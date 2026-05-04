@@ -27,16 +27,22 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
   const [isPending, startTransition] = useTransition();
 
   // Form State
-  const [title, setTitle] = useState(initialData?.title || "");
+  const [titleTr, setTitleTr] = useState(initialData?.titleTr || "");
+  const [titleEn, setTitleEn] = useState(initialData?.titleEn || "");
   const [slug, setSlug] = useState(initialData?.slug || "");
   const [coverImage, setCoverImage] = useState(initialData?.coverImage || "");
-  const [excerpt, setExcerpt] = useState(initialData?.excerpt || "");
-  const [content, setContent] = useState(initialData?.content || "");
+  const [excerptTr, setExcerptTr] = useState(initialData?.excerptTr || "");
+  const [excerptEn, setExcerptEn] = useState(initialData?.excerptEn || "");
+  const [contentTr, setContentTr] = useState(initialData?.contentTr || "");
+  const [contentEn, setContentEn] = useState(initialData?.contentEn || "");
   const [published, setPublished] = useState(initialData?.published ?? true);
   const [featured, setFeatured] = useState(initialData?.featured ?? false);
 
-  // Tags (Mapping relations to string array)
-  const [tags, setTags] = useState<string[]>(initialData?.tags?.map((t: any) => t.name) || []);
+  // Tags (Mapping relations to simplified objects for the server action)
+  const [tags, setTags] = useState<string[]>(() => {
+    const initialTags = initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) || [];
+    return Array.from(new Set(initialTags));
+  });
 
   // Files
   const [files, setFiles] = useState<FileAttachment[]>(initialData?.files || []);
@@ -44,20 +50,27 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !slug || !excerpt || !content) {
-      toast.error("Lütfen zorunlu alanları doldurun.");
+    if (!titleTr || !titleEn || !slug || !excerptTr || !excerptEn || !contentTr || !contentEn) {
+      toast.error("Lütfen zorunlu alanları (TR ve EN) doldurun.");
       return;
     }
 
     const payload = {
-      title,
+      titleTr,
+      titleEn,
       slug,
-      excerpt,
-      content,
+      excerptTr,
+      excerptEn,
+      contentTr,
+      contentEn,
       coverImage,
       published,
       featured,
-      tagsList: tags,
+      tagsList: tags.map(tag => ({
+        nameTr: tag,
+        nameEn: tag,
+        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      })),
       filesList: files,
     };
 
@@ -98,20 +111,31 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
               <CardTitle>Genel Bilgiler</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Yazı Başlığı *</Label>
-                  <Input value={title} onChange={e => setTitle(e.target.value)} required className="bg-accent/30" />
+                  <Label>Yazı Başlığı (TR) *</Label>
+                  <Input value={titleTr} onChange={e => setTitleTr(e.target.value)} required className="bg-accent/30" />
                 </div>
                 <div className="space-y-2">
-                  <Label>URL Slug *</Label>
-                  <Input value={slug} onChange={e => setSlug(e.target.value)} required className="bg-accent/30" />
+                  <Label>Yazı Başlığı (EN) *</Label>
+                  <Input value={titleEn} onChange={e => setTitleEn(e.target.value)} required className="bg-accent/30" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Kısa Özet (Ana sayfada görünür) *</Label>
-                <Textarea value={excerpt} onChange={e => setExcerpt(e.target.value)} required className="bg-accent/30" rows={2} />
+                <Label>URL Slug *</Label>
+                <Input value={slug} onChange={e => setSlug(e.target.value)} required className="bg-accent/30" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Kısa Özet (TR) *</Label>
+                  <Textarea value={excerptTr} onChange={e => setExcerptTr(e.target.value)} required className="bg-accent/30" rows={2} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Kısa Özet (EN) *</Label>
+                  <Textarea value={excerptEn} onChange={e => setExcerptEn(e.target.value)} required className="bg-accent/30" rows={2} />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -123,10 +147,19 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Blog İçeriği (Rich Text) *</CardTitle>
+              <CardTitle>Blog İçeriği (TR) *</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={content} onChange={setContent} placeholder="Blog yazınızı buraya oluşturun..." />
+              <RichTextEditor content={contentTr} onChange={setContentTr} placeholder="Blog yazınızı buraya oluşturun..." />
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 bg-card/50">
+            <CardHeader>
+              <CardTitle>Blog İçeriği (EN) *</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RichTextEditor content={contentEn} onChange={setContentEn} placeholder="Create your blog post here..." />
             </CardContent>
           </Card>
 

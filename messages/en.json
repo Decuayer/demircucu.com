@@ -14,7 +14,11 @@
     "changePassword": "Change Password",
     "myLikes": "My Likes",
     "myComments": "My Comments",
-    "likes": "Likes"
+    "likes": "Likes",
+    "socialmedia": "Social Media",
+    "fastlinks": "Fast Links",
+    "copyright": "All rights reserved."
+
   },
   "home": {
     "heroTitle": "Hello, I'm Demircucu",
@@ -107,7 +111,25 @@
     "totalComments": "Total Comments",
     "totalMessages": "Total Messages",
     "recentMessages": "Recent Messages",
-    "recentComments": "Recent Comments"
+    "recentComments": "Recent Comments",
+    "featured": "Featured",
+    "published": "Published",
+    "unpublished": "Unpublished",
+    "editProject": "Edit Project",
+    "addProject": "Add Project",
+    "saving": "Saving...",
+    "generalInfo": "General Information",
+    "projectTitle": "Project Title",
+    "slug": "URL Slug",
+    "summary": "Short Summary",
+    "liveSite": "Live Site",
+    "coverImage": "Cover Image",
+    "description": "Detailed Description",
+    "files": "Attached Files",
+    "optional": "Optional",
+    "status": "Status",
+    "technologies": "Technologies Used"
+
   },
   "common": {
     "loading": "Loading...",

@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, ExternalLink, Code2, FileIcon } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
 import { Link } from "@/i18n/navigation";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 import { Project, Tag } from "@prisma/client";
 
@@ -17,6 +19,8 @@ interface ProjectDetailClientProps {
 
 export default function ProjectDetailClient({ project }: ProjectDetailClientProps) {
   const t = useTranslations("projects");
+  const params = useParams();
+  const locale = params.locale as string;
 
   return (
     <div className="py-16 md:py-24">
@@ -37,14 +41,14 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center border border-border/50">
                 {project.logo ? (
-                  <img src={project.logo} alt={project.title} className="w-10 h-10 object-contain rounded" />
+                  <img src={project.logo} alt={getTranslated(project, "title", locale)} className="w-10 h-10 object-contain rounded" />
                 ) : (
                   <Code2 className="h-8 w-8 text-cyan-400" />
                 )}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold">{project.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold">{getTranslated(project, "title", locale)}</h1>
             </div>
-            <p className="text-lg text-muted-foreground">{project.summary}</p>
+            <p className="text-lg text-muted-foreground">{getTranslated(project, "summary", locale)}</p>
           </div>
 
           {/* Action buttons */}
@@ -75,8 +79,8 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
               </h3>
               <div className="flex flex-wrap gap-2">
                 {project.tags.map((tag) => (
-                  <Badge key={tag.name} variant="secondary" className="bg-accent/50">
-                    {tag.name}
+                  <Badge key={tag.id} variant="secondary" className="bg-accent/50">
+                    {getTranslated(tag, "name", locale)}
                   </Badge>
                 ))}
               </div>
@@ -84,10 +88,10 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
           )}
 
           {/* Content */}
-          {(project.description && project.description.trim() !== "") && (
+          {getTranslated(project, "description", locale) && getTranslated(project, "description", locale).trim() !== "" && (
             <Card className="border-border/50 bg-card/50 mb-8">
               <CardContent className="p-8 prose dark:prose-invert prose-sm max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: project.description }} />
+                <div dangerouslySetInnerHTML={{ __html: getTranslated(project, "description", locale) }} />
               </CardContent>
             </Card>
           )}
