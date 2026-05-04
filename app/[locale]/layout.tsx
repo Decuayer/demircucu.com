@@ -47,6 +47,7 @@ export async function generateMetadata({
     ),
     icons: {
       icon: settings?.faviconUrl || "/favicon.ico",
+      apple: settings?.faviconUrl || "/favicon.ico",
     }
   };
 }

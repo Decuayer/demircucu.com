@@ -27,3 +27,16 @@ export function getTranslated(obj: any, field: string, locale: string): string {
   // Final fallback to the base field name if it exists (for backward compatibility during migration)
   return obj[field] || "";
 }
+
+/**
+ * Formats a date consistently for server and client to avoid hydration mismatches
+ * @param date The date to format
+ * @returns Formatted date string (DD.MM.YYYY)
+ */
+export function formatDate(date: Date | string | number): string {
+  const d = new Date(date);
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}.${month}.${year}`;
+}

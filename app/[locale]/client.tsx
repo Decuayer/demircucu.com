@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Code2, Briefcase, Newspaper, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
-import { getTranslated } from "@/lib/i18n-utils";
+import { getTranslated, formatDate } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
 const fadeUp = {
@@ -220,7 +220,9 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                   <Card className="group h-full border-border/50 bg-card/50 hover:bg-card hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/5">
                     <CardContent className="p-6 space-y-4">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <time>{new Date(post.createdAt).toLocaleDateString()}</time>
+                        <time>
+                          {formatDate(post.createdAt)}
+                        </time>
                         <span>·</span>
                         <span>{Math.max(1, Math.ceil(getTranslated(post, "content", locale).length / 1000))} dk okuma</span>
                       </div>

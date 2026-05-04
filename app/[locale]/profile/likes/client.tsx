@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "@/i18n/navigation";
 import { Heart, MessageSquare, Calendar, ChevronRight } from "lucide-react";
-import { getTranslated } from "@/lib/i18n-utils";
+import { getTranslated, formatDate } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
 export default function ProfileLikesClient({ likes, comments }: { likes: any[], comments: any[] }) {
@@ -48,7 +48,7 @@ export default function ProfileLikesClient({ likes, comments }: { likes: any[], 
                       </h3>
                       <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                         <Calendar className="w-3 h-3" />
-                        {new Date(like.createdAt).toLocaleDateString()} tarihinde beğenildi
+                        {formatDate(like.createdAt)} tarihinde beğenildi
                       </p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-violet-400 group-hover:translate-x-1 transition-all" />
@@ -71,7 +71,7 @@ export default function ProfileLikesClient({ likes, comments }: { likes: any[], 
                       {getTranslated(comment.post, "title", locale)}
                     </Link>
                     <span className="text-xs text-muted-foreground">
-                      {new Date(comment.createdAt).toLocaleDateString()}
+                      {formatDate(comment.createdAt)}
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
