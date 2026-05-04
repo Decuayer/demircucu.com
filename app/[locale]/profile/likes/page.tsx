@@ -17,7 +17,8 @@ export default async function ProfileLikesPage() {
       post: {
         select: {
           id: true,
-          title: true,
+          titleTr: true,
+          titleEn: true,
           slug: true,
           createdAt: true,
         }
@@ -32,7 +33,8 @@ export default async function ProfileLikesPage() {
     include: {
       post: {
         select: {
-          title: true,
+          titleTr: true,
+          titleEn: true,
           slug: true,
         }
       }

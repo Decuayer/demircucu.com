@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, GripVertical, Briefcase } from "lucide-react";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -29,6 +31,8 @@ interface AdminExperiencesClientProps {
 
 export default function AdminExperiencesClient({ initialExperiences }: AdminExperiencesClientProps) {
   const t = useTranslations("admin");
+  const params = useParams();
+  const locale = params.locale as string;
   const [experiences, setExperiences] = useState(initialExperiences);
   const [isPending, startTransition] = useTransition();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -81,7 +85,7 @@ export default function AdminExperiencesClient({ initialExperiences }: AdminExpe
                   <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
                   <div>
                     <p className="font-medium">{exp.company}</p>
-                    <p className="text-sm text-muted-foreground">{exp.position}</p>
+                    <p className="text-sm text-muted-foreground">{getTranslated(exp, "position", locale)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

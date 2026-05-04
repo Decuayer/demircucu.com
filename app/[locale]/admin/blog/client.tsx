@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, Newspaper, Eye } from "lucide-react";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
+
+
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -28,6 +32,8 @@ interface AdminBlogClientProps {
 }
 export default function AdminBlogClient({ initialPosts }: AdminBlogClientProps) {
   const t = useTranslations("admin");
+  const params = useParams();
+  const locale = params.locale as string;
   const [posts, setPosts] = useState(initialPosts);
   const [isPending, startTransition] = useTransition();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -75,7 +81,7 @@ export default function AdminBlogClient({ initialPosts }: AdminBlogClientProps) 
             <Card className="border-border/50 bg-card/50 hover:bg-card transition-colors">
               <CardContent className="p-4 flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="font-medium">{post.title}</p>
+                  <p className="font-medium">{getTranslated(post, "title", locale)}</p>
                   <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                     <time>{new Date(post.createdAt).toLocaleDateString()}</time>
                     <div className="flex items-center gap-1">

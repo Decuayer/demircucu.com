@@ -5,9 +5,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "@/i18n/navigation";
 import { Heart, MessageSquare, Calendar, ChevronRight } from "lucide-react";
+import { getTranslated } from "@/lib/i18n-utils";
+import { useParams } from "next/navigation";
 
 export default function ProfileLikesClient({ likes, comments }: { likes: any[], comments: any[] }) {
   const t = useTranslations("nav");
+  const params = useParams();
+  const locale = params.locale as string;
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-16 max-w-4xl">
@@ -40,7 +44,7 @@ export default function ProfileLikesClient({ likes, comments }: { likes: any[], 
                   <CardContent className="p-4 flex items-center justify-between">
                     <div>
                       <h3 className="font-medium group-hover:text-violet-400 transition-colors">
-                        {like.post.title}
+                        {getTranslated(like.post, "title", locale)}
                       </h3>
                       <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                         <Calendar className="w-3 h-3" />
@@ -64,7 +68,7 @@ export default function ProfileLikesClient({ likes, comments }: { likes: any[], 
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-3">
                     <Link href={`/blog/${comment.post.slug}`} className="text-sm font-medium text-violet-400 hover:underline">
-                      {comment.post.title}
+                      {getTranslated(comment.post, "title", locale)}
                     </Link>
                     <span className="text-xs text-muted-foreground">
                       {new Date(comment.createdAt).toLocaleDateString()}

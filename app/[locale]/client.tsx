@@ -222,7 +222,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <time>{new Date(post.createdAt).toLocaleDateString()}</time>
                         <span>·</span>
-                        <span>{Math.max(1, Math.ceil(post.content.length / 1000))} dk okuma</span>
+                        <span>{Math.max(1, Math.ceil(getTranslated(post, "content", locale).length / 1000))} dk okuma</span>
                       </div>
                       <h3 className="font-semibold text-lg group-hover:text-cyan-400 transition-colors">
                         {getTranslated(post, "title", locale)}
