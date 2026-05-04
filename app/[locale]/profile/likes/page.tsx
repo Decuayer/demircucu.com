@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ProfileLikesClient from "./client";
 
-export default async function ProfileLikesPage() {
+export default async function ProfileLikesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getCurrentUser();
-
+ 
   if (!user) {
-    redirect("/en/auth/login");
+    redirect(`/${locale}/auth/login`);
   }
 
   // Fetch liked posts

@@ -4,14 +4,14 @@ import { redirect } from "next/navigation";
 import ExperienceFormClient from "../../form-client";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }
 
 export default async function EditExperiencePage({ params }: PageProps) {
+  const { id, locale } = await params;
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect("/en/auth/login");
+  if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);
 
-  const { id } = await params;
   const experience = await getExperienceById(id);
 
   if (!experience) {

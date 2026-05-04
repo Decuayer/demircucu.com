@@ -138,7 +138,7 @@ export default function RegisterPage() {
 
             <div className="text-center text-sm text-muted-foreground">
               {t("hasAccount")}{" "}
-              <Link href="/en/auth/login" className="text-violet-400 hover:underline font-medium">
+              <Link href="/auth/login" className="text-violet-400 hover:underline font-medium">
                 {t("loginButton")}
               </Link>
             </div>

@@ -4,18 +4,18 @@ import { redirect } from "next/navigation";
 import BlogFormClient from "../../form-client";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }
 
 export default async function EditBlogPostPage({ params }: PageProps) {
+  const { id, locale } = await params;
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect("/en/auth/login");
+  if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);
 
-  const { id } = await params;
   const post = await getBlogPostById(id);
 
   if (!post) {
-    redirect("/admin/blog");
+    redirect(`/${locale}/admin/blog`);
   }
 
   return (

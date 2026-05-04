@@ -3,9 +3,10 @@ import { getMediaFiles } from "@/app/actions/media";
 import { redirect } from "next/navigation";
 import AdminMediaClient from "./client";
 
-export default async function AdminMediaPage() {
+export default async function AdminMediaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect("/en/auth/login");
+  if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);
 
   const initialFiles = await getMediaFiles();
 
