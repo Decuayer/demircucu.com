@@ -28,9 +28,9 @@ export async function generateMetadata({
   const { locale } = await params;
   const settings = await getSiteSettings();
 
-  const title = locale === "tr" 
-    ? (settings?.siteTitleTr || "Demircucu | Full-Stack Developer")
-    : (settings?.siteTitleEn || "Demircucu | Full-Stack Developer");
+  const title = locale === "tr"
+    ? (settings?.siteTitleTr || "Demircucu | Bilgisayar Mühendisi")
+    : (settings?.siteTitleEn || "Demircucu | Computer Engineer");
 
   const description = locale === "tr"
     ? (settings?.siteDescriptionTr || "Kişisel portfolio ve blog sitesi. Projeler, deneyimler ve yazılım dünyasından yazılar.")
@@ -39,7 +39,7 @@ export async function generateMetadata({
   return {
     title: {
       default: title,
-      template: `%s | ${title.split('|')[0].trim()}`,
+      template: `%s | ${title}}`,
     },
     description,
     metadataBase: new URL(
