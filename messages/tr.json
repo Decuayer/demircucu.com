@@ -21,7 +21,7 @@
 
   },
   "home": {
-    "heroTitle": "Merhaba, Ben Demircucu",
+    "heroTitle": "Merhaba, Ben",
     "heroSub": "Full-Stack Geliştirici & Yazılım Mühendisi",
     "heroCta": "Benimle İletişime Geç",
     "featuredProjects": "Öne Çıkan Projeler",
@@ -36,7 +36,8 @@
     "hobbies": "Hobiler",
     "skills": "Teknik Yetkinlikler",
     "github": "GitHub Profili",
-    "gallery": "Fotoğraf Galerisi"
+    "gallery": "Fotoğraf Galerisi",
+    "heroTitle": "Merhaba, Ben"
   },
   "experience": {
     "title": "Deneyimlerim",

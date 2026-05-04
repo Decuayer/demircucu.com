@@ -21,7 +21,7 @@
 
   },
   "home": {
-    "heroTitle": "Hello, I'm Demircucu",
+    "heroTitle": "Hello, I am",
     "heroSub": "Full-Stack Developer & Software Engineer",
     "heroCta": "Get In Touch",
     "featuredProjects": "Featured Projects",
@@ -29,6 +29,7 @@
     "aboutPreview": "About Me",
     "viewAll": "View All",
     "readMore": "Read More"
+    
   },
   "about": {
     "title": "About Me",
@@ -36,7 +37,8 @@
     "hobbies": "Hobbies",
     "skills": "Technical Skills",
     "github": "GitHub Profile",
-    "gallery": "Photo Gallery"
+    "gallery": "Photo Gallery",
+    "heroTitle": "Hello, I am"
   },
   "experience": {
     "title": "Experience",

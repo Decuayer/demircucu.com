@@ -73,14 +73,17 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
               custom={1}
               className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6"
             >
-              {getTranslated(settings, "heroTitle", locale) || (
-                <>
-                  Merhaba, Ben{" "}
-                  <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
-                    Demircucu
-                  </span>
-                </>
-              )}
+              {t("heroTitle")}{" "}
+              <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
+                {getTranslated(settings, "heroTitle", locale) || (
+                  <>
+                    {t("heroTitle")}{" "}
+                    <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
+                      Demircucu
+                    </span>
+                  </>
+                )}
+                </span>
             </motion.h1>
 
             <motion.p

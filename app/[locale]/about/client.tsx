@@ -86,9 +86,15 @@ export default function AboutClient({ settings }: AboutClientProps) {
             {t("title")}
           </Badge>
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
-            Merhaba, Ben{" "}
+            {t("heroTitle")}{" "}
             <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
-              {getTranslated(settings, "heroTitle", locale).replace("Merhaba, Ben ", "").replace("Hello, I am ", "") || "Demircucu"}
+              {getTranslated(settings, "heroTitle", locale)|| (
+                <>
+                  <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
+                    Demircucu
+                  </span>
+                </>
+              )}
             </span>
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
