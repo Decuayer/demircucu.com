@@ -188,6 +188,12 @@ model SiteSettings {
   footerTitleEn     String?
   footerDescriptionTr String? @db.Text
   footerDescriptionEn String? @db.Text
+  // SEO & Meta
+  siteTitleTr       String?
+  siteTitleEn       String?
+  siteDescriptionTr String?  @db.Text
+  siteDescriptionEn String?  @db.Text
+  faviconUrl        String?
   // Meta
   updatedAt         DateTime @updatedAt
 }

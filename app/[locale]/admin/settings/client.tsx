@@ -89,6 +89,12 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
   const [footerDescriptionTr, setFooterDescriptionTr] = useState(initialSettings?.footerDescriptionTr || "");
   const [footerDescriptionEn, setFooterDescriptionEn] = useState(initialSettings?.footerDescriptionEn || "");
 
+  const [siteTitleTr, setSiteTitleTr] = useState(initialSettings?.siteTitleTr || "");
+  const [siteTitleEn, setSiteTitleEn] = useState(initialSettings?.siteTitleEn || "");
+  const [siteDescriptionTr, setSiteDescriptionTr] = useState(initialSettings?.siteDescriptionTr || "");
+  const [siteDescriptionEn, setSiteDescriptionEn] = useState(initialSettings?.siteDescriptionEn || "");
+  const [faviconUrl, setFaviconUrl] = useState(initialSettings?.faviconUrl || "");
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -101,7 +107,8 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         socialGithub, socialLinkedin, socialTwitter,
         socialInstagram, socialYoutube, socialMedium, socialStackoverflow,
         ctaTitleTr, ctaTitleEn, ctaDescriptionTr, ctaDescriptionEn,
-        footerTitleTr, footerTitleEn, footerDescriptionTr, footerDescriptionEn
+        footerTitleTr, footerTitleEn, footerDescriptionTr, footerDescriptionEn,
+        siteTitleTr, siteTitleEn, siteDescriptionTr, siteDescriptionEn, faviconUrl
       };
 
       const res = await updateSiteSettings(payload);
@@ -152,11 +159,12 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
       </div>
 
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="general">Genel & Hero</TabsTrigger>
           <TabsTrigger value="about">Hakkımda</TabsTrigger>
           <TabsTrigger value="contact">İletişim & Sosyal</TabsTrigger>
           <TabsTrigger value="skills">Yetenekler & Hobiler</TabsTrigger>
+          <TabsTrigger value="seo">SEO & Meta</TabsTrigger>
         </TabsList>
 
         {/* GENEL & HERO */}
@@ -473,6 +481,42 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* SEO & META */}
+        <TabsContent value="seo" className="space-y-6">
+          <Card className="border-border/50 bg-card/50">
+            <CardContent className="p-6 space-y-4">
+              <h2 className="font-semibold text-lg">Arama Motoru Optimizasyonu (SEO)</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Site Başlığı (TR)</Label>
+                  <Input value={siteTitleTr} onChange={e => setSiteTitleTr(e.target.value)} className="bg-accent/30" placeholder="Demircucu | Full-Stack Developer" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Site Başlığı (EN)</Label>
+                  <Input value={siteTitleEn} onChange={e => setSiteTitleEn(e.target.value)} className="bg-accent/30" placeholder="Demircucu | Full-Stack Developer" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Site Açıklaması (TR)</Label>
+                  <Textarea value={siteDescriptionTr} onChange={e => setSiteDescriptionTr(e.target.value)} className="bg-accent/30" rows={4} placeholder="Siteniz hakkında kısa bir açıklama..." />
+                </div>
+                <div className="space-y-2">
+                  <Label>Site Açıklaması (EN)</Label>
+                  <Textarea value={siteDescriptionEn} onChange={e => setSiteDescriptionEn(e.target.value)} className="bg-accent/30" rows={4} placeholder="A short description about your site..." />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Favicon (Site İkonu)</Label>
+                <ImageUpload value={faviconUrl} onChange={setFaviconUrl} folder="settings" usedIn="settings:favicon" />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Önerilen format: 32x32 veya 64x64 PNG/ICO.
+                </p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

@@ -20,17 +20,36 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Demircucu | Full-Stack Developer",
-    template: "%s | Demircucu",
-  },
-  description:
-    "Kişisel portfolio ve blog sitesi. Projeler, deneyimler ve yazılım dünyasından yazılar.",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  ),
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const settings = await getSiteSettings();
+
+  const title = locale === "tr" 
+    ? (settings?.siteTitleTr || "Demircucu | Full-Stack Developer")
+    : (settings?.siteTitleEn || "Demircucu | Full-Stack Developer");
+
+  const description = locale === "tr"
+    ? (settings?.siteDescriptionTr || "Kişisel portfolio ve blog sitesi. Projeler, deneyimler ve yazılım dünyasından yazılar.")
+    : (settings?.siteDescriptionEn || "Personal portfolio and blog site. Projects, experiences and articles from the software world.");
+
+  return {
+    title: {
+      default: title,
+      template: `%s | ${title.split('|')[0].trim()}`,
+    },
+    description,
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    ),
+    icons: {
+      icon: settings?.faviconUrl || "/favicon.ico",
+    }
+  };
+}
 
 export default async function LocaleLayout({
   children,
