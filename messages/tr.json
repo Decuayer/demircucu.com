@@ -127,13 +127,8 @@
     "description": "Detaylı Açıklama",
     "files": "Ekli Dosyalar",
     "optional": "Opsiyonel",
-    "status": "Durum",
+    "status": "Durum",    
     "technologies": "Kullanılan Teknolojiler"
-
-
-
-
-
   },
   "common": {
     "loading": "Yükleniyor...",
