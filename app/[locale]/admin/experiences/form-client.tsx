@@ -14,6 +14,8 @@ import { TagSelector } from "@/components/ui/tag-selector";
 import { FileUploader, FileAttachment } from "@/components/ui/file-uploader";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { createExperience, updateExperience } from "@/app/actions/admin";
+import { useTranslations } from "next-intl";
+
 
 interface ExperienceFormClientProps {
   initialData?: any;
@@ -21,6 +23,7 @@ interface ExperienceFormClientProps {
 }
 
 export default function ExperienceFormClient({ initialData, isEdit }: ExperienceFormClientProps) {
+  const t = useTranslations("admin");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale;
@@ -52,7 +55,7 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
     e.preventDefault();
 
     if (!company || !positionTr || !positionEn || !descriptionTr || !descriptionEn || !startDate) {
-      toast.error("Lütfen zorunlu alanları (TR ve EN) doldurun.");
+      toast.error(t("required_fields"));
       return;
     }
 
@@ -87,7 +90,7 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
       if (res.error) {
         toast.error(res.error);
       } else {
-        toast.success(isEdit ? "Deneyim güncellendi." : "Deneyim başarıyla eklendi.");
+        toast.success(isEdit ? t("experience_updated") : t("experience_created"));
         router.push(`/${locale}/admin/experiences`);
       }
     });
@@ -96,11 +99,11 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{isEdit ? "Deneyimi Düzenle" : "Yeni Deneyim Ekle"}</h1>
+        <h1 className="text-2xl font-bold">{isEdit ? t("editExperience") : t("addExperience")}</h1>
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()}>İptal</Button>
+          <Button type="button" variant="outline" onClick={() => router.back()}>{t("cancel")}</Button>
           <Button type="submit" disabled={isPending} className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
-            {isPending ? "Kaydediliyor..." : "Kaydet"}
+            {isPending ? t("saving") : t("save")}
           </Button>
         </div>
       </div>
@@ -110,37 +113,37 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Genel Bilgiler</CardTitle>
+              <CardTitle>{t("generalInfo")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Şirket Adı *</Label>
+                <Label>{t("companyName")} *</Label>
                 <Input value={company} onChange={e => setCompany(e.target.value)} required className="bg-accent/30" />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Pozisyon (TR) *</Label>
+                  <Label>{t("position")} (TR) *</Label>
                   <Input value={positionTr} onChange={e => setPositionTr(e.target.value)} required className="bg-accent/30" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Pozisyon (EN) *</Label>
+                  <Label>{t("position")} (EN) *</Label>
                   <Input value={positionEn} onChange={e => setPositionEn(e.target.value)} required className="bg-accent/30" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Şirket Logosu (İsteğe Bağlı)</Label>
+                <Label>{t("companyLogo")} ({t("optional")})</Label>
                 <ImageUpload value={logo} onChange={setLogo} folder="experiences" usedIn={isEdit ? `experience:${initialData?.id}` : undefined} />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Kısa Açıklama (TR) *</Label>
+                  <Label>{t("summary")} (TR) *</Label>
                   <Textarea value={descriptionTr} onChange={e => setDescriptionTr(e.target.value)} required className="bg-accent/30" rows={3} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Kısa Açıklama (EN) *</Label>
+                  <Label>{t("summary")} (EN) *</Label>
                   <Textarea value={descriptionEn} onChange={e => setDescriptionEn(e.target.value)} required className="bg-accent/30" rows={3} />
                 </div>
               </div>
@@ -149,25 +152,25 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Detaylı İçerik (TR)</CardTitle>
+              <CardTitle>{t("details")} (TR)</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={detailsTr} onChange={setDetailsTr} placeholder="Görevlerinizi, başarılarınızı buraya yazabilirsiniz..." />
+              <RichTextEditor content={detailsTr} onChange={setDetailsTr} placeholder={t("duties")} />
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Detaylı İçerik (EN)</CardTitle>
+              <CardTitle>{t("details")} (EN)</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={detailsEn} onChange={setDetailsEn} placeholder="You can write your duties and achievements here..." />
+              <RichTextEditor content={detailsEn} onChange={setDetailsEn} placeholder={t("duties")} />
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Ekli Dosyalar</CardTitle>
+              <CardTitle>{t("addedFiles")}</CardTitle>
             </CardHeader>
             <CardContent>
               <FileUploader files={files} onChange={setFiles} folder="experiences" usedIn={isEdit ? `experience:${initialData?.id}` : undefined} />
@@ -179,27 +182,27 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
         <div className="space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Tarih & Durum</CardTitle>
+              <CardTitle>{t("datesituation")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Başlangıç Tarihi *</Label>
+                <Label>{t("startDate")} *</Label>
                 <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required className="bg-accent/30" />
               </div>
               <div className="space-y-2">
-                <Label>Bitiş Tarihi (Devam ediyorsa boş bırakın)</Label>
+                <Label>{t("endDate")} ({t("currentJob")})</Label>
                 <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="bg-accent/30" />
               </div>
               <div className="flex items-center space-x-2 pt-4 border-t border-border/50">
                 <Switch checked={published} onCheckedChange={setPublished} />
-                <Label>Yayında (Görünür)</Label>
+                <Label>{t("published")}</Label>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Etiketler (Tags)</CardTitle>
+              <CardTitle>{t("tags")}</CardTitle>
             </CardHeader>
             <CardContent>
               <TagSelector tags={tags} onChange={setTags} />

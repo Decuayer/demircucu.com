@@ -4,12 +4,15 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "./auth";
 import { revalidatePath } from "next/cache";
 import { Project, Experience, BlogPost } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
 // Middleware to check admin rights inside server actions
 async function requireAdmin() {
+  const t = await getTranslations("admin");
+
   const user = await getCurrentUser();
   if (!user || user.role !== "ADMIN") {
-    throw new Error("Bu işlemi yapmak için yetkiniz yok.");
+    throw new Error(t("unauthorized"));
   }
   return user;
 }
@@ -28,6 +31,8 @@ export async function getProjectById(id: string) {
 }
 
 export async function createProject(data: any) {
+  const t = await getTranslations("admin");
+  
   try {
     await requireAdmin();
     const project = await prisma.project.create({
@@ -64,11 +69,13 @@ export async function createProject(data: any) {
     return { success: true, project };
   } catch (error: any) {
     console.error(error);
-    return { error: error.message || "Proje oluşturulamadı." };
+    return { error: error.message || t("projectCreationFailed") };
   }
 }
 
 export async function updateProject(id: string, data: any) {
+  const t = await getTranslations("admin");
+
   try {
     await requireAdmin();
     const project = await prisma.project.update({
@@ -107,11 +114,13 @@ export async function updateProject(id: string, data: any) {
     revalidatePath("/");
     return { success: true, project };
   } catch (error: any) {
-    return { error: error.message || "Proje güncellenemedi." };
+    return { error: error.message || t("projectUpdateFailed") };
   }
 }
 
 export async function deleteProject(id: string) {
+  const t = await getTranslations("admin");
+
   try {
     await requireAdmin();
     await prisma.project.delete({ where: { id } });
@@ -120,7 +129,7 @@ export async function deleteProject(id: string) {
     revalidatePath("/");
     return { success: true };
   } catch (error: any) {
-    return { error: error.message || "Proje silinemedi." };
+    return { error: error.message || t("projectDeleteFailed") };
   }
 }
 
@@ -138,6 +147,8 @@ export async function getExperienceById(id: string) {
 }
 
 export async function createExperience(data: any) {
+  const t = await getTranslations("admin");
+
   try {
     await requireAdmin();
     const experience = await prisma.experience.create({
@@ -171,11 +182,13 @@ export async function createExperience(data: any) {
     revalidatePath("/experience");
     return { success: true, experience };
   } catch (error: any) {
-    return { error: error.message || "Deneyim oluşturulamadı." };
+    return { error: error.message || t("experienceCreationFailed") };
   }
 }
 
 export async function updateExperience(id: string, data: any) {
+  const t = await getTranslations("admin");
+
   try {
     await requireAdmin();
     const experience = await prisma.experience.update({
@@ -212,11 +225,13 @@ export async function updateExperience(id: string, data: any) {
     revalidatePath(`/experience/${id}`);
     return { success: true, experience };
   } catch (error: any) {
-    return { error: error.message || "Deneyim güncellenemedi." };
+    return { error: error.message || t("experienceUpdateFailed") };
   }
 }
 
 export async function deleteExperience(id: string) {
+  const t = await getTranslations("admin");
+
   try {
     await requireAdmin();
     await prisma.experience.delete({ where: { id } });
@@ -224,7 +239,7 @@ export async function deleteExperience(id: string) {
     revalidatePath("/experience");
     return { success: true };
   } catch (error: any) {
-    return { error: error.message || "Deneyim silinemedi." };
+    return { error: error.message || t("experienceDeleteFailed") };
   }
 }
 
@@ -242,6 +257,8 @@ export async function getBlogPostById(id: string) {
 }
 
 export async function createBlogPost(data: any) {
+  const t = await getTranslations("admin");
+
   try {
     const admin = await requireAdmin();
     const post = await prisma.blogPost.create({
@@ -277,11 +294,13 @@ export async function createBlogPost(data: any) {
     return { success: true, post };
   } catch (error: any) {
     console.error("Blog creation error:", error);
-    return { error: error.message || "Yazı oluşturulamadı." };
+    return { error: error.message || t("blogCreationFailed") };
   }
 }
 
 export async function updateBlogPost(id: string, data: any) {
+  const t = await getTranslations("admin");
+
   try {
     await requireAdmin();
     const post = await prisma.blogPost.update({
@@ -317,11 +336,13 @@ export async function updateBlogPost(id: string, data: any) {
     revalidatePath("/");
     return { success: true, post };
   } catch (error: any) {
-    return { error: error.message || "Yazı güncellenemedi." };
+    return { error: error.message || t("blogUpdateFailed") };
   }
 }
 
 export async function deleteBlogPost(id: string) {
+  const t = await getTranslations("admin");
+
   try {
     await requireAdmin();
     await prisma.blogPost.delete({ where: { id } });
@@ -330,7 +351,7 @@ export async function deleteBlogPost(id: string) {
     revalidatePath("/");
     return { success: true };
   } catch (error: any) {
-    return { error: error.message || "Yazı silinemedi." };
+    return { error: error.message || t("blogDeleteFailed") };
   }
 }
 
@@ -347,12 +368,14 @@ export async function getContactMessages() {
 }
 
 export async function deleteContactMessage(id: string) {
+  const t = await getTranslations("admin");
+
   try {
     await requireAdmin();
     await prisma.contactMessage.delete({ where: { id } });
     revalidatePath("/admin/contacts");
     return { success: true };
   } catch (error: any) {
-    return { error: error.message || "Mesaj silinemedi." };
+    return { error: error.message || t("contactDeleteFailed") };
   }
 }

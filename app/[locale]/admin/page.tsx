@@ -28,7 +28,7 @@ export default function AdminDashboard() {
         animate={{ opacity: 1, y: 0 }}
       >
         <h1 className="text-3xl font-bold mb-2">{t("dashboard")}</h1>
-        <p className="text-muted-foreground">Sitenize genel bir bakış</p>
+        <p className="text-muted-foreground">{t("overview")}</p>
       </motion.div>
 
       {/* Stats Grid */}

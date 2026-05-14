@@ -4,8 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 export async function signUp(data: any) {
+  const t = await getTranslations("auth");
+
   const { email, password, name } = data;
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -34,14 +37,16 @@ export async function signUp(data: any) {
       return { success: true };
     } catch (dbError) {
       console.error("Profile creation error:", dbError);
-      return { error: "Profil oluşturulurken bir hata oluştu." };
+      return { error: t("profileCreationError") || "Profil oluşturulurken bir hata oluştu." };
     }
   }
 
-  return { error: "Bilinmeyen bir hata oluştu." };
+  return { error: t("unknownError") || "Bilinmeyen bir hata oluştu." };
 }
 
 export async function signIn(data: any) {
+  const t = await getTranslations("auth");
+  
   const { email, password } = data;
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -52,7 +57,7 @@ export async function signIn(data: any) {
   });
 
   if (error) {
-    return { error: "E-posta veya şifre hatalı." };
+    return { error: t("invalidCredentials") || "E-posta veya şifre hatalı." };
   }
 
   return { success: true };
@@ -80,9 +85,11 @@ export async function getCurrentUser() {
   return profile;
 }
 
-export async function updateProfile(data: { name: string }) {
+export async function updateProfile(data: { name: string }) {  
+  const t = await getTranslations("auth");
+  
   const user = await getCurrentUser();
-  if (!user) return { error: "Yetkisiz işlem." };
+  if (!user) return { error: t("unauthorized") || "Yetkisiz işlem." };
 
   try {
     await prisma.profile.update({
@@ -91,17 +98,19 @@ export async function updateProfile(data: { name: string }) {
     });
     return { success: true };
   } catch (e) {
-    return { error: "Profil güncellenemedi." };
+    return { error: t("profileUpdateError") || "Profil güncellenemedi." };
   }
 }
 
 export async function updatePassword(password: string) {
+  const t = await getTranslations("auth");
+  
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   
   const { error } = await supabase.auth.updateUser({ password });
   if (error) {
-    return { error: "Şifre güncellenemedi." };
+    return { error: t("passwordUpdateError") || "Şifre güncellenemedi." };
   }
   return { success: true };
 }

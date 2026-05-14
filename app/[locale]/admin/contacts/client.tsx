@@ -93,15 +93,15 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent className="border-border/50 bg-background">
           <AlertDialogHeader>
-            <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+            <AlertDialogTitle>{t("confirmDelete")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Bu iletişim mesajı veritabanından kalıcı olarak silinecektir. Bu işlem geri alınamaz.
+                      {t("deleteContactConfirmation")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İptal</AlertDialogCancel>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={isPending}>
-              {isPending ? "Siliniyor..." : "Sil"}
+              {isPending ? t("deleting") : t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

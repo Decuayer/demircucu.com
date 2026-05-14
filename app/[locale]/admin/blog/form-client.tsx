@@ -14,6 +14,7 @@ import { TagSelector } from "@/components/ui/tag-selector";
 import { FileUploader, FileAttachment } from "@/components/ui/file-uploader";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { createBlogPost, updateBlogPost } from "@/app/actions/admin";
+import { useTranslations } from "next-intl";
 
 interface BlogFormClientProps {
   initialData?: any;
@@ -21,6 +22,7 @@ interface BlogFormClientProps {
 }
 
 export default function BlogFormClient({ initialData, isEdit }: BlogFormClientProps) {
+  const t = useTranslations("admin");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale;
@@ -85,7 +87,7 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
       if (res.error) {
         toast.error(res.error);
       } else {
-        toast.success(isEdit ? "Yazı güncellendi." : "Yazı başarıyla eklendi.");
+        toast.success(isEdit ? t("blogUpdated") : t("blogUpdated"));
         router.push(`/${locale}/admin/blog`);
       }
     });
@@ -94,11 +96,11 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{isEdit ? "Yazıyı Düzenle" : "Yeni Yazı Ekle"}</h1>
+        <h1 className="text-2xl font-bold">{isEdit ? t("editBlog") : t("addBlog")}</h1>
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()}>İptal</Button>
+          <Button type="button" variant="outline" onClick={() => router.back()}>{t("cancel")}</Button>
           <Button type="submit" disabled={isPending} className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
-            {isPending ? "Kaydediliyor..." : "Kaydet"}
+            {isPending ? t("saving") : t("save")}
           </Button>
         </div>
       </div>
@@ -108,16 +110,16 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Genel Bilgiler</CardTitle>
+              <CardTitle>{t("generalInfo")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Yazı Başlığı (TR) *</Label>
+                  <Label>{t("blogTitle")} (TR) *</Label>
                   <Input value={titleTr} onChange={e => setTitleTr(e.target.value)} required className="bg-accent/30" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Yazı Başlığı (EN) *</Label>
+                  <Label>{t("blogTitle")} (EN) *</Label>
                   <Input value={titleEn} onChange={e => setTitleEn(e.target.value)} required className="bg-accent/30" />
                 </div>
               </div>
@@ -129,17 +131,17 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Kısa Özet (TR) *</Label>
+                  <Label>{t("summary")} (TR) *</Label>
                   <Textarea value={excerptTr} onChange={e => setExcerptTr(e.target.value)} required className="bg-accent/30" rows={2} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Kısa Özet (EN) *</Label>
+                  <Label>{t("summary")} (EN) *</Label>
                   <Textarea value={excerptEn} onChange={e => setExcerptEn(e.target.value)} required className="bg-accent/30" rows={2} />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Kapak Görseli (Opsiyonel)</Label>
+                <Label>{t("coverImageBlog")} ({t("optional")})</Label>
                 <ImageUpload value={coverImage} onChange={setCoverImage} folder="blog" usedIn={isEdit ? `blog:${initialData?.id}` : undefined} />
               </div>
             </CardContent>
@@ -147,25 +149,25 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Blog İçeriği (TR) *</CardTitle>
+              <CardTitle>{t("contentBlog")} (TR) *</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={contentTr} onChange={setContentTr} placeholder="Blog yazınızı buraya oluşturun..." />
+              <RichTextEditor content={contentTr} onChange={setContentTr} placeholder={t("blogContentPlaceholder")} />
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Blog İçeriği (EN) *</CardTitle>
+              <CardTitle>{t("contentBlog")} (EN) *</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={contentEn} onChange={setContentEn} placeholder="Create your blog post here..." />
+              <RichTextEditor content={contentEn} onChange={setContentEn} placeholder={t("blogContentPlaceholder")} />
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Ekli Dosyalar (Opsiyonel)</CardTitle>
+              <CardTitle>{t("files")} ({t("optional")})</CardTitle>
             </CardHeader>
             <CardContent>
               <FileUploader files={files} onChange={setFiles} folder="blog" usedIn={isEdit ? `blog:${initialData?.id}` : undefined} />
@@ -177,23 +179,23 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
         <div className="space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Yayın Durumu</CardTitle>
+              <CardTitle>{t("publishStatus")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Switch checked={published} onCheckedChange={setPublished} />
-                <Label>Yayında (Görünür)</Label>
+                <Label>{t("published")}</Label>
               </div>
               <div className="flex items-center space-x-2 pt-2">
                 <Switch checked={featured} onCheckedChange={setFeatured} />
-                <Label>Öne Çıkan (Featured)</Label>
+                <Label>{t("featured")}</Label>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>Kategori ve Konular (Tags)</CardTitle>
+              <CardTitle>{t("categoriesAndTags")}</CardTitle>
             </CardHeader>
             <CardContent>
               <TagSelector tags={tags} onChange={setTags} />

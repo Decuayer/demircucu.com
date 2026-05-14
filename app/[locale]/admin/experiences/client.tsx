@@ -90,7 +90,7 @@ export default function AdminExperiencesClient({ initialExperiences }: AdminExpe
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant={exp.published ? "default" : "secondary"} className="text-xs">
-                    {exp.published ? "Yayında" : "Taslak"}
+                    {exp.published ? t("published") : t("unpublished")}
                   </Badge>
                   <Link href={`/admin/experiences/${exp.id}/edit`}>
                     <Button variant="ghost" size="icon">
@@ -111,19 +111,19 @@ export default function AdminExperiencesClient({ initialExperiences }: AdminExpe
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent className="border-border/50 bg-background">
           <AlertDialogHeader>
-            <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+            <AlertDialogTitle>{t("confirmDelete")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Bu deneyim veritabanından kalıcı olarak silinecektir. Bu işlem geri alınamaz.
+              {t("deleteExperienceConfirmation")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İptal</AlertDialogCancel>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={isPending}
             >
-              {isPending ? "Siliniyor..." : "Sil"}
+              {isPending ? t("deleting") : t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

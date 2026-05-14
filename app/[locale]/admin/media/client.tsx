@@ -70,7 +70,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Dosya boyutu 5MB'dan küçük olmalıdır.");
+      toast.error(t("fileSizeLimit"));
       return;
     }
 
@@ -89,9 +89,9 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
 
       if (response.ok && data.success) {
         setFiles(prev => [data.file, ...prev]);
-        toast.success("Dosya başarıyla yüklendi.");
+        toast.success(t("fileUploaded"));
       } else {
-        throw new Error(data.error || "Yükleme başarısız.");
+        throw new Error(data.error || t("uploadFailed"));
       }
     } catch (error: any) {
       toast.error(error.message);
@@ -110,7 +110,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       if (res.error) {
         toast.error(res.error);
       } else {
-        toast.success("Dosya başarıyla silindi.");
+        toast.success(t("fileDeleted"));
         setFiles(prev => prev.filter(f => f.id !== deleteId));
         if (selectedFile?.id === deleteId) {
           setSelectedFile(null);
@@ -143,14 +143,14 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
           className="text-2xl font-bold flex items-center gap-3"
         >
           <ImageIcon className="h-6 w-6 text-violet-400" />
-          Medya Kütüphanesi
+          {t("mediaLibrary")}
         </motion.h1>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
-              placeholder="Dosya ara..." 
+              placeholder={t("searchFiles")} 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 bg-accent/30"
@@ -162,7 +162,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
             className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0 whitespace-nowrap"
           >
             {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-            {isUploading ? "Yükleniyor..." : "Dosya Yükle"}
+            {isUploading ? t("uploading") : t("uploadFile")}
           </Button>
           <input
             type="file"
@@ -183,7 +183,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
           onClick={() => setFilterType("all")}
           className={filterType === "all" ? "bg-accent/50 text-foreground" : "text-muted-foreground"}
         >
-          Tümü
+          {t("all")}
         </Button>
         <Button 
           variant={filterType === "image" ? "default" : "ghost"} 
@@ -191,7 +191,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
           onClick={() => setFilterType("image")}
           className={filterType === "image" ? "bg-accent/50 text-foreground" : "text-muted-foreground"}
         >
-          Görseller
+          {t("images")}
         </Button>
         <Button 
           variant={filterType === "document" ? "default" : "ghost"} 
@@ -199,7 +199,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
           onClick={() => setFilterType("document")}
           className={filterType === "document" ? "bg-accent/50 text-foreground" : "text-muted-foreground"}
         >
-          Dokümanlar
+          {t("documents")}
         </Button>
       </div>
 
@@ -207,8 +207,8 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       {filteredFiles.length === 0 ? (
         <div className="text-center py-20 border-2 border-dashed border-border/50 rounded-xl bg-accent/10">
           <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-4 opacity-50" />
-          <h3 className="text-lg font-medium">Dosya bulunamadı</h3>
-          <p className="text-sm text-muted-foreground">Arama kriterlerinize uygun medya dosyası yok.</p>
+          <h3 className="text-lg font-medium">{t("noFilesFound")}</h3>
+          <p className="text-sm text-muted-foreground">{t("noMatchingFiles")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -234,7 +234,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                   {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                     <Button size="sm" variant="secondary" className="h-8 text-xs">
-                      <EyeIcon className="mr-2 h-3 w-3" /> Detay
+                      <EyeIcon className="mr-2 h-3 w-3" /> {t("detail")}
                     </Button>
                   </div>
                 </div>
@@ -255,7 +255,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       <Dialog open={!!selectedFile} onOpenChange={(open) => !open && setSelectedFile(null)}>
         <DialogContent className="sm:max-w-[700px] border-border/50 bg-background">
           <DialogHeader>
-            <DialogTitle>Dosya Detayları</DialogTitle>
+            <DialogTitle>{t("fileDetails")}</DialogTitle>
           </DialogHeader>
           {selectedFile && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
@@ -293,13 +293,13 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Yüklenme Tarihi</Label>
+                  <Label className="text-xs text-muted-foreground">{t("uploadDate")}</Label>
                   <p className="text-sm">{new Date(selectedFile.createdAt).toLocaleString()}</p>
                 </div>
 
                 {selectedFile.usedIn && (
                   <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Kullanıldığı Yer</Label>
+                    <Label className="text-xs text-muted-foreground">{t("usedIn")}</Label>
                     <p className="text-sm px-3 py-1.5 bg-accent/30 rounded-md border border-border/50 inline-block">
                       {selectedFile.usedIn}
                     </p>
@@ -315,7 +315,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                     }}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Dosyayı Sil
+                    {t("deleteFile")}
                   </Button>
                 </div>
               </div>
@@ -328,15 +328,15 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent className="border-border/50 bg-background">
           <AlertDialogHeader>
-            <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+            <AlertDialogTitle>{t("confirmDelete")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Bu dosya kalıcı olarak silinecektir. Eğer bu dosya sitede kullanılıyorsa (örneğin bir projede veya blog yazısında), görsel bozuk çıkabilir.
+              {t("deleteFileConfirmation")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İptal</AlertDialogCancel>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={isPending}>
-              {isPending ? "Siliniyor..." : "Sil"}
+              {isPending ? t("deleting") : t("deleteFile")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

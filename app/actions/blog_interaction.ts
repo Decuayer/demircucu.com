@@ -3,16 +3,19 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "./auth";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 export async function addComment(postId: string, content: string, pathToRevalidate: string) {
+  const t = await getTranslations("blog")
+
   const user = await getCurrentUser();
 
   if (!user) {
-    return { error: "Yorum yapmak için giriş yapmalısınız." };
+    return { error: t("loginToComment") || "Yorum yapmak için giriş yapmalısınız." };
   }
 
   if (!content || content.trim().length === 0) {
-    return { error: "Yorum boş olamaz." };
+    return { error: t("commentEmpty") || "Yorum boş olamaz." };
   }
 
   try {
@@ -28,15 +31,17 @@ export async function addComment(postId: string, content: string, pathToRevalida
     return { success: true };
   } catch (error) {
     console.error("Add comment error:", error);
-    return { error: "Yorum eklenirken bir hata oluştu." };
+    return { error: t("commentError") || "Yorum eklenirken bir hata oluştu." };
   }
 }
 
 export async function toggleLike(postId: string, pathToRevalidate: string) {
+  const t = await getTranslations("blog")
+
   const user = await getCurrentUser();
 
   if (!user) {
-    return { error: "Beğenmek için giriş yapmalısınız." };
+    return { error: t("loginToLike") || "Beğenmek için giriş yapmalısınız." };
   }
 
   try {
@@ -66,7 +71,7 @@ export async function toggleLike(postId: string, pathToRevalidate: string) {
     return { success: true };
   } catch (error) {
     console.error("Toggle like error:", error);
-    return { error: "Beğeni işlemi başarısız oldu." };
+    return { error: t("likeError") || "Beğeni işlemi başarısız oldu." };
   }
 }
 

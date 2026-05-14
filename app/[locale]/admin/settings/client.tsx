@@ -116,7 +116,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
       if (res.error) {
         toast.error(res.error);
       } else {
-        toast.success("Ayarlar başarıyla kaydedildi!");
+        toast.success(t("settingsSaved") || "Ayarlar başarıyla kaydedildi!");
       }
     });
   };
@@ -146,7 +146,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
           className="text-2xl font-bold flex items-center gap-3"
         >
           <Settings className="h-6 w-6 text-violet-400" />
-          Site Ayarları
+          {t("siteSettings")}
         </motion.h1>
         <Button 
           onClick={handleSubmit} 
@@ -160,35 +160,35 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
 
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="grid w-full grid-cols-5 mb-6">
-          <TabsTrigger value="general">Genel & Hero</TabsTrigger>
-          <TabsTrigger value="about">Hakkımda</TabsTrigger>
-          <TabsTrigger value="contact">İletişim & Sosyal</TabsTrigger>
-          <TabsTrigger value="skills">Yetenekler & Hobiler</TabsTrigger>
-          <TabsTrigger value="seo">SEO & Meta</TabsTrigger>
+          <TabsTrigger value="general">{t("generalHero")}</TabsTrigger>
+          <TabsTrigger value="about">{t("about")}</TabsTrigger>
+          <TabsTrigger value="contact">{t("contact")}</TabsTrigger>
+          <TabsTrigger value="skills">{t("skills")}</TabsTrigger>
+          <TabsTrigger value="seo">{t("seo")}</TabsTrigger>
         </TabsList>
 
         {/* GENEL & HERO */}
         <TabsContent value="general" className="space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-6 space-y-4">
-              <h2 className="font-semibold text-lg">Hero Bölümü (Ana Sayfa)</h2>
+              <h2 className="font-semibold text-lg">{t("heroSection")} ({t("homepage")})</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Ana Başlık (TR)</Label>
+                  <Label>{t("mainTitle")} (TR)</Label>
                   <Input value={heroTitleTr} onChange={e => setHeroTitleTr(e.target.value)} className="bg-accent/30" placeholder="Merhaba, Ben..." />
                 </div>
                 <div className="space-y-2">
-                  <Label>Ana Başlık (EN)</Label>
+                  <Label>{t("mainTitle")} (EN)</Label>
                   <Input value={heroTitleEn} onChange={e => setHeroTitleEn(e.target.value)} className="bg-accent/30" placeholder="Hello, I am..." />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Alt Başlık / Unvan (TR)</Label>
+                  <Label>{t("subTitle")} (TR)</Label>
                   <Input value={heroSubTr} onChange={e => setHeroSubTr(e.target.value)} className="bg-accent/30" placeholder="Full-Stack Developer..." />
                 </div>
                 <div className="space-y-2">
-                  <Label>Alt Başlık / Unvan (EN)</Label>
+                  <Label>{t("subTitle")} (EN)</Label>
                   <Input value={heroSubEn} onChange={e => setHeroSubEn(e.target.value)} className="bg-accent/30" placeholder="Full-Stack Developer..." />
                 </div>
               </div>
@@ -197,24 +197,24 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
 
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-6 space-y-4">
-              <h2 className="font-semibold text-lg">Call to Action (Ana Sayfa Altı)</h2>
+              <h2 className="font-semibold text-lg">{t("cta")} ({t("footer")})</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>CTA Başlık (TR)</Label>
+                  <Label>{t("ctaTitle")} (TR)</Label>
                   <Input value={ctaTitleTr} onChange={e => setCtaTitleTr(e.target.value)} className="bg-accent/30" placeholder="Birlikte Çalışalım" />
                 </div>
                 <div className="space-y-2">
-                  <Label>CTA Başlık (EN)</Label>
+                  <Label>{t("ctaTitle")} (EN)</Label>
                   <Input value={ctaTitleEn} onChange={e => setCtaTitleEn(e.target.value)} className="bg-accent/30" placeholder="Let's Work Together" />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>CTA Açıklama (TR)</Label>
+                  <Label>{t("ctaDescription")} (TR)</Label>
                   <Textarea value={ctaDescriptionTr} onChange={e => setCtaDescriptionTr(e.target.value)} className="bg-accent/30" rows={3} />
                 </div>
                 <div className="space-y-2">
-                  <Label>CTA Açıklama (EN)</Label>
+                  <Label>{t("ctaDescription")} (EN)</Label>
                   <Textarea value={ctaDescriptionEn} onChange={e => setCtaDescriptionEn(e.target.value)} className="bg-accent/30" rows={3} />
                 </div>
               </div>
@@ -223,24 +223,24 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
 
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-6 space-y-4">
-              <h2 className="font-semibold text-lg">Footer Bölümü</h2>
+              <h2 className="font-semibold text-lg">{t("footerSection")}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Footer Başlık (TR)</Label>
+                  <Label>{t("footerTitle")} (TR)</Label>
                   <Input value={footerTitleTr} onChange={e => setFooterTitleTr(e.target.value)} className="bg-accent/30" placeholder="demircucu.com" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Footer Başlık (EN)</Label>
+                  <Label>{t("footerTitle")} (EN)</Label>
                   <Input value={footerTitleEn} onChange={e => setFooterTitleEn(e.target.value)} className="bg-accent/30" placeholder="demircucu.com" />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Footer Açıklama (TR)</Label>
+                  <Label>{t("footerDescription")} (TR)</Label>
                   <Textarea value={footerDescriptionTr} onChange={e => setFooterDescriptionTr(e.target.value)} className="bg-accent/30" rows={3} placeholder="Full-Stack Developer & Software Engineer..." />
                 </div>
                 <div className="space-y-2">
-                  <Label>Footer Açıklama (EN)</Label>
+                  <Label>{t("footerDescription")} (EN)</Label>
                   <Textarea value={footerDescriptionEn} onChange={e => setFooterDescriptionEn(e.target.value)} className="bg-accent/30" rows={3} placeholder="Full-Stack Developer & Software Engineer..." />
                 </div>
               </div>
@@ -252,31 +252,31 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         <TabsContent value="about" className="space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-6 space-y-4">
-              <h2 className="font-semibold text-lg">Profil ve Biyografi</h2>
+              <h2 className="font-semibold text-lg">{t("about")}</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Profil Fotoğrafı</Label>
+                    <Label>{t("profilePhoto")}</Label>
                     <ImageUpload value={aboutPhoto} onChange={setAboutPhoto} folder="settings" usedIn="settings:profile" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Lokasyon (TR)</Label>
+                      <Label>{t("location")} (TR)</Label>
                       <Input value={aboutLocationTr} onChange={e => setAboutLocationTr(e.target.value)} className="bg-accent/30" placeholder="İstanbul, Türkiye" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Lokasyon (EN)</Label>
+                      <Label>{t("location")} (EN)</Label>
                       <Input value={aboutLocationEn} onChange={e => setAboutLocationEn(e.target.value)} className="bg-accent/30" placeholder="Istanbul, Turkey" />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Deneyim (TR)</Label>
+                      <Label>{t("experience")} (TR)</Label>
                       <Input value={aboutExperienceTr} onChange={e => setAboutExperienceTr(e.target.value)} className="bg-accent/30" placeholder="5+ Yıl Deneyim" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Deneyim (EN)</Label>
+                      <Label>{t("experience")} (EN)</Label>
                       <Input value={aboutExperienceEn} onChange={e => setAboutExperienceEn(e.target.value)} className="bg-accent/30" placeholder="5+ Years Experience" />
                     </div>
                   </div>
@@ -284,11 +284,11 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Detaylı Biyografi (TR)</Label>
+                    <Label>{t("detailedBiography")} (TR)</Label>
                     <RichTextEditor content={aboutBioTr} onChange={setAboutBioTr} placeholder="Kendinizden bahsedin..." />
                   </div>
                   <div className="space-y-2">
-                    <Label>Detaylı Biyografi (EN)</Label>
+                    <Label>{t("detailedBiography")} (EN)</Label>
                     <RichTextEditor content={aboutBioEn} onChange={setAboutBioEn} placeholder="Tell us about yourself..." />
                   </div>
                 </div>
@@ -301,19 +301,19 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         <TabsContent value="contact" className="space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-6 space-y-4">
-              <h2 className="font-semibold text-lg">İletişim Bilgileri</h2>
+              <h2 className="font-semibold text-lg">{t("contact")}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Email</Label>
+                  <Label>{t("email")}</Label>
                   <Input value={contactEmail} onChange={e => setContactEmail(e.target.value)} className="bg-accent/30" placeholder="info@example.com" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Telefon</Label>
+                  <Label>{t("phone")}</Label>
                   <Input value={contactPhone} onChange={e => setContactPhone(e.target.value)} className="bg-accent/30" placeholder="+90 5XX XXX XX XX" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Adres</Label>
+                <Label>{t("address")}</Label>
                 <Textarea value={contactAddress} onChange={e => setContactAddress(e.target.value)} className="bg-accent/30 resize-none" rows={2} />
               </div>
             </CardContent>
@@ -321,7 +321,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
 
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-6 space-y-4">
-              <h2 className="font-semibold text-lg">Sosyal Medya Linkleri</h2>
+              <h2 className="font-semibold text-lg">{t("socialMedia")}</h2>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>GitHub URL</Label>
@@ -361,28 +361,28 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-6 space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="font-semibold text-lg">Yetenekler (Skills)</h2>
+                <h2 className="font-semibold text-lg">{t("skillsSettings")}</h2>
                 <Button type="button" onClick={addSkill} variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-2" /> Yetenek Ekle
+                  <Plus className="h-4 w-4 mr-2" /> {t("addSkill")}
                 </Button>
               </div>
               
               {skills.length === 0 ? (
-                <p className="text-muted-foreground text-sm">Henüz yetenek eklenmemiş.</p>
+                <p className="text-muted-foreground text-sm">{t("noSkills")}</p>
               ) : (
                 <div className="space-y-3">
                   {skills.map((skill, index) => (
                     <div key={index} className="flex flex-col md:flex-row gap-3 items-end bg-accent/20 p-3 rounded-lg border border-border/50">
                       <div className="flex-[2] w-full">
-                        <Label className="text-xs text-muted-foreground mb-1 block">Yetenek Adı (TR)</Label>
+                        <Label className="text-xs text-muted-foreground mb-1 block">{t("skillName")} (TR)</Label>
                         <Input value={skill.nameTr} onChange={e => updateSkill(index, "nameTr", e.target.value)} className="bg-background h-8" placeholder="Örn: React" />
                       </div>
                       <div className="flex-[2] w-full">
-                        <Label className="text-xs text-muted-foreground mb-1 block">Yetenek Adı (EN)</Label>
+                        <Label className="text-xs text-muted-foreground mb-1 block">{t("skillName")} (EN)</Label>
                         <Input value={skill.nameEn} onChange={e => updateSkill(index, "nameEn", e.target.value)} className="bg-background h-8" placeholder="E.g. React" />
                       </div>
                       <div className="flex-1 w-full">
-                        <Label className="text-xs text-muted-foreground mb-1 block">Seviye (0-100)</Label>
+                        <Label className="text-xs text-muted-foreground mb-1 block">{t("level")} (0-100)</Label>
                         <Input type="number" min="0" max="100" value={skill.level} onChange={e => updateSkill(index, "level", parseInt(e.target.value) || 0)} className="bg-background h-8" />
                       </div>
                       <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => removeSkill(index)}>
@@ -398,28 +398,28 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-6 space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="font-semibold text-lg">Hobiler ve İlgi Alanları</h2>
+                <h2 className="font-semibold text-lg">{t("hobbiesAndInterests")}</h2>
                 <Button type="button" onClick={addHobby} variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-2" /> Hobi Ekle
+                  <Plus className="h-4 w-4 mr-2" /> {t("addHobby")}
                 </Button>
               </div>
               
               {hobbies.length === 0 ? (
-                <p className="text-muted-foreground text-sm">Henüz hobi eklenmemiş.</p>
+                <p className="text-muted-foreground text-sm">{t("noHobbies")}</p>
               ) : (
                 <div className="space-y-3">
                   {hobbies.map((hobby, index) => (
                     <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start bg-accent/20 p-3 rounded-lg border border-border/50">
                       <div className="md:col-span-2">
-                        <Label className="text-xs text-muted-foreground mb-1 block">Adı (TR)</Label>
+                        <Label className="text-xs text-muted-foreground mb-1 block">{t("hobbyName")} (TR)</Label>
                         <Input value={hobby.nameTr} onChange={e => updateHobby(index, "nameTr", e.target.value)} className="bg-background h-8" placeholder="Fotoğraf" />
                       </div>
                       <div className="md:col-span-2">
-                        <Label className="text-xs text-muted-foreground mb-1 block">Adı (EN)</Label>
+                        <Label className="text-xs text-muted-foreground mb-1 block">{t("hobbyName")} (EN)</Label>
                         <Input value={hobby.nameEn} onChange={e => updateHobby(index, "nameEn", e.target.value)} className="bg-background h-8" placeholder="Photography" />
                       </div>
                       <div className="md:col-span-2">
-                        <Label className="text-xs text-muted-foreground mb-1 block">İkon / Emoji</Label>
+                        <Label className="text-xs text-muted-foreground mb-1 block">{t("hobbyIcon")}</Label>
                         <div className="flex gap-1">
                           <Input value={hobby.icon} onChange={e => updateHobby(index, "icon", e.target.value)} className="bg-background h-8" placeholder="Örn: 🎮 veya Camera" />
                           <DropdownMenu>
@@ -429,7 +429,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                             <DropdownMenuContent align="end" className="w-72 max-h-[400px] p-3 bg-popover border-border shadow-xl overflow-y-auto">
                               <div className="space-y-4">
                                 <div>
-                                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-2 px-1">Popüler Emojiler</p>
+                                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-2 px-1">{t("popularEmojis")}</p>
                                   <div className="grid grid-cols-7 gap-1">
                                     {COMMON_EMOJIS.map(emoji => (
                                       <button
@@ -444,7 +444,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                                   </div>
                                 </div>
                                 <div>
-                                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-2 px-1">Lucide İkonları</p>
+                                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-2 px-1">{t("lucideIcons")}</p>
                                   <div className="grid grid-cols-4 gap-1 px-1">
                                     {LUCIDE_ICONS.map(icon => (
                                       <button
@@ -465,11 +465,11 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                         </div>
                       </div>
                       <div className="md:col-span-2">
-                        <Label className="text-xs text-muted-foreground mb-1 block">Açıklama (TR)</Label>
+                        <Label className="text-xs text-muted-foreground mb-1 block">{t("descriptionOnly")} (TR)</Label>
                         <Input value={hobby.descTr} onChange={e => updateHobby(index, "descTr", e.target.value)} className="bg-background h-8" />
                       </div>
                       <div className="md:col-span-3">
-                        <Label className="text-xs text-muted-foreground mb-1 block">Açıklama (EN)</Label>
+                        <Label className="text-xs text-muted-foreground mb-1 block">{t("descriptionOnly")} (EN)</Label>
                         <Input value={hobby.descEn} onChange={e => updateHobby(index, "descEn", e.target.value)} className="bg-background h-8" />
                       </div>
                       <div className="md:col-span-1 flex justify-end">
@@ -489,32 +489,32 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         <TabsContent value="seo" className="space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardContent className="p-6 space-y-4">
-              <h2 className="font-semibold text-lg">Arama Motoru Optimizasyonu (SEO)</h2>
+              <h2 className="font-semibold text-lg">{t("seoOpt")} (SEO)</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Site Başlığı (TR)</Label>
+                  <Label>{t("siteTitle")} (TR)</Label>
                   <Input value={siteTitleTr} onChange={e => setSiteTitleTr(e.target.value)} className="bg-accent/30" placeholder="Demircucu | Full-Stack Developer" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Site Başlığı (EN)</Label>
+                  <Label>{t("siteTitle")} (EN)</Label>
                   <Input value={siteTitleEn} onChange={e => setSiteTitleEn(e.target.value)} className="bg-accent/30" placeholder="Demircucu | Full-Stack Developer" />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Site Açıklaması (TR)</Label>
+                  <Label>{t("siteDescription")} (TR)</Label>
                   <Textarea value={siteDescriptionTr} onChange={e => setSiteDescriptionTr(e.target.value)} className="bg-accent/30" rows={4} placeholder="Siteniz hakkında kısa bir açıklama..." />
                 </div>
                 <div className="space-y-2">
-                  <Label>Site Açıklaması (EN)</Label>
+                  <Label>{t("siteDescription")} (EN)</Label>
                   <Textarea value={siteDescriptionEn} onChange={e => setSiteDescriptionEn(e.target.value)} className="bg-accent/30" rows={4} placeholder="A short description about your site..." />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Favicon (Site İkonu)</Label>
+                <Label>{t("siteIcon")} (Site İkonu)</Label>
                 <ImageUpload value={faviconUrl} onChange={setFaviconUrl} folder="settings" usedIn="settings:favicon" />
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  Önerilen format: 32x32 veya 64x64 PNG/ICO.
+                  {t("siteIconPlaceholder")}
                 </p>
               </div>
             </CardContent>

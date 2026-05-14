@@ -42,7 +42,7 @@ export default function AdminLayout({
               <Shield className="h-5 w-5 text-violet-400" />
             </div>
             <div>
-              <h2 className="font-bold text-sm">Admin Panel</h2>
+              <h2 className="font-bold text-sm">{t("adminPanel")}</h2>
               <p className="text-xs text-muted-foreground">demircucu.com</p>
             </div>
           </div>

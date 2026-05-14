@@ -19,7 +19,7 @@ export default function ProfileLikesClient({ likes, comments }: { likes: any[], 
         <div className="p-3 bg-pink-500/10 rounded-xl">
           <Heart className="w-6 h-6 text-pink-400" />
         </div>
-        <h1 className="text-3xl font-bold">Aktivitelerim</h1>
+        <h1 className="text-3xl font-bold">{t("activities") || "Aktivitelerim"}</h1>
       </div>
 
       <Tabs defaultValue="likes" className="w-full">
@@ -36,7 +36,7 @@ export default function ProfileLikesClient({ likes, comments }: { likes: any[], 
 
         <TabsContent value="likes" className="space-y-4">
           {likes.length === 0 ? (
-            <p className="text-muted-foreground">Henüz hiçbir yazıyı beğenmediniz.</p>
+            <p className="text-muted-foreground">{t("noLikes") || "Henüz hiçbir yazıyı beğenmediniz."}</p>
           ) : (
             likes.map((like) => (
               <Link key={like.id} href={`/blog/${like.post.slug}`}>
@@ -48,7 +48,7 @@ export default function ProfileLikesClient({ likes, comments }: { likes: any[], 
                       </h3>
                       <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                         <Calendar className="w-3 h-3" />
-                        {formatDate(like.createdAt)} tarihinde beğenildi
+                        {formatDate(like.createdAt)} {t("liked") || "tarihinde beğenildi"}
                       </p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-violet-400 group-hover:translate-x-1 transition-all" />
@@ -61,7 +61,7 @@ export default function ProfileLikesClient({ likes, comments }: { likes: any[], 
 
         <TabsContent value="comments" className="space-y-4">
           {comments.length === 0 ? (
-            <p className="text-muted-foreground">Henüz hiçbir yorum yapmadınız.</p>
+            <p className="text-muted-foreground">{t("noComments") || "Henüz hiçbir yorum yapmadınız."}</p>
           ) : (
             comments.map((comment) => (
               <Card key={comment.id} className="border-border/50 bg-card/50">

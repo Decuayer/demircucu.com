@@ -1,12 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 
 export async function submitContactMessage(data: any) {
+  const t = await getTranslations("contact");
   const { name, email, subject, message } = data;
 
   if (!name || !email || !message) {
-    return { error: "Lütfen gerekli tüm alanları doldurun." };
+    return { error: t("requiredFields") };
   }
 
   try {
@@ -22,6 +24,6 @@ export async function submitContactMessage(data: any) {
     return { success: true };
   } catch (error) {
     console.error("Contact submission error:", error);
-    return { error: "Mesajınız gönderilirken bir hata oluştu." };
+    return { error: t("submissionError") };
   }
 }

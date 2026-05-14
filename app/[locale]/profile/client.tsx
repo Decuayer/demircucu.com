@@ -22,7 +22,7 @@ export default function ProfileClient({ user }: { user: any }) {
     startTransition(async () => {
       const res = await updateProfile({ name });
       if (res.error) toast.error(res.error);
-      else toast.success("Profiliniz başarıyla güncellendi.");
+      else toast.success(t("profileUpdated") || "Profiliniz başarıyla güncellendi.");
     });
   };
 
@@ -33,7 +33,7 @@ export default function ProfileClient({ user }: { user: any }) {
     const confirm = formData.get("confirm") as string;
 
     if (password !== confirm) {
-      toast.error("Şifreler eşleşmiyor.");
+      toast.error(t("passwordMismatch") || "Şifreler eşleşmiyor.");
       return;
     }
 
@@ -41,7 +41,7 @@ export default function ProfileClient({ user }: { user: any }) {
       const res = await updatePassword(password);
       if (res.error) toast.error(res.error);
       else {
-        toast.success("Şifreniz güncellendi.");
+        toast.success(t("passwordUpdated") || "Şifreniz güncellendi.");
         (e.target as HTMLFormElement).reset();
       }
     });
@@ -61,21 +61,21 @@ export default function ProfileClient({ user }: { user: any }) {
           <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2">
               <User className="w-5 h-5" />
-              Hesap Bilgileri
+              {t("accountInfo") || "Hesap Bilgileri"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleProfileSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">E-posta</Label>
+                <Label htmlFor="email">{t("email") || "E-posta"}</Label>
                 <Input id="email" defaultValue={user.email} disabled className="bg-accent/30 opacity-50" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="name">Ad Soyad</Label>
+                <Label htmlFor="name">{t("name") || "Ad Soyad"}</Label>
                 <Input id="name" name="name" defaultValue={user.name} required className="bg-accent/30" />
               </div>
               <Button disabled={isPending} type="submit" className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
-                {isPending ? "Kaydediliyor..." : "Kaydet"}
+                {isPending ? t("updating") || "Güncelleniyor..." : t("save") || "Kaydet"}
               </Button>
             </form>
           </CardContent>
@@ -91,15 +91,15 @@ export default function ProfileClient({ user }: { user: any }) {
           <CardContent>
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="password">Yeni Şifre</Label>
+                <Label htmlFor="password">{t("newPassword") || "Yeni Şifre"}</Label>
                 <Input id="password" name="password" type="password" required className="bg-accent/30" placeholder="••••••••" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm">Şifreyi Doğrula</Label>
+                <Label htmlFor="confirm">{t("confirmPassword") || "Şifreyi Doğrula"}</Label>
                 <Input id="confirm" name="confirm" type="password" required className="bg-accent/30" placeholder="••••••••" />
               </div>
               <Button disabled={isPending} type="submit" className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
-                {isPending ? "Güncelleniyor..." : "Şifreyi Güncelle"}
+                {isPending ? t("updating") || "Güncelleniyor..." : t("updatePassword") || "Şifreyi Güncelle"}
               </Button>
             </form>
           </CardContent>

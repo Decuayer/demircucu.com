@@ -4,12 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "./auth";
 import { deleteFileFromStorage } from "@/lib/supabase/storage";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
+
 
 // Middleware to check admin rights inside server actions
 async function requireAdmin() {
+  const t = await getTranslations("media");
+
   const user = await getCurrentUser();
   if (!user || user.role !== "ADMIN") {
-    throw new Error("Bu işlemi yapmak için yetkiniz yok.");
+    throw new Error(t("unauthorized"));
   }
   return user;
 }
@@ -41,13 +45,15 @@ export async function getMediaFiles(typeFilter?: string) {
  * Delete a media file from DB and Storage
  */
 export async function deleteMediaFile(id: string) {
+  const t = await getTranslations("media");
+
   try {
     await requireAdmin();
     
     // Find the file to get its path
     const file = await prisma.mediaFile.findUnique({ where: { id } });
     if (!file) {
-      return { error: "Dosya bulunamadı." };
+      return { error: t("fileNotFound") };
     }
     
     // Delete from Supabase Storage
@@ -65,7 +71,7 @@ export async function deleteMediaFile(id: string) {
     return { success: true };
   } catch (error: any) {
     console.error("Error deleting media file:", error);
-    return { error: error.message || "Dosya silinirken bir hata oluştu." };
+    return { error: error.message || t("deleteError") };
   }
 }
 
@@ -81,6 +87,8 @@ export async function saveMediaFileToDB(data: {
   path: string;
   usedIn?: string;
 }) {
+  const t = await getTranslations("media");
+  
   try {
     await requireAdmin();
     
@@ -100,6 +108,6 @@ export async function saveMediaFileToDB(data: {
     return { success: true, mediaFile };
   } catch (error: any) {
     console.error("Error saving media file to DB:", error);
-    return { error: error.message || "Dosya veritabanına kaydedilemedi." };
+    return { error: error.message || t("saveError") };
   }
 }
