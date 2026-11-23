@@ -27,7 +27,10 @@
     "db:seed": "tsx scripts/assert-local-db.ts && prisma db seed",
     "db:reset": "tsx scripts/assert-local-db.ts && prisma migrate reset --force",
     "db:studio": "prisma studio",
-    "prepare": "husky"
+    "prepare": "husky",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -91,6 +94,7 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "prisma": "^7.10.1",
     "shadcn": "^4.23.0",
+    "supabase": "^3.3.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",
