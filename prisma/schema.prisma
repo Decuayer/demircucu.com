@@ -50,7 +50,7 @@ model Experience {
   tags          Tag[]
   logo          String?
   images        String[]
-  files         Json?     // Array of { name: string, url: string, type: string }
+  files         Json? // Array of { name: string, url: string, type: string }
   githubUrl     String?
   order         Int       @default(0)
   published     Boolean   @default(true)
@@ -68,7 +68,7 @@ model Project {
   descriptionTr String?  @db.Text
   descriptionEn String?  @db.Text
   tags          Tag[]
-  files         Json?    // Array of { name: string, url: string, type: string }
+  files         Json? // Array of { name: string, url: string, type: string }
   logo          String?
   images        String[]
   githubUrl     String?
@@ -91,7 +91,7 @@ model BlogPost {
   contentEn  String   @db.Text
   coverImage String?
   tags       Tag[]
-  files      Json?    // Array of { name: string, url: string, type: string }
+  files      Json? // Array of { name: string, url: string, type: string }
   published  Boolean  @default(false)
   featured   Boolean  @default(false)
   viewCount  Int      @default(0)
@@ -150,26 +150,26 @@ model MediaFile {
 }
 
 model SiteSettings {
-  id                String   @id @default("main")
+  id                  String   @id @default("main")
   // Hero
-  heroTitleTr       String?
-  heroTitleEn       String?
-  heroSubTr         String?
-  heroSubEn         String?
+  heroTitleTr         String?
+  heroTitleEn         String?
+  heroSubTr           String?
+  heroSubEn           String?
   // About
-  aboutBioTr        String?  @db.Text
-  aboutBioEn        String?  @db.Text
-  aboutPhoto        String?
-  aboutLocationTr   String?
-  aboutLocationEn   String?
-  aboutExperienceTr String?
-  aboutExperienceEn String?
-  skills            Json?
-  hobbies           Json?
+  aboutBioTr          String?  @db.Text
+  aboutBioEn          String?  @db.Text
+  aboutPhoto          String?
+  aboutLocationTr     String?
+  aboutLocationEn     String?
+  aboutExperienceTr   String?
+  aboutExperienceEn   String?
+  skills              Json?
+  hobbies             Json?
   // Contact
-  contactEmail      String?
-  contactPhone      String?
-  contactAddress    String?
+  contactEmail        String?
+  contactPhone        String?
+  contactAddress      String?
   // Social
   socialGithub        String?
   socialLinkedin      String?
@@ -179,21 +179,21 @@ model SiteSettings {
   socialMedium        String?
   socialStackoverflow String?
   // CTA
-  ctaTitleTr        String?
-  ctaTitleEn        String?
-  ctaDescriptionTr  String?  @db.Text
-  ctaDescriptionEn  String?  @db.Text
+  ctaTitleTr          String?
+  ctaTitleEn          String?
+  ctaDescriptionTr    String?  @db.Text
+  ctaDescriptionEn    String?  @db.Text
   // Footer
-  footerTitleTr     String?
-  footerTitleEn     String?
-  footerDescriptionTr String? @db.Text
-  footerDescriptionEn String? @db.Text
+  footerTitleTr       String?
+  footerTitleEn       String?
+  footerDescriptionTr String?  @db.Text
+  footerDescriptionEn String?  @db.Text
   // SEO & Meta
-  siteTitleTr       String?
-  siteTitleEn       String?
-  siteDescriptionTr String?  @db.Text
-  siteDescriptionEn String?  @db.Text
-  faviconUrl        String?
+  siteTitleTr         String?
+  siteTitleEn         String?
+  siteDescriptionTr   String?  @db.Text
+  siteDescriptionEn   String?  @db.Text
+  faviconUrl          String?
   // Meta
-  updatedAt         DateTime @updatedAt
+  updatedAt           DateTime @updatedAt
 }
