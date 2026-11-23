@@ -9,8 +9,6 @@ import { Plus, Pencil, Trash2, Newspaper, Eye } from "lucide-react";
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
-
-
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
@@ -57,13 +55,13 @@ export default function AdminBlogClient({ initialPosts }: AdminBlogClientProps) 
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-2xl font-bold flex items-center gap-3"
+          className="flex items-center gap-3 text-2xl font-bold"
         >
           <Newspaper className="h-6 w-6 text-cyan-400" />
           {t("blog")}
         </motion.h1>
         <Link href="/admin/blog/new">
-          <Button className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
+          <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
             <Plus className="mr-2 h-4 w-4" />
             {t("add") || "Ekle"}
           </Button>
@@ -78,11 +76,11 @@ export default function AdminBlogClient({ initialPosts }: AdminBlogClientProps) 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="border-border/50 bg-card/50 hover:bg-card transition-colors">
-              <CardContent className="p-4 flex items-center justify-between">
+            <Card className="border-border/50 bg-card/50 transition-colors hover:bg-card">
+              <CardContent className="flex items-center justify-between p-4">
                 <div className="flex-1">
                   <p className="font-medium">{getTranslated(post, "title", locale)}</p>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                  <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
                     <time>{new Date(post.createdAt).toLocaleDateString()}</time>
                     <div className="flex items-center gap-1">
                       <Eye className="h-3 w-3" />
@@ -99,7 +97,12 @@ export default function AdminBlogClient({ initialPosts }: AdminBlogClientProps) 
                       <Pencil className="h-4 w-4" />
                     </Button>
                   </Link>
-                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setDeleteId(post.id)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive"
+                    onClick={() => setDeleteId(post.id)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -109,19 +112,19 @@ export default function AdminBlogClient({ initialPosts }: AdminBlogClientProps) 
         ))}
       </div>
 
-
-
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent className="border-border/50 bg-background">
           <AlertDialogHeader>
             <AlertDialogTitle>{t("confirmDelete")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("deleteBlogConfirmation")}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("deleteBlogConfirmation")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={isPending}>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+              disabled={isPending}
+            >
               {isPending ? t("deleting") : t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>

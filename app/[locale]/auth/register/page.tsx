@@ -47,39 +47,37 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-16">
+    <div className="flex min-h-[80vh] items-center justify-center py-16">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md px-4"
       >
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-8 space-y-6">
-            <div className="text-center space-y-2">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10 mx-auto mb-4">
+          <CardContent className="space-y-6 p-8">
+            <div className="space-y-2 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10">
                 <UserPlus className="h-6 w-6 text-cyan-400" />
               </div>
               <h1 className="text-2xl font-bold">{t("registerTitle")}</h1>
-              <p className="text-sm text-muted-foreground">
-                Yeni bir hesap oluşturun
-              </p>
+              <p className="text-sm text-muted-foreground">Yeni bir hesap oluşturun</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="p-3 text-sm text-red-500 bg-red-500/10 rounded-lg border border-red-500/20 text-center">
+                <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-center text-sm text-red-500">
                   {error}
                 </div>
               )}
               <div className="space-y-2">
                 <Label htmlFor="name">{t("name")}</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <User className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="name"
                     name="name"
                     required
-                    className="pl-10 bg-accent/30 border-border/50"
+                    className="border-border/50 bg-accent/30 pl-10"
                     placeholder="John Doe"
                   />
                 </div>
@@ -87,13 +85,13 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label htmlFor="email">{t("email")}</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="email"
                     name="email"
                     type="email"
                     required
-                    className="pl-10 bg-accent/30 border-border/50"
+                    className="border-border/50 bg-accent/30 pl-10"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -101,13 +99,13 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label htmlFor="password">{t("password")}</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="password"
                     name="password"
                     type="password"
                     required
-                    className="pl-10 bg-accent/30 border-border/50"
+                    className="border-border/50 bg-accent/30 pl-10"
                     placeholder="••••••••"
                   />
                 </div>
@@ -115,13 +113,13 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
                     type="password"
                     required
-                    className="pl-10 bg-accent/30 border-border/50"
+                    className="border-border/50 bg-accent/30 pl-10"
                     placeholder="••••••••"
                   />
                 </div>
@@ -130,7 +128,7 @@ export default function RegisterPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-700 hover:to-cyan-700 text-white border-0"
+                className="w-full border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700"
               >
                 {loading ? "..." : t("registerButton")}
               </Button>
@@ -138,7 +136,7 @@ export default function RegisterPage() {
 
             <div className="text-center text-sm text-muted-foreground">
               {t("hasAccount")}{" "}
-              <Link href="/auth/login" className="text-violet-400 hover:underline font-medium">
+              <Link href="/auth/login" className="font-medium text-violet-400 hover:underline">
                 {t("loginButton")}
               </Link>
             </div>

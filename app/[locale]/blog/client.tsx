@@ -26,8 +26,8 @@ function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
       transition={{ delay: index * 0.1 }}
     >
       <Link href={`/blog/${post.slug}`}>
-        <Card className="group h-full border-border/50 bg-card/50 hover:bg-card hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/5">
-          <CardContent className="p-6 space-y-4">
+        <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
+          <CardContent className="space-y-4 p-6">
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
@@ -41,25 +41,22 @@ function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
               <span>·</span>
               <time>{new Date(post.createdAt).toLocaleDateString()}</time>
             </div>
-            <h3 className="font-semibold text-lg group-hover:text-cyan-400 transition-colors">
+            <h3 className="text-lg font-semibold transition-colors group-hover:text-cyan-400">
               {getTranslated(post, "title", locale)}
             </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm leading-relaxed text-muted-foreground">
               {getTranslated(post, "excerpt", locale)}
             </p>
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
-                <Badge
-                  key={tag.id}
-                  variant="secondary"
-                  className="text-xs bg-accent/50"
-                >
+                <Badge key={tag.id} variant="secondary" className="bg-accent/50 text-xs">
                   {getTranslated(tag, "name", locale)}
                 </Badge>
               ))}
             </div>
-            <div className="flex items-center text-sm text-cyan-400 font-medium pt-1">
-              Devamını Oku <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
+            <div className="flex items-center pt-1 text-sm font-medium text-cyan-400">
+              Devamını Oku{" "}
+              <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" />
             </div>
           </CardContent>
         </Card>
@@ -75,30 +72,32 @@ interface BlogClientProps {
 export default function BlogClient({ posts }: BlogClientProps) {
   const t = useTranslations("blog");
   const mostRead = [...posts].sort((a, b) => b.viewCount - a.viewCount);
-  const latest = [...posts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const latest = [...posts].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
 
   return (
     <div className="py-16 md:py-24">
-      <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+      <div className="container mx-auto max-w-5xl px-4 md:px-6">
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          className="mb-16 text-center"
         >
           <Badge
             variant="secondary"
-            className="mb-4 px-4 py-1.5 bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
+            className="mb-4 border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-cyan-400"
           >
-            <Newspaper className="h-3 w-3 mr-1" />
+            <Newspaper className="mr-1 h-3 w-3" />
             {t("title")}
           </Badge>
-          <h1 className="text-3xl md:text-5xl font-bold">{t("title")}</h1>
+          <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
         </motion.div>
 
         {/* Tabs */}
         <Tabs defaultValue="latest" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 bg-accent/50">
+          <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2 bg-accent/50">
             <TabsTrigger value="latest" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
               {t("latest")}
@@ -110,7 +109,7 @@ export default function BlogClient({ posts }: BlogClientProps) {
           </TabsList>
 
           <TabsContent value="latest">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {latest.map((post, i) => (
                 <PostCard key={post.id} post={post} index={i} />
               ))}
@@ -118,7 +117,7 @@ export default function BlogClient({ posts }: BlogClientProps) {
           </TabsContent>
 
           <TabsContent value="popular">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {mostRead.map((post, i) => (
                 <PostCard key={post.id} post={post} index={i} />
               ))}

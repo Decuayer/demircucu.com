@@ -39,28 +39,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-16">
+    <div className="flex min-h-[80vh] items-center justify-center py-16">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md px-4"
       >
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-8 space-y-6">
+          <CardContent className="space-y-6 p-8">
             {/* Header */}
-            <div className="text-center space-y-2">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10 mx-auto mb-4">
+            <div className="space-y-2 text-center">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10">
                 <LogIn className="h-6 w-6 text-violet-400" />
               </div>
               <h1 className="text-2xl font-bold">{t("loginTitle")}</h1>
-              <p className="text-sm text-muted-foreground">
-                demircucu.com hesabınıza giriş yapın
-              </p>
+              <p className="text-sm text-muted-foreground">demircucu.com hesabınıza giriş yapın</p>
             </div>
 
             {/* Form */}
             {error && (
-              <div className="p-3 text-sm text-red-500 bg-red-500/10 rounded-lg border border-red-500/20 text-center">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-center text-sm text-red-500">
                 {error}
               </div>
             )}
@@ -68,13 +66,13 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <Label htmlFor="email">{t("email")}</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="email"
                     name="email"
                     type="email"
                     required
-                    className="pl-10 bg-accent/30 border-border/50"
+                    className="border-border/50 bg-accent/30 pl-10"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -82,20 +80,23 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <Label htmlFor="password">{t("password")}</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="password"
                     name="password"
                     type="password"
                     required
-                    className="pl-10 bg-accent/30 border-border/50"
+                    className="border-border/50 bg-accent/30 pl-10"
                     placeholder="••••••••"
                   />
                 </div>
               </div>
 
               <div className="text-right">
-                <button type="button" className="text-xs text-muted-foreground hover:text-violet-400 transition-colors">
+                <button
+                  type="button"
+                  className="text-xs text-muted-foreground transition-colors hover:text-violet-400"
+                >
                   {t("forgotPassword")}
                 </button>
               </div>
@@ -103,7 +104,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-700 hover:to-cyan-700 text-white border-0"
+                className="w-full border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700"
               >
                 {loading ? "..." : t("loginButton")}
               </Button>
@@ -112,7 +113,7 @@ export default function LoginPage() {
             {/* Register Link */}
             <div className="text-center text-sm text-muted-foreground">
               {t("noAccount")}{" "}
-              <Link href="/auth/register" className="text-violet-400 hover:underline font-medium">
+              <Link href="/auth/register" className="font-medium text-violet-400 hover:underline">
                 {t("registerButton")}
               </Link>
             </div>

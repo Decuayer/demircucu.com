@@ -3,10 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ProfileLikesClient from "./client";
 
-export default async function ProfileLikesPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ProfileLikesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   const user = await getCurrentUser();
- 
+
   if (!user) {
     redirect(`/${locale}/auth/login`);
   }
@@ -22,10 +26,10 @@ export default async function ProfileLikesPage({ params }: { params: Promise<{ l
           titleEn: true,
           slug: true,
           createdAt: true,
-        }
-      }
+        },
+      },
     },
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
   });
 
   // Fetch past comments
@@ -37,10 +41,10 @@ export default async function ProfileLikesPage({ params }: { params: Promise<{ l
           titleTr: true,
           titleEn: true,
           slug: true,
-        }
-      }
+        },
+      },
     },
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
   });
 
   return <ProfileLikesClient likes={likes} comments={comments} />;

@@ -23,7 +23,7 @@ export async function getProjectById(id: string) {
     await requireAdmin();
     return await prisma.project.findUnique({
       where: { id },
-      include: { tags: true }
+      include: { tags: true },
     });
   } catch (error) {
     return null;
@@ -32,7 +32,7 @@ export async function getProjectById(id: string) {
 
 export async function createProject(data: any) {
   const t = await getTranslations("admin");
-  
+
   try {
     await requireAdmin();
     const project = await prisma.project.create({
@@ -46,16 +46,18 @@ export async function createProject(data: any) {
         descriptionEn: data.descriptionEn || null,
         logo: data.logo || null,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              connectOrCreate: data.tagsList.map((tag: any) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         githubUrl: data.githubUrl,
         liveUrl: data.liveUrl,
         order: data.order || 0,
@@ -90,17 +92,19 @@ export async function updateProject(id: string, data: any) {
         descriptionEn: data.descriptionEn,
         logo: data.logo,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          set: [],
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              set: [],
+              connectOrCreate: data.tagsList.map((tag: any) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         githubUrl: data.githubUrl,
         liveUrl: data.liveUrl,
         order: data.order,
@@ -139,7 +143,7 @@ export async function getExperienceById(id: string) {
     await requireAdmin();
     return await prisma.experience.findUnique({
       where: { id },
-      include: { tags: true }
+      include: { tags: true },
     });
   } catch (error) {
     return null;
@@ -164,16 +168,18 @@ export async function createExperience(data: any) {
         endDate: data.endDate,
         logo: data.logo || null,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              connectOrCreate: data.tagsList.map((tag: any) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         order: data.order || 0,
         published: data.published ?? true,
       },
@@ -205,17 +211,19 @@ export async function updateExperience(id: string, data: any) {
         endDate: data.endDate,
         logo: data.logo,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          set: [], // Clear existing relations
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              set: [], // Clear existing relations
+              connectOrCreate: data.tagsList.map((tag: any) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         order: data.order,
         published: data.published,
       },
@@ -249,7 +257,7 @@ export async function getBlogPostById(id: string) {
     await requireAdmin();
     return await prisma.blogPost.findUnique({
       where: { id },
-      include: { tags: true }
+      include: { tags: true },
     });
   } catch (error) {
     return null;
@@ -272,16 +280,18 @@ export async function createBlogPost(data: any) {
         contentEn: data.contentEn!,
         coverImage: data.coverImage,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              connectOrCreate: data.tagsList.map((tag: any) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         published: data.published ?? true,
         featured: data.featured ?? false,
         authorId: admin.id,
@@ -315,17 +325,19 @@ export async function updateBlogPost(id: string, data: any) {
         contentEn: data.contentEn,
         coverImage: data.coverImage,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          set: [],
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              set: [],
+              connectOrCreate: data.tagsList.map((tag: any) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         published: data.published,
         featured: data.featured,
       },

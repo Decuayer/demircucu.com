@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
     // 2. Parse FormData
     const formData = await req.formData();
     const file = formData.get("file") as File;
-    const folder = formData.get("folder") as string || "general";
-    const usedIn = formData.get("usedIn") as string || undefined;
+    const folder = (formData.get("folder") as string) || "general";
+    const usedIn = (formData.get("usedIn") as string) || undefined;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     // 4. Upload to Supabase Storage
     const uploadRes = await uploadFileToStorage(buffer, fileName, fileType, folder);
-    
+
     if (!uploadRes.success || !uploadRes.path || !uploadRes.publicUrl) {
       return NextResponse.json({ error: uploadRes.error }, { status: 500 });
     }
@@ -56,12 +56,11 @@ export async function POST(req: NextRequest) {
     }
 
     // 6. Return success
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       url: uploadRes.publicUrl,
-      file: dbRes.mediaFile
+      file: dbRes.mediaFile,
     });
-
   } catch (error: any) {
     console.error("Upload API error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

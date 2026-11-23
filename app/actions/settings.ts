@@ -52,7 +52,7 @@ export async function updateSiteSettings(data: any) {
       update: data,
       create: {
         id: "main",
-        ...data
+        ...data,
       },
     });
 

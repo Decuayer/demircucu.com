@@ -4,7 +4,18 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { useState } from "react";
-import { Menu, X, Globe, User, LogOut, Settings, Heart, MessageSquare, Shield, LayoutDashboard } from "lucide-react";
+import {
+  Menu,
+  X,
+  Globe,
+  User,
+  LogOut,
+  Settings,
+  Heart,
+  MessageSquare,
+  Shield,
+  LayoutDashboard,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -53,27 +64,22 @@ export default function HeaderClient({ user }: HeaderClientProps) {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-lg font-bold tracking-tight"
-        >
+        <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
           <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
             demircucu
           </span>
-          <span className="text-muted-foreground text-sm font-normal">.com</span>
+          <span className="text-sm font-normal text-muted-foreground">.com</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.key}
               href={link.href}
               className={cn(
-                "px-3 py-2 text-sm font-medium rounded-md transition-colors hover:text-foreground hover:bg-accent",
-                pathname === link.href
-                  ? "text-foreground bg-accent"
-                  : "text-muted-foreground"
+                "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground",
+                pathname === link.href ? "bg-accent text-foreground" : "text-muted-foreground",
               )}
             >
               {t(link.key)}
@@ -99,7 +105,9 @@ export default function HeaderClient({ user }: HeaderClientProps) {
           {/* Auth Button or User Dropdown */}
           {user ? (
             <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="ghost" className="relative h-8 w-8 rounded-full ml-2" />}>
+              <DropdownMenuTrigger
+                render={<Button variant="ghost" className="relative ml-2 h-8 w-8 rounded-full" />}
+              >
                 <Avatar className="h-8 w-8 border border-border/50">
                   <AvatarFallback className="bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-violet-400">
                     {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
@@ -109,27 +117,35 @@ export default function HeaderClient({ user }: HeaderClientProps) {
               <DropdownMenuContent className="w-56" align="end">
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium text-sm">{user.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
                 {user.role === "ADMIN" && (
-                  <DropdownMenuItem render={<Link href="/admin" className="cursor-pointer flex items-center" />}>
+                  <DropdownMenuItem
+                    render={<Link href="/admin" className="flex cursor-pointer items-center" />}
+                  >
                     <LayoutDashboard className="mr-2 h-4 w-4 text-violet-400" />
                     <span>{t("admin") || "Admin Panel"}</span>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem render={<Link href="/profile" className="cursor-pointer flex items-center" />}>
+                <DropdownMenuItem
+                  render={<Link href="/profile" className="flex cursor-pointer items-center" />}
+                >
                   <Settings className="mr-2 h-4 w-4" />
                   <span>{t("profile") || "Profilim"}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem render={<Link href="/profile/likes" className="cursor-pointer flex items-center" />}>
+                <DropdownMenuItem
+                  render={
+                    <Link href="/profile/likes" className="flex cursor-pointer items-center" />
+                  }
+                >
                   <Heart className="mr-2 h-4 w-4 text-red-400" />
                   <span>{t("likes") || "Beğenilerim"}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="text-red-400 cursor-pointer">
+                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-400">
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>{t("logout") || "Çıkış Yap"}</span>
                 </DropdownMenuItem>
@@ -140,7 +156,7 @@ export default function HeaderClient({ user }: HeaderClientProps) {
               <Button
                 variant="default"
                 size="sm"
-                className="hidden md:inline-flex bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-700 hover:to-cyan-700 text-white border-0"
+                className="hidden border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700 md:inline-flex"
               >
                 {t("login")}
               </Button>
@@ -149,44 +165,46 @@ export default function HeaderClient({ user }: HeaderClientProps) {
 
           {/* Mobile Menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger
-              render={<Button variant="ghost" size="icon" className="md:hidden" />}
-            >
+            <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden" />}>
               <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="right" className="w-[280px] p-0">
-              <div className="flex flex-col h-full">
-                <div className="p-6 border-b border-border">
-                  <span className="text-lg font-bold bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
+              <div className="flex h-full flex-col">
+                <div className="border-b border-border p-6">
+                  <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-lg font-bold text-transparent">
                     demircucu.com
                   </span>
                 </div>
-                <nav className="flex-1 flex flex-col gap-1 p-4">
+                <nav className="flex flex-1 flex-col gap-1 p-4">
                   {navLinks.map((link) => (
                     <Link
                       key={link.key}
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
                       className={cn(
-                        "px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
+                        "rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                         pathname === link.href
-                          ? "text-foreground bg-accent"
-                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                          ? "bg-accent text-foreground"
+                          : "text-muted-foreground hover:bg-accent hover:text-foreground",
                       )}
                     >
                       {t(link.key)}
                     </Link>
                   ))}
                 </nav>
-                <div className="p-4 border-t border-border">
+                <div className="border-t border-border p-4">
                   {user ? (
-                    <Button onClick={handleSignOut} variant="outline" className="w-full text-red-400 border-red-400/20 hover:bg-red-400/10">
+                    <Button
+                      onClick={handleSignOut}
+                      variant="outline"
+                      className="w-full border-red-400/20 text-red-400 hover:bg-red-400/10"
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       Çıkış Yap
                     </Button>
                   ) : (
                     <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                      <Button className="w-full bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
+                      <Button className="w-full border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
                         {t("login")}
                       </Button>
                     </Link>

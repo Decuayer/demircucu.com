@@ -7,9 +7,19 @@ import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Button } from "@/components/ui/button";
 import {
-  Bold, Italic, Strikethrough, List, ListOrdered,
-  Heading1, Heading2, Heading3, Link as LinkIcon, Image as ImageIcon,
-  Undo, Redo, Pilcrow
+  Bold,
+  Italic,
+  Strikethrough,
+  List,
+  ListOrdered,
+  Heading1,
+  Heading2,
+  Heading3,
+  Link as LinkIcon,
+  Image as ImageIcon,
+  Undo,
+  Redo,
+  Pilcrow,
 } from "lucide-react";
 
 interface RichTextEditorProps {
@@ -25,12 +35,12 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-violet-500 underline',
+          class: "text-violet-500 underline",
         },
       }),
       Image.configure({
         HTMLAttributes: {
-          class: 'rounded-xl max-w-full my-4 border border-border/50',
+          class: "rounded-xl max-w-full my-4 border border-border/50",
         },
       }),
       Placeholder.configure({
@@ -47,116 +57,154 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
   if (!editor) return null;
 
   const addLink = () => {
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL girin', previousUrl);
+    const previousUrl = editor.getAttributes("link").href;
+    const url = window.prompt("URL girin", previousUrl);
 
     if (url === null) return;
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    if (url === "") {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
       return;
     }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
   const addImage = () => {
-    const url = window.prompt('Görsel URL si girin');
+    const url = window.prompt("Görsel URL si girin");
     if (url) {
       editor.chain().focus().setImage({ src: url }).run();
     }
   };
 
   return (
-    <div className="border border-border/50 rounded-xl overflow-hidden bg-background/50 flex flex-col">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border/50 bg-background/50">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 p-2 border-b border-border/50 bg-muted/20">
+      <div className="flex flex-wrap items-center gap-1 border-b border-border/50 bg-muted/20 p-2">
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={editor.isActive('bold') ? 'bg-accent text-accent-foreground' : ''}
+          className={editor.isActive("bold") ? "bg-accent text-accent-foreground" : ""}
         >
-          <Bold className="w-4 h-4" />
+          <Bold className="h-4 w-4" />
         </Button>
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={editor.isActive('italic') ? 'bg-accent text-accent-foreground' : ''}
+          className={editor.isActive("italic") ? "bg-accent text-accent-foreground" : ""}
         >
-          <Italic className="w-4 h-4" />
+          <Italic className="h-4 w-4" />
         </Button>
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={editor.isActive('strike') ? 'bg-accent text-accent-foreground' : ''}
+          className={editor.isActive("strike") ? "bg-accent text-accent-foreground" : ""}
         >
-          <Strikethrough className="w-4 h-4" />
+          <Strikethrough className="h-4 w-4" />
         </Button>
-        <div className="w-px h-6 bg-border mx-1" />
+        <div className="mx-1 h-6 w-px bg-border" />
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => editor.chain().focus().setParagraph().run()}
-          className={editor.isActive('paragraph') ? 'bg-accent text-accent-foreground' : ''}
+          className={editor.isActive("paragraph") ? "bg-accent text-accent-foreground" : ""}
           title="Paragraf"
         >
-          <Pilcrow className="w-4 h-4" />
+          <Pilcrow className="h-4 w-4" />
         </Button>
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={editor.isActive('heading', { level: 1 }) ? 'bg-accent text-accent-foreground' : ''}
+          className={
+            editor.isActive("heading", { level: 1 }) ? "bg-accent text-accent-foreground" : ""
+          }
         >
-          <Heading1 className="w-4 h-4" />
+          <Heading1 className="h-4 w-4" />
         </Button>
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={editor.isActive('heading', { level: 2 }) ? 'bg-accent text-accent-foreground' : ''}
+          className={
+            editor.isActive("heading", { level: 2 }) ? "bg-accent text-accent-foreground" : ""
+          }
         >
-          <Heading2 className="w-4 h-4" />
+          <Heading2 className="h-4 w-4" />
         </Button>
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={editor.isActive('heading', { level: 3 }) ? 'bg-accent text-accent-foreground' : ''}
+          className={
+            editor.isActive("heading", { level: 3 }) ? "bg-accent text-accent-foreground" : ""
+          }
         >
-          <Heading3 className="w-4 h-4" />
+          <Heading3 className="h-4 w-4" />
         </Button>
-        <div className="w-px h-6 bg-border mx-1" />
+        <div className="mx-1 h-6 w-px bg-border" />
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive('bulletList') ? 'bg-accent text-accent-foreground' : ''}
+          className={editor.isActive("bulletList") ? "bg-accent text-accent-foreground" : ""}
         >
-          <List className="w-4 h-4" />
+          <List className="h-4 w-4" />
         </Button>
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={editor.isActive('orderedList') ? 'bg-accent text-accent-foreground' : ''}
+          className={editor.isActive("orderedList") ? "bg-accent text-accent-foreground" : ""}
         >
-          <ListOrdered className="w-4 h-4" />
+          <ListOrdered className="h-4 w-4" />
         </Button>
-        <div className="w-px h-6 bg-border mx-1" />
+        <div className="mx-1 h-6 w-px bg-border" />
         <Button
-          type="button" variant="ghost" size="icon"
+          type="button"
+          variant="ghost"
+          size="icon"
           onClick={addLink}
-          className={editor.isActive('link') ? 'bg-accent text-accent-foreground' : ''}
+          className={editor.isActive("link") ? "bg-accent text-accent-foreground" : ""}
         >
-          <LinkIcon className="w-4 h-4" />
+          <LinkIcon className="h-4 w-4" />
         </Button>
         <Button type="button" variant="ghost" size="icon" onClick={addImage}>
-          <ImageIcon className="w-4 h-4" />
+          <ImageIcon className="h-4 w-4" />
         </Button>
-        <div className="w-px h-6 bg-border mx-1" />
-        <Button type="button" variant="ghost" size="icon" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()}>
-          <Undo className="w-4 h-4" />
+        <div className="mx-1 h-6 w-px bg-border" />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+        >
+          <Undo className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()}>
-          <Redo className="w-4 h-4" />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+        >
+          <Redo className="h-4 w-4" />
         </Button>
       </div>
 
       {/* Editor Content Area */}
-      <div className="p-4 min-h-[300px] cursor-text prose dark:prose-invert max-w-none focus:outline-none">
+      <div className="prose min-h-[300px] max-w-none cursor-text p-4 focus:outline-none dark:prose-invert">
         <EditorContent editor={editor} />
       </div>
 

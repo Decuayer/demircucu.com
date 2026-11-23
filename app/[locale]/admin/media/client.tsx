@@ -8,25 +8,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Image as ImageIcon, 
-  FileIcon, 
-  Trash2, 
-  Upload, 
-  Search, 
+import {
+  Image as ImageIcon,
+  FileIcon,
+  Trash2,
+  Upload,
+  Search,
   Copy,
   ExternalLink,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MediaFile } from "@prisma/client";
 import { deleteMediaFile } from "@/app/actions/media";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,19 +42,19 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
   const [files, setFiles] = useState<MediaFile[]>(initialFiles);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"all" | "image" | "document">("all");
-  
+
   const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  
+
   const [isUploading, setIsUploading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filter files
-  const filteredFiles = files.filter(file => {
+  const filteredFiles = files.filter((file) => {
     const matchesSearch = file.name.toLowerCase().includes(searchTerm.toLowerCase());
     if (!matchesSearch) return false;
-    
+
     if (filterType === "image") return file.type.startsWith("image/");
     if (filterType === "document") return !file.type.startsWith("image/");
     return true;
@@ -88,7 +83,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setFiles(prev => [data.file, ...prev]);
+        setFiles((prev) => [data.file, ...prev]);
         toast.success(t("fileUploaded"));
       } else {
         throw new Error(data.error || t("uploadFailed"));
@@ -104,14 +99,14 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
   // Handle file deletion
   const handleDelete = async () => {
     if (!deleteId) return;
-    
+
     startTransition(async () => {
       const res = await deleteMediaFile(deleteId);
       if (res.error) {
         toast.error(res.error);
       } else {
         toast.success(t("fileDeleted"));
-        setFiles(prev => prev.filter(f => f.id !== deleteId));
+        setFiles((prev) => prev.filter((f) => f.id !== deleteId));
         if (selectedFile?.id === deleteId) {
           setSelectedFile(null);
         }
@@ -126,42 +121,46 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
   };
 
   const formatSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   return (
     <div className="space-y-6">
       {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-2xl font-bold flex items-center gap-3"
+          className="flex items-center gap-3 text-2xl font-bold"
         >
           <ImageIcon className="h-6 w-6 text-violet-400" />
           {t("mediaLibrary")}
         </motion.h1>
 
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex w-full items-center gap-3 md:w-auto">
           <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder={t("searchFiles")} 
+            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder={t("searchFiles")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 bg-accent/30"
+              className="bg-accent/30 pl-9"
             />
           </div>
-          <Button 
-            onClick={() => !isUploading && fileInputRef.current?.click()} 
+          <Button
+            onClick={() => !isUploading && fileInputRef.current?.click()}
             disabled={isUploading}
-            className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0 whitespace-nowrap"
+            className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 whitespace-nowrap text-white"
           >
-            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+            {isUploading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="mr-2 h-4 w-4" />
+            )}
             {isUploading ? t("uploading") : t("uploadFile")}
           </Button>
           <input
@@ -177,27 +176,33 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
 
       {/* Filter Tabs */}
       <div className="flex items-center gap-2 border-b border-border/50 pb-4">
-        <Button 
-          variant={filterType === "all" ? "default" : "ghost"} 
-          size="sm" 
+        <Button
+          variant={filterType === "all" ? "default" : "ghost"}
+          size="sm"
           onClick={() => setFilterType("all")}
-          className={filterType === "all" ? "bg-accent/50 text-foreground" : "text-muted-foreground"}
+          className={
+            filterType === "all" ? "bg-accent/50 text-foreground" : "text-muted-foreground"
+          }
         >
           {t("all")}
         </Button>
-        <Button 
-          variant={filterType === "image" ? "default" : "ghost"} 
-          size="sm" 
+        <Button
+          variant={filterType === "image" ? "default" : "ghost"}
+          size="sm"
           onClick={() => setFilterType("image")}
-          className={filterType === "image" ? "bg-accent/50 text-foreground" : "text-muted-foreground"}
+          className={
+            filterType === "image" ? "bg-accent/50 text-foreground" : "text-muted-foreground"
+          }
         >
           {t("images")}
         </Button>
-        <Button 
-          variant={filterType === "document" ? "default" : "ghost"} 
-          size="sm" 
+        <Button
+          variant={filterType === "document" ? "default" : "ghost"}
+          size="sm"
           onClick={() => setFilterType("document")}
-          className={filterType === "document" ? "bg-accent/50 text-foreground" : "text-muted-foreground"}
+          className={
+            filterType === "document" ? "bg-accent/50 text-foreground" : "text-muted-foreground"
+          }
         >
           {t("documents")}
         </Button>
@@ -205,13 +210,13 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
 
       {/* Grid */}
       {filteredFiles.length === 0 ? (
-        <div className="text-center py-20 border-2 border-dashed border-border/50 rounded-xl bg-accent/10">
-          <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-4 opacity-50" />
+        <div className="rounded-xl border-2 border-dashed border-border/50 bg-accent/10 py-20 text-center">
+          <ImageIcon className="mx-auto mb-4 h-10 w-10 text-muted-foreground opacity-50" />
           <h3 className="text-lg font-medium">{t("noFilesFound")}</h3>
           <p className="text-sm text-muted-foreground">{t("noMatchingFiles")}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {filteredFiles.map((file, i) => (
             <motion.div
               key={file.id}
@@ -219,30 +224,40 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05 }}
             >
-              <Card 
-                className="overflow-hidden cursor-pointer group border-border/50 bg-card/50 hover:border-violet-500/50 transition-colors"
+              <Card
+                className="group cursor-pointer overflow-hidden border-border/50 bg-card/50 transition-colors hover:border-violet-500/50"
                 onClick={() => setSelectedFile(file)}
               >
-                <div className="aspect-square bg-accent/20 flex items-center justify-center p-2 relative">
+                <div className="relative flex aspect-square items-center justify-center bg-accent/20 p-2">
                   {file.type.startsWith("image/") ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={file.url} alt={file.name} className="object-cover w-full h-full rounded-md" />
+                    <img
+                      src={file.url}
+                      alt={file.name}
+                      className="h-full w-full rounded-md object-cover"
+                    />
                   ) : (
                     <FileIcon className="h-12 w-12 text-cyan-400 opacity-80" />
                   )}
-                  
+
                   {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
                     <Button size="sm" variant="secondary" className="h-8 text-xs">
                       <EyeIcon className="mr-2 h-3 w-3" /> {t("detail")}
                     </Button>
                   </div>
                 </div>
                 <CardContent className="p-3">
-                  <p className="text-xs font-medium truncate" title={file.name}>{file.name}</p>
-                  <div className="flex justify-between items-center mt-1">
-                    <span className="text-[10px] text-muted-foreground">{formatSize(file.size)}</span>
-                    <span className="text-[10px] text-muted-foreground">{new Date(file.createdAt).toLocaleDateString()}</span>
+                  <p className="truncate text-xs font-medium" title={file.name}>
+                    {file.name}
+                  </p>
+                  <div className="mt-1 flex items-center justify-between">
+                    <span className="text-[10px] text-muted-foreground">
+                      {formatSize(file.size)}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {new Date(file.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -253,35 +268,50 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
 
       {/* File Details Dialog */}
       <Dialog open={!!selectedFile} onOpenChange={(open) => !open && setSelectedFile(null)}>
-        <DialogContent className="sm:max-w-[700px] border-border/50 bg-background">
+        <DialogContent className="border-border/50 bg-background sm:max-w-[700px]">
           <DialogHeader>
             <DialogTitle>{t("fileDetails")}</DialogTitle>
           </DialogHeader>
           {selectedFile && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-              <div className="bg-accent/20 rounded-xl flex items-center justify-center p-4 border border-border/50 min-h-[200px]">
+            <div className="grid grid-cols-1 gap-6 py-4 md:grid-cols-2">
+              <div className="flex min-h-[200px] items-center justify-center rounded-xl border border-border/50 bg-accent/20 p-4">
                 {selectedFile.type.startsWith("image/") ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={selectedFile.url} alt={selectedFile.name} className="max-w-full max-h-[300px] object-contain rounded-md" />
+                  <img
+                    src={selectedFile.url}
+                    alt={selectedFile.name}
+                    className="max-h-[300px] max-w-full rounded-md object-contain"
+                  />
                 ) : (
                   <FileIcon className="h-24 w-24 text-cyan-400" />
                 )}
               </div>
-              
+
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-lg break-words leading-tight mb-1">{selectedFile.name}</h3>
+                  <h3 className="mb-1 text-lg leading-tight font-semibold break-words">
+                    {selectedFile.name}
+                  </h3>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">{selectedFile.type}</Badge>
-                    <span className="text-xs text-muted-foreground">{formatSize(selectedFile.size)}</span>
+                    <Badge variant="outline" className="text-xs">
+                      {selectedFile.type}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {formatSize(selectedFile.size)}
+                    </span>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">Public URL</Label>
                   <div className="flex gap-2">
-                    <Input readOnly value={selectedFile.url} className="bg-accent/30 h-8 text-xs" />
-                    <Button size="icon" variant="secondary" className="h-8 w-8 shrink-0" onClick={() => copyToClipboard(selectedFile.url)}>
+                    <Input readOnly value={selectedFile.url} className="h-8 bg-accent/30 text-xs" />
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-8 w-8 shrink-0"
+                      onClick={() => copyToClipboard(selectedFile.url)}
+                    >
                       <Copy className="h-3.5 w-3.5" />
                     </Button>
                     <a href={selectedFile.url} target="_blank" rel="noopener noreferrer">
@@ -300,15 +330,15 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                 {selectedFile.usedIn && (
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground">{t("usedIn")}</Label>
-                    <p className="text-sm px-3 py-1.5 bg-accent/30 rounded-md border border-border/50 inline-block">
+                    <p className="inline-block rounded-md border border-border/50 bg-accent/30 px-3 py-1.5 text-sm">
                       {selectedFile.usedIn}
                     </p>
                   </div>
                 )}
 
-                <div className="pt-4 border-t border-border/50 mt-4">
-                  <Button 
-                    variant="destructive" 
+                <div className="mt-4 border-t border-border/50 pt-4">
+                  <Button
+                    variant="destructive"
                     className="w-full"
                     onClick={() => {
                       setDeleteId(selectedFile.id);
@@ -329,13 +359,15 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
         <AlertDialogContent className="border-border/50 bg-background">
           <AlertDialogHeader>
             <AlertDialogTitle>{t("confirmDelete")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("deleteFileConfirmation")}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("deleteFileConfirmation")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={isPending}>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+              disabled={isPending}
+            >
               {isPending ? t("deleting") : t("deleteFile")}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -11,14 +11,18 @@ interface TagSelectorProps {
   placeholder?: string;
 }
 
-export function TagSelector({ tags, onChange, placeholder = "Etiket yazıp Enter'a basın..." }: TagSelectorProps) {
+export function TagSelector({
+  tags,
+  onChange,
+  placeholder = "Etiket yazıp Enter'a basın...",
+}: TagSelectorProps) {
   const [inputValue, setInputValue] = useState("");
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
       const newTag = inputValue.trim().toLowerCase();
-      
+
       if (newTag && !tags.includes(newTag)) {
         onChange([...tags, newTag]);
       }
@@ -34,16 +38,20 @@ export function TagSelector({ tags, onChange, placeholder = "Etiket yazıp Enter
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-2 mb-2">
+      <div className="mb-2 flex flex-wrap gap-2">
         {tags.filter(Boolean).map((tag, index) => (
-          <Badge key={`${tag}-${index}`} variant="secondary" className="px-2 py-1 flex items-center gap-1">
+          <Badge
+            key={`${tag}-${index}`}
+            variant="secondary"
+            className="flex items-center gap-1 px-2 py-1"
+          >
             {tag}
             <button
               type="button"
               onClick={() => removeTag(tag)}
-              className="text-muted-foreground hover:text-foreground rounded-full"
+              className="rounded-full text-muted-foreground hover:text-foreground"
             >
-              <X className="w-3 h-3" />
+              <X className="h-3 w-3" />
             </button>
           </Badge>
         ))}
@@ -55,7 +63,9 @@ export function TagSelector({ tags, onChange, placeholder = "Etiket yazıp Enter
         placeholder={placeholder}
         className="bg-accent/30"
       />
-      <p className="text-xs text-muted-foreground">Birden fazla etiket eklemek için Enter tuşunu kullanın.</p>
+      <p className="text-xs text-muted-foreground">
+        Birden fazla etiket eklemek için Enter tuşunu kullanın.
+      </p>
     </div>
   );
 }

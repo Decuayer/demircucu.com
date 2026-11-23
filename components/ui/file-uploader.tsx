@@ -76,7 +76,7 @@ export function FileUploader({ files, onChange, folder = "general", usedIn }: Fi
   return (
     <div className="space-y-4">
       <Tabs defaultValue="upload" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
+        <TabsList className="mb-4 grid w-full grid-cols-2">
           <TabsTrigger value="upload" className="flex items-center gap-2">
             <Upload className="h-4 w-4" />
             Dosya Yükle
@@ -88,11 +88,8 @@ export function FileUploader({ files, onChange, folder = "general", usedIn }: Fi
         </TabsList>
 
         <TabsContent value="upload" className="mt-0">
-          <div 
-            className={`
-              border-2 border-dashed rounded-xl p-8 transition-colors text-center cursor-pointer
-              ${isUploading ? "opacity-50 pointer-events-none border-border/50" : "border-border/50 hover:border-violet-500/50 hover:bg-accent/30"}
-            `}
+          <div
+            className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors ${isUploading ? "pointer-events-none border-border/50 opacity-50" : "border-border/50 hover:border-violet-500/50 hover:bg-accent/30"} `}
             onClick={() => !isUploading && fileInputRef.current?.click()}
           >
             <input
@@ -106,7 +103,7 @@ export function FileUploader({ files, onChange, folder = "general", usedIn }: Fi
                 }
               }}
             />
-            
+
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               {isUploading ? (
                 <>
@@ -115,15 +112,11 @@ export function FileUploader({ files, onChange, folder = "general", usedIn }: Fi
                 </>
               ) : (
                 <>
-                  <div className="p-3 bg-background rounded-full shadow-sm mb-2">
+                  <div className="mb-2 rounded-full bg-background p-3 shadow-sm">
                     <Upload className="h-6 w-6 text-violet-400" />
                   </div>
-                  <p className="text-sm font-medium">
-                    Dosya seçmek için tıklayın
-                  </p>
-                  <p className="text-xs opacity-70">
-                    PDF, DOC, ZIP, vb. (Max 5MB)
-                  </p>
+                  <p className="text-sm font-medium">Dosya seçmek için tıklayın</p>
+                  <p className="text-xs opacity-70">PDF, DOC, ZIP, vb. (Max 5MB)</p>
                 </>
               )}
             </div>
@@ -131,33 +124,33 @@ export function FileUploader({ files, onChange, folder = "general", usedIn }: Fi
         </TabsContent>
 
         <TabsContent value="url" className="mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end p-4 border border-border/50 rounded-xl bg-accent/10">
-            <div className="md:col-span-5 space-y-2">
+          <div className="grid grid-cols-1 items-end gap-3 rounded-xl border border-border/50 bg-accent/10 p-4 md:grid-cols-12">
+            <div className="space-y-2 md:col-span-5">
               <Label>Dosya Adı</Label>
-              <Input 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-                placeholder="Örn: Proje Sunumu (PDF)" 
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Örn: Proje Sunumu (PDF)"
                 className="bg-background"
               />
             </div>
-            <div className="md:col-span-5 space-y-2">
+            <div className="space-y-2 md:col-span-5">
               <Label>Dosya Linki (URL)</Label>
-              <Input 
-                value={url} 
-                onChange={(e) => setUrl(e.target.value)} 
-                placeholder="https://..." 
+              <Input
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://..."
                 className="bg-background"
               />
             </div>
             <div className="md:col-span-2">
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 onClick={handleAddUrl}
                 disabled={!name.trim() || !url.trim()}
                 className="w-full bg-secondary text-secondary-foreground"
               >
-                <Plus className="w-4 h-4 mr-2" /> Ekle
+                <Plus className="mr-2 h-4 w-4" /> Ekle
               </Button>
             </div>
           </div>
@@ -165,19 +158,28 @@ export function FileUploader({ files, onChange, folder = "general", usedIn }: Fi
       </Tabs>
 
       {files.length > 0 && (
-        <div className="space-y-2 mt-6 border border-border/50 rounded-lg p-3 bg-card/30">
-          <Label className="text-muted-foreground mb-2 block">Ekli Dosyalar:</Label>
+        <div className="mt-6 space-y-2 rounded-lg border border-border/50 bg-card/30 p-3">
+          <Label className="mb-2 block text-muted-foreground">Ekli Dosyalar:</Label>
           {files.map((file, i) => (
-            <div key={i} className="flex items-center justify-between p-2 rounded-md bg-accent/20 border border-border/50">
+            <div
+              key={i}
+              className="flex items-center justify-between rounded-md border border-border/50 bg-accent/20 p-2"
+            >
               <div className="flex items-center gap-3 overflow-hidden">
-                <FileIcon className="w-4 h-4 text-violet-400 shrink-0" />
+                <FileIcon className="h-4 w-4 shrink-0 text-violet-400" />
                 <div className="overflow-hidden">
-                  <p className="text-sm font-medium truncate">{file.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{file.url}</p>
+                  <p className="truncate text-sm font-medium">{file.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">{file.url}</p>
                 </div>
               </div>
-              <Button type="button" variant="ghost" size="icon" className="text-destructive shrink-0" onClick={() => handleRemove(i)}>
-                <Trash2 className="w-4 h-4" />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="shrink-0 text-destructive"
+                onClick={() => handleRemove(i)}
+              >
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           ))}

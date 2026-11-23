@@ -42,7 +42,9 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
 
   // Tags (Mapping relations to simplified objects for the server action)
   const [tags, setTags] = useState<string[]>(() => {
-    const initialTags = initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) || [];
+    const initialTags =
+      initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) ||
+      [];
     return Array.from(new Set(initialTags));
   });
 
@@ -68,10 +70,10 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
       coverImage,
       published,
       featured,
-      tagsList: tags.map(tag => ({
+      tagsList: tags.map((tag) => ({
         nameTr: tag,
         nameEn: tag,
-        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       })),
       filesList: files,
     };
@@ -94,55 +96,95 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl">
+    <form onSubmit={handleSubmit} className="max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{isEdit ? t("editBlog") : t("addBlog")}</h1>
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()}>{t("cancel")}</Button>
-          <Button type="submit" disabled={isPending} className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            {t("cancel")}
+          </Button>
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+          >
             {isPending ? t("saving") : t("save")}
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Sol Kolon: Temel Bilgiler */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
               <CardTitle>{t("generalInfo")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>{t("blogTitle")} (TR) *</Label>
-                  <Input value={titleTr} onChange={e => setTitleTr(e.target.value)} required className="bg-accent/30" />
+                  <Input
+                    value={titleTr}
+                    onChange={(e) => setTitleTr(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("blogTitle")} (EN) *</Label>
-                  <Input value={titleEn} onChange={e => setTitleEn(e.target.value)} required className="bg-accent/30" />
+                  <Input
+                    value={titleEn}
+                    onChange={(e) => setTitleEn(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label>URL Slug *</Label>
-                <Input value={slug} onChange={e => setSlug(e.target.value)} required className="bg-accent/30" />
+                <Input
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  required
+                  className="bg-accent/30"
+                />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>{t("summary")} (TR) *</Label>
-                  <Textarea value={excerptTr} onChange={e => setExcerptTr(e.target.value)} required className="bg-accent/30" rows={2} />
+                  <Textarea
+                    value={excerptTr}
+                    onChange={(e) => setExcerptTr(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                    rows={2}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("summary")} (EN) *</Label>
-                  <Textarea value={excerptEn} onChange={e => setExcerptEn(e.target.value)} required className="bg-accent/30" rows={2} />
+                  <Textarea
+                    value={excerptEn}
+                    onChange={(e) => setExcerptEn(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                    rows={2}
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>{t("coverImageBlog")} ({t("optional")})</Label>
-                <ImageUpload value={coverImage} onChange={setCoverImage} folder="blog" usedIn={isEdit ? `blog:${initialData?.id}` : undefined} />
+                <Label>
+                  {t("coverImageBlog")} ({t("optional")})
+                </Label>
+                <ImageUpload
+                  value={coverImage}
+                  onChange={setCoverImage}
+                  folder="blog"
+                  usedIn={isEdit ? `blog:${initialData?.id}` : undefined}
+                />
               </div>
             </CardContent>
           </Card>
@@ -152,7 +194,11 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
               <CardTitle>{t("contentBlog")} (TR) *</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={contentTr} onChange={setContentTr} placeholder={t("blogContentPlaceholder")} />
+              <RichTextEditor
+                content={contentTr}
+                onChange={setContentTr}
+                placeholder={t("blogContentPlaceholder")}
+              />
             </CardContent>
           </Card>
 
@@ -161,16 +207,27 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
               <CardTitle>{t("contentBlog")} (EN) *</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={contentEn} onChange={setContentEn} placeholder={t("blogContentPlaceholder")} />
+              <RichTextEditor
+                content={contentEn}
+                onChange={setContentEn}
+                placeholder={t("blogContentPlaceholder")}
+              />
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>{t("files")} ({t("optional")})</CardTitle>
+              <CardTitle>
+                {t("files")} ({t("optional")})
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <FileUploader files={files} onChange={setFiles} folder="blog" usedIn={isEdit ? `blog:${initialData?.id}` : undefined} />
+              <FileUploader
+                files={files}
+                onChange={setFiles}
+                folder="blog"
+                usedIn={isEdit ? `blog:${initialData?.id}` : undefined}
+              />
             </CardContent>
           </Card>
         </div>

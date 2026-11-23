@@ -16,7 +16,6 @@ import { ImageUpload } from "@/components/ui/image-upload";
 import { createExperience, updateExperience } from "@/app/actions/admin";
 import { useTranslations } from "next-intl";
 
-
 interface ExperienceFormClientProps {
   initialData?: any;
   isEdit?: boolean;
@@ -38,13 +37,19 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
   const [descriptionEn, setDescriptionEn] = useState(initialData?.descriptionEn || "");
   const [detailsTr, setDetailsTr] = useState(initialData?.detailsTr || "");
   const [detailsEn, setDetailsEn] = useState(initialData?.detailsEn || "");
-  const [startDate, setStartDate] = useState(initialData?.startDate ? new Date(initialData.startDate).toISOString().split('T')[0] : "");
-  const [endDate, setEndDate] = useState(initialData?.endDate ? new Date(initialData.endDate).toISOString().split('T')[0] : "");
+  const [startDate, setStartDate] = useState(
+    initialData?.startDate ? new Date(initialData.startDate).toISOString().split("T")[0] : "",
+  );
+  const [endDate, setEndDate] = useState(
+    initialData?.endDate ? new Date(initialData.endDate).toISOString().split("T")[0] : "",
+  );
   const [published, setPublished] = useState(initialData?.published ?? true);
 
   // Tags (Mapping relations to simplified objects for the server action)
   const [tags, setTags] = useState<string[]>(() => {
-    const initialTags = initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) || [];
+    const initialTags =
+      initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) ||
+      [];
     return Array.from(new Set(initialTags));
   });
 
@@ -71,10 +76,10 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
       startDate: new Date(startDate),
       endDate: endDate ? new Date(endDate) : undefined,
       published,
-      tagsList: tags.map(tag => ({
+      tagsList: tags.map((tag) => ({
         nameTr: tag,
         nameEn: tag,
-        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       })),
       filesList: files,
     };
@@ -97,20 +102,26 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl">
+    <form onSubmit={handleSubmit} className="max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{isEdit ? t("editExperience") : t("addExperience")}</h1>
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()}>{t("cancel")}</Button>
-          <Button type="submit" disabled={isPending} className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            {t("cancel")}
+          </Button>
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+          >
             {isPending ? t("saving") : t("save")}
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Sol Kolon: Temel Bilgiler */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
               <CardTitle>{t("generalInfo")}</CardTitle>
@@ -118,33 +129,67 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>{t("companyName")} *</Label>
-                <Input value={company} onChange={e => setCompany(e.target.value)} required className="bg-accent/30" />
+                <Input
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  required
+                  className="bg-accent/30"
+                />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>{t("position")} (TR) *</Label>
-                  <Input value={positionTr} onChange={e => setPositionTr(e.target.value)} required className="bg-accent/30" />
+                  <Input
+                    value={positionTr}
+                    onChange={(e) => setPositionTr(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("position")} (EN) *</Label>
-                  <Input value={positionEn} onChange={e => setPositionEn(e.target.value)} required className="bg-accent/30" />
+                  <Input
+                    value={positionEn}
+                    onChange={(e) => setPositionEn(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>{t("companyLogo")} ({t("optional")})</Label>
-                <ImageUpload value={logo} onChange={setLogo} folder="experiences" usedIn={isEdit ? `experience:${initialData?.id}` : undefined} />
+                <Label>
+                  {t("companyLogo")} ({t("optional")})
+                </Label>
+                <ImageUpload
+                  value={logo}
+                  onChange={setLogo}
+                  folder="experiences"
+                  usedIn={isEdit ? `experience:${initialData?.id}` : undefined}
+                />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>{t("summary")} (TR) *</Label>
-                  <Textarea value={descriptionTr} onChange={e => setDescriptionTr(e.target.value)} required className="bg-accent/30" rows={3} />
+                  <Textarea
+                    value={descriptionTr}
+                    onChange={(e) => setDescriptionTr(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                    rows={3}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("summary")} (EN) *</Label>
-                  <Textarea value={descriptionEn} onChange={e => setDescriptionEn(e.target.value)} required className="bg-accent/30" rows={3} />
+                  <Textarea
+                    value={descriptionEn}
+                    onChange={(e) => setDescriptionEn(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                    rows={3}
+                  />
                 </div>
               </div>
             </CardContent>
@@ -155,7 +200,11 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
               <CardTitle>{t("details")} (TR)</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={detailsTr} onChange={setDetailsTr} placeholder={t("duties")} />
+              <RichTextEditor
+                content={detailsTr}
+                onChange={setDetailsTr}
+                placeholder={t("duties")}
+              />
             </CardContent>
           </Card>
 
@@ -164,7 +213,11 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
               <CardTitle>{t("details")} (EN)</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={detailsEn} onChange={setDetailsEn} placeholder={t("duties")} />
+              <RichTextEditor
+                content={detailsEn}
+                onChange={setDetailsEn}
+                placeholder={t("duties")}
+              />
             </CardContent>
           </Card>
 
@@ -173,7 +226,12 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
               <CardTitle>{t("addedFiles")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <FileUploader files={files} onChange={setFiles} folder="experiences" usedIn={isEdit ? `experience:${initialData?.id}` : undefined} />
+              <FileUploader
+                files={files}
+                onChange={setFiles}
+                folder="experiences"
+                usedIn={isEdit ? `experience:${initialData?.id}` : undefined}
+              />
             </CardContent>
           </Card>
         </div>
@@ -187,13 +245,26 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>{t("startDate")} *</Label>
-                <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required className="bg-accent/30" />
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  required
+                  className="bg-accent/30"
+                />
               </div>
               <div className="space-y-2">
-                <Label>{t("endDate")} ({t("currentJob")})</Label>
-                <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="bg-accent/30" />
+                <Label>
+                  {t("endDate")} ({t("currentJob")})
+                </Label>
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="bg-accent/30"
+                />
               </div>
-              <div className="flex items-center space-x-2 pt-4 border-t border-border/50">
+              <div className="flex items-center space-x-2 border-t border-border/50 pt-4">
                 <Switch checked={published} onCheckedChange={setPublished} />
                 <Label>{t("published")}</Label>
               </div>

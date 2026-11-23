@@ -9,7 +9,7 @@ export default async function AdminBlogPage({ params }: { params: Promise<{ loca
   if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);
 
   const posts = await prisma.blogPost.findMany({
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
   });
 
   return <AdminBlogClient initialPosts={posts} />;

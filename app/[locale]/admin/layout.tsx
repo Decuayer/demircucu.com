@@ -15,7 +15,9 @@ export default async function AdminLayout({
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     redirect(`/${locale}/auth/login`);
@@ -23,7 +25,7 @@ export default async function AdminLayout({
 
   // Check role in database
   const profile = await prisma.profile.findUnique({
-    where: { id: user.id }
+    where: { id: user.id },
   });
 
   if (!profile || profile.role !== "ADMIN") {

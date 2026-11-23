@@ -24,11 +24,8 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
 
   return (
     <div className="py-16 md:py-24">
-      <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+      <div className="container mx-auto max-w-4xl px-4 md:px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Link href="/projects">
             <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -38,21 +35,29 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
 
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center border border-border/50">
+            <div className="mb-4 flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20">
                 {project.logo ? (
-                  <img src={project.logo} alt={getTranslated(project, "title", locale)} className="w-10 h-10 object-contain rounded" />
+                  <img
+                    src={project.logo}
+                    alt={getTranslated(project, "title", locale)}
+                    className="h-10 w-10 rounded object-contain"
+                  />
                 ) : (
                   <Code2 className="h-8 w-8 text-cyan-400" />
                 )}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold">{getTranslated(project, "title", locale)}</h1>
+              <h1 className="text-3xl font-bold md:text-4xl">
+                {getTranslated(project, "title", locale)}
+              </h1>
             </div>
-            <p className="text-lg text-muted-foreground">{getTranslated(project, "summary", locale)}</p>
+            <p className="text-lg text-muted-foreground">
+              {getTranslated(project, "summary", locale)}
+            </p>
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-wrap gap-3 mb-8">
+          <div className="mb-8 flex flex-wrap gap-3">
             {project.githubUrl && (
               <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="border-border/50">
@@ -63,7 +68,7 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
             )}
             {project.liveUrl && (
               <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                <Button className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
+                <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   {t("liveSite")}
                 </Button>
@@ -74,7 +79,7 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
           {/* Tech Stack */}
           {project.tags && project.tags.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+              <h3 className="mb-3 text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                 {t("techStack")}
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -88,29 +93,34 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
           )}
 
           {/* Content */}
-          {getTranslated(project, "description", locale) && getTranslated(project, "description", locale).trim() !== "" && (
-            <Card className="border-border/50 bg-card/50 mb-8">
-              <CardContent className="p-8 prose dark:prose-invert prose-sm max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: getTranslated(project, "description", locale) }} />
-              </CardContent>
-            </Card>
-          )}
+          {getTranslated(project, "description", locale) &&
+            getTranslated(project, "description", locale).trim() !== "" && (
+              <Card className="mb-8 border-border/50 bg-card/50">
+                <CardContent className="prose prose-sm max-w-none p-8 dark:prose-invert">
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: getTranslated(project, "description", locale),
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            )}
 
           {/* Files */}
           {project.files && Array.isArray(project.files) && project.files.length > 0 && (
             <div className="mb-8 space-y-3">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
+              <h3 className="flex items-center gap-2 text-lg font-semibold">
                 <FileIcon className="h-5 w-5 text-violet-400" />
                 Ekli Dosyalar
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {(project.files as any[]).map((file, i) => (
                   <a key={i} href={file.url} target="_blank" rel="noopener noreferrer">
-                    <Card className="border-border/50 bg-card/50 hover:bg-card hover:border-violet-500/30 transition-all cursor-pointer">
-                      <CardContent className="p-4 flex items-center justify-between">
+                    <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
+                      <CardContent className="flex items-center justify-between p-4">
                         <div className="flex items-center gap-3 overflow-hidden">
-                          <FileIcon className="h-4 w-4 text-cyan-400 shrink-0" />
-                          <p className="text-sm font-medium truncate">{file.name}</p>
+                          <FileIcon className="h-4 w-4 shrink-0 text-cyan-400" />
+                          <p className="truncate text-sm font-medium">{file.name}</p>
                         </div>
                       </CardContent>
                     </Card>

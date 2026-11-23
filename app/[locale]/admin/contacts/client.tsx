@@ -51,7 +51,7 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-2xl font-bold flex items-center gap-3"
+        className="flex items-center gap-3 text-2xl font-bold"
       >
         <Mail className="h-6 w-6 text-cyan-400" />
         {t("messages")}
@@ -65,21 +65,26 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="border-border/50 hover:bg-card transition-colors bg-card/50">
+            <Card className="border-border/50 bg-card/50 transition-colors hover:bg-card">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
-                  <div className="space-y-1 flex-1">
+                  <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-semibold">
                         {msg.name} ({msg.email})
                       </p>
                     </div>
                     <p className="text-sm font-medium">{msg.subject}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">{msg.message}</p>
+                    <p className="line-clamp-1 text-xs text-muted-foreground">{msg.message}</p>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <time>{new Date(msg.createdAt).toLocaleDateString()}</time>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(msg.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive"
+                      onClick={() => setDeleteId(msg.id)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -94,13 +99,15 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
         <AlertDialogContent className="border-border/50 bg-background">
           <AlertDialogHeader>
             <AlertDialogTitle>{t("confirmDelete")}</AlertDialogTitle>
-            <AlertDialogDescription>
-                      {t("deleteContactConfirmation")}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("deleteContactConfirmation")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={isPending}>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+              disabled={isPending}
+            >
               {isPending ? t("deleting") : t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>

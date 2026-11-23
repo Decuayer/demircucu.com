@@ -24,25 +24,25 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
 
   return (
     <div className="py-16 md:py-24">
-      <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+      <div className="container mx-auto max-w-5xl px-4 md:px-6">
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          className="mb-16 text-center"
         >
           <Badge
             variant="secondary"
-            className="mb-4 px-4 py-1.5 bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
+            className="mb-4 border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-cyan-400"
           >
-            <Code2 className="h-3 w-3 mr-1" />
+            <Code2 className="mr-1 h-3 w-3" />
             {t("title")}
           </Badge>
-          <h1 className="text-3xl md:text-5xl font-bold">{t("title")}</h1>
+          <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
         </motion.div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {projects.map((project, i) => (
             <motion.div
               key={project.id}
@@ -51,11 +51,11 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
             >
-              <Card className="group h-full border-border/50 bg-card/50 hover:bg-card hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/5">
-                <CardContent className="p-6 space-y-4 h-full flex flex-col">
+              <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
+                <CardContent className="flex h-full flex-col space-y-4 p-6">
                   {/* Project header */}
                   <div className="flex items-start justify-between">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/10 to-cyan-500/10 flex items-center justify-center border border-border/50 group-hover:scale-110 transition-transform">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/10 to-cyan-500/10 transition-transform group-hover:scale-110">
                       <Code2 className="h-6 w-6 text-cyan-400" />
                     </div>
                     <div className="flex gap-2">
@@ -65,7 +65,7 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="p-2 rounded-lg hover:bg-accent transition-colors"
+                          className="rounded-lg p-2 transition-colors hover:bg-accent"
                         >
                           <GithubIcon className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                         </a>
@@ -76,7 +76,7 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="p-2 rounded-lg hover:bg-accent transition-colors"
+                          className="rounded-lg p-2 transition-colors hover:bg-accent"
                         >
                           <ExternalLink className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                         </a>
@@ -87,11 +87,11 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
                   {/* Content */}
                   <div className="flex-1 space-y-3">
                     <Link href={`/projects/${project.slug}`}>
-                      <h3 className="font-semibold text-lg group-hover:text-cyan-400 transition-colors cursor-pointer">
+                      <h3 className="cursor-pointer text-lg font-semibold transition-colors group-hover:text-cyan-400">
                         {getTranslated(project, "title", locale)}
                       </h3>
                     </Link>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm leading-relaxed text-muted-foreground">
                       {getTranslated(project, "summary", locale)}
                     </p>
                   </div>
@@ -99,11 +99,7 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
-                      <Badge
-                        key={tag.id}
-                        variant="secondary"
-                        className="text-xs bg-accent/50"
-                      >
+                      <Badge key={tag.id} variant="secondary" className="bg-accent/50 text-xs">
                         {getTranslated(tag, "name", locale)}
                       </Badge>
                     ))}
@@ -111,9 +107,9 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
 
                   {/* View details */}
                   <Link href={`/projects/${project.slug}`}>
-                    <div className="flex items-center text-sm text-cyan-400 font-medium pt-2 cursor-pointer">
+                    <div className="flex cursor-pointer items-center pt-2 text-sm font-medium text-cyan-400">
                       {t("viewProject")}
-                      <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" />
                     </div>
                   </Link>
                 </CardContent>

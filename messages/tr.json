@@ -98,7 +98,7 @@
     "info": "İletişim Bilgileri",
     "social": "Sosyal Medya",
     "requiredFields": "Lütfen gerekli tüm alanları doldurun.",
-    "submissionError": "Mesajınız gönderilirken bir hata oluştu." 
+    "submissionError": "Mesajınız gönderilirken bir hata oluştu."
   },
   "auth": {
     "loginTitle": "Giriş Yap",
@@ -117,8 +117,7 @@
     "invalidCredentials": "E-posta veya şifre hatalı.",
     "unauthorized": "Yetkisiz işlem.",
     "profileUpdateError": "Profil güncellenemedi.",
-    "passwordUpdateError": "Şifre güncellenemedi." 
-
+    "passwordUpdateError": "Şifre güncellenemedi."
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -155,7 +154,7 @@
     "description": "Detaylı Açıklama",
     "files": "Ekli Dosyalar",
     "optional": "Opsiyonel",
-    "status": "Durum",    
+    "status": "Durum",
     "technologies": "Kullanılan Teknolojiler",
     "required_fields": "Lütfen zorunlu alanları (TR ve EN) doldurun.",
     "experience_updated": "Deneyim güncellendi.",
@@ -166,7 +165,7 @@
     "position": "Pozisyon",
     "companyLogo": "Şirket Logosu",
     "details": "Detaylı İçerik",
-    "addedFiles":"Ekli Dosyalar",
+    "addedFiles": "Ekli Dosyalar",
     "datesituation": "Tarih & Durum",
     "startDate": "Başlangıç Tarihi",
     "endDate": "Bitiş Tarihi",
@@ -269,7 +268,6 @@
     "blogUpdateFailed": "Yazı güncellenemedi.",
     "blogDeleteFailed": "Yazı silinemedi.",
     "contactDeleteFailed": "Mesaj silinemedi."
-
   },
   "common": {
     "loading": "Yükleniyor...",

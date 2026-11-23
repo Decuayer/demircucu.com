@@ -46,7 +46,7 @@ export async function signUp(data: any) {
 
 export async function signIn(data: any) {
   const t = await getTranslations("auth");
-  
+
   const { email, password } = data;
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -73,21 +73,23 @@ export async function signOut() {
 export async function getCurrentUser() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (!user) return null;
 
   // Fetch full profile from Prisma
   const profile = await prisma.profile.findUnique({
-    where: { id: user.id }
+    where: { id: user.id },
   });
 
   return profile;
 }
 
-export async function updateProfile(data: { name: string }) {  
+export async function updateProfile(data: { name: string }) {
   const t = await getTranslations("auth");
-  
+
   const user = await getCurrentUser();
   if (!user) return { error: t("unauthorized") || "Yetkisiz işlem." };
 
@@ -104,10 +106,10 @@ export async function updateProfile(data: { name: string }) {
 
 export async function updatePassword(password: string) {
   const t = await getTranslations("auth");
-  
+
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  
+
   const { error } = await supabase.auth.updateUser({ password });
   if (error) {
     return { error: t("passwordUpdateError") || "Şifre güncellenemedi." };

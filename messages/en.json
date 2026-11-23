@@ -33,7 +33,6 @@
     "save": "Save",
     "name": "Full Name",
     "email": "E-mail"
-
   },
   "home": {
     "heroTitle": "Hello, I am",
@@ -44,7 +43,6 @@
     "aboutPreview": "About Me",
     "viewAll": "View All",
     "readMore": "Read More"
-    
   },
   "about": {
     "title": "About Me",
@@ -100,7 +98,7 @@
     "info": "Contact Information",
     "social": "Social Media",
     "requiredFields": "Please fill in the required fields.",
-    "submissionError": "An error occurred while submitting the message." 
+    "submissionError": "An error occurred while submitting the message."
   },
   "auth": {
     "loginTitle": "Sign In",
@@ -120,7 +118,6 @@
     "unauthorized": "Unauthorized action.",
     "profileUpdateError": "Failed to update profile.",
     "passwordUpdateError": "Failed to update password."
-
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -168,7 +165,7 @@
     "position": "Position",
     "companyLogo": "Company Logo",
     "details": "Detailed Content",
-    "addedFiles":"Attached Files",
+    "addedFiles": "Attached Files",
     "datesituation": "Dates & Status",
     "startDate": "Start Date",
     "endDate": "End Date",
@@ -271,8 +268,6 @@
     "blogUpdateFailed": "Blog post update failed.",
     "blogDeleteFailed": "Blog post delete failed.",
     "contactDeleteFailed": "Contact message delete failed."
-
-
   },
   "common": {
     "loading": "Loading...",

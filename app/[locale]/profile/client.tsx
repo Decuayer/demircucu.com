@@ -48,10 +48,10 @@ export default function ProfileClient({ user }: { user: any }) {
   };
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-16 max-w-2xl">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-violet-500/10 rounded-xl">
-          <Settings className="w-6 h-6 text-violet-400" />
+    <div className="container mx-auto max-w-2xl px-4 py-16 md:px-6">
+      <div className="mb-8 flex items-center gap-3">
+        <div className="rounded-xl bg-violet-500/10 p-3">
+          <Settings className="h-6 w-6 text-violet-400" />
         </div>
         <h1 className="text-3xl font-bold">{t("profile") || "Profilim"}</h1>
       </div>
@@ -59,8 +59,8 @@ export default function ProfileClient({ user }: { user: any }) {
       <div className="space-y-6">
         <Card className="border-border/50 bg-card/50">
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <User className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <User className="h-5 w-5" />
               {t("accountInfo") || "Hesap Bilgileri"}
             </CardTitle>
           </CardHeader>
@@ -68,13 +68,28 @@ export default function ProfileClient({ user }: { user: any }) {
             <form onSubmit={handleProfileSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">{t("email") || "E-posta"}</Label>
-                <Input id="email" defaultValue={user.email} disabled className="bg-accent/30 opacity-50" />
+                <Input
+                  id="email"
+                  defaultValue={user.email}
+                  disabled
+                  className="bg-accent/30 opacity-50"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="name">{t("name") || "Ad Soyad"}</Label>
-                <Input id="name" name="name" defaultValue={user.name} required className="bg-accent/30" />
+                <Input
+                  id="name"
+                  name="name"
+                  defaultValue={user.name}
+                  required
+                  className="bg-accent/30"
+                />
               </div>
-              <Button disabled={isPending} type="submit" className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
+              <Button
+                disabled={isPending}
+                type="submit"
+                className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+              >
                 {isPending ? t("updating") || "Güncelleniyor..." : t("save") || "Kaydet"}
               </Button>
             </form>
@@ -83,8 +98,8 @@ export default function ProfileClient({ user }: { user: any }) {
 
         <Card className="border-border/50 bg-card/50">
           <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Lock className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Lock className="h-5 w-5" />
               {t("changePassword") || "Şifre Değiştir"}
             </CardTitle>
           </CardHeader>
@@ -92,14 +107,34 @@ export default function ProfileClient({ user }: { user: any }) {
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="password">{t("newPassword") || "Yeni Şifre"}</Label>
-                <Input id="password" name="password" type="password" required className="bg-accent/30" placeholder="••••••••" />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="bg-accent/30"
+                  placeholder="••••••••"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirm">{t("confirmPassword") || "Şifreyi Doğrula"}</Label>
-                <Input id="confirm" name="confirm" type="password" required className="bg-accent/30" placeholder="••••••••" />
+                <Input
+                  id="confirm"
+                  name="confirm"
+                  type="password"
+                  required
+                  className="bg-accent/30"
+                  placeholder="••••••••"
+                />
               </div>
-              <Button disabled={isPending} type="submit" className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
-                {isPending ? t("updating") || "Güncelleniyor..." : t("updatePassword") || "Şifreyi Güncelle"}
+              <Button
+                disabled={isPending}
+                type="submit"
+                className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+              >
+                {isPending
+                  ? t("updating") || "Güncelleniyor..."
+                  : t("updatePassword") || "Şifreyi Güncelle"}
               </Button>
             </form>
           </CardContent>

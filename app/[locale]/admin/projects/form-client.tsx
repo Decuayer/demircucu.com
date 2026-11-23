@@ -16,14 +16,12 @@ import { ImageUpload } from "@/components/ui/image-upload";
 import { createProject, updateProject } from "@/app/actions/admin";
 import { useTranslations } from "next-intl";
 
-
 interface ProjectFormClientProps {
   initialData?: any;
   isEdit?: boolean;
 }
 
 export default function ProjectFormClient({ initialData, isEdit }: ProjectFormClientProps) {
-
   const t = useTranslations("admin");
   const router = useRouter();
   const params = useParams();
@@ -46,7 +44,9 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
 
   // Tags (Mapping relations to simplified objects for the server action)
   const [tags, setTags] = useState<string[]>(() => {
-    const initialTags = initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) || [];
+    const initialTags =
+      initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) ||
+      [];
     return Array.from(new Set(initialTags));
   });
 
@@ -74,10 +74,10 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
       liveUrl,
       published,
       featured,
-      tagsList: tags.map(tag => ({
+      tagsList: tags.map((tag) => ({
         nameTr: tag,
         nameEn: tag, // For now, we use same name for both languages for tech tags
-        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       })),
       filesList: files,
     };
@@ -100,94 +100,155 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl">
+    <form onSubmit={handleSubmit} className="max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{isEdit ? t("editProject") : t("addProject")}</h1>
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()}>{t("cancel")}</Button>
-          <Button type="submit" disabled={isPending} className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            {t("cancel")}
+          </Button>
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+          >
             {isPending ? t("saving") : t("save")}
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Sol Kolon: Temel Bilgiler */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>{t('generalInfo')}</CardTitle>
+              <CardTitle>{t("generalInfo")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t('projectTitle')} (TR) *</Label>
-                  <Input value={titleTr} onChange={e => setTitleTr(e.target.value)} required className="bg-accent/30" />
+                  <Label>{t("projectTitle")} (TR) *</Label>
+                  <Input
+                    value={titleTr}
+                    onChange={(e) => setTitleTr(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t('projectTitle')} (EN) *</Label>
-                  <Input value={titleEn} onChange={e => setTitleEn(e.target.value)} required className="bg-accent/30" />
+                  <Label>{t("projectTitle")} (EN) *</Label>
+                  <Input
+                    value={titleEn}
+                    onChange={(e) => setTitleEn(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>{t('slug')} *</Label>
-                <Input value={slug} onChange={e => setSlug(e.target.value)} required className="bg-accent/30" />
+                <Label>{t("slug")} *</Label>
+                <Input
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  required
+                  className="bg-accent/30"
+                />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t('summary')} (TR) *</Label>
-                  <Textarea value={summaryTr} onChange={e => setSummaryTr(e.target.value)} required className="bg-accent/30" rows={2} />
+                  <Label>{t("summary")} (TR) *</Label>
+                  <Textarea
+                    value={summaryTr}
+                    onChange={(e) => setSummaryTr(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                    rows={2}
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t('summary')} (EN) *</Label>
-                  <Textarea value={summaryEn} onChange={e => setSummaryEn(e.target.value)} required className="bg-accent/30" rows={2} />
+                  <Label>{t("summary")} (EN) *</Label>
+                  <Textarea
+                    value={summaryEn}
+                    onChange={(e) => setSummaryEn(e.target.value)}
+                    required
+                    className="bg-accent/30"
+                    rows={2}
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>GitHub URL</Label>
-                  <Input value={githubUrl} onChange={e => setGithubUrl(e.target.value)} className="bg-accent/30" />
+                  <Input
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    className="bg-accent/30"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>Live URL ({t('liveSite')})</Label>
-                  <Input value={liveUrl} onChange={e => setLiveUrl(e.target.value)} className="bg-accent/30" />
+                  <Label>Live URL ({t("liveSite")})</Label>
+                  <Input
+                    value={liveUrl}
+                    onChange={(e) => setLiveUrl(e.target.value)}
+                    className="bg-accent/30"
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>{t('coverImage')}</Label>
-                <ImageUpload value={logo} onChange={setLogo} folder="projects" usedIn={isEdit ? `project:${initialData?.id}` : undefined} />
+                <Label>{t("coverImage")}</Label>
+                <ImageUpload
+                  value={logo}
+                  onChange={setLogo}
+                  folder="projects"
+                  usedIn={isEdit ? `project:${initialData?.id}` : undefined}
+                />
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>{t('description')} (TR)</CardTitle>
+              <CardTitle>{t("description")} (TR)</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={descriptionTr} onChange={setDescriptionTr} placeholder="Projenizin tüm detaylarını buraya yazabilirsiniz..." />
+              <RichTextEditor
+                content={descriptionTr}
+                onChange={setDescriptionTr}
+                placeholder="Projenizin tüm detaylarını buraya yazabilirsiniz..."
+              />
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>{t('description')} (EN)</CardTitle>
+              <CardTitle>{t("description")} (EN)</CardTitle>
             </CardHeader>
             <CardContent>
-              <RichTextEditor content={descriptionEn} onChange={setDescriptionEn} placeholder="You can write all project details here..." />
+              <RichTextEditor
+                content={descriptionEn}
+                onChange={setDescriptionEn}
+                placeholder="You can write all project details here..."
+              />
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>{t('files')} ({t('optional')})</CardTitle>
+              <CardTitle>
+                {t("files")} ({t("optional")})
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <FileUploader files={files} onChange={setFiles} folder="projects" usedIn={isEdit ? `project:${initialData?.id}` : undefined} />
+              <FileUploader
+                files={files}
+                onChange={setFiles}
+                folder="projects"
+                usedIn={isEdit ? `project:${initialData?.id}` : undefined}
+              />
             </CardContent>
           </Card>
         </div>
@@ -196,23 +257,23 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
         <div className="space-y-6">
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>{t('status')}</CardTitle>
+              <CardTitle>{t("status")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Switch checked={published} onCheckedChange={setPublished} />
-                <Label>{t('published')}</Label>
+                <Label>{t("published")}</Label>
               </div>
               <div className="flex items-center space-x-2 pt-2">
                 <Switch checked={featured} onCheckedChange={setFeatured} />
-                <Label>{t('featured')}</Label>
+                <Label>{t("featured")}</Label>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50 bg-card/50">
             <CardHeader>
-              <CardTitle>{t('technologies')}</CardTitle>
+              <CardTitle>{t("technologies")}</CardTitle>
             </CardHeader>
             <CardContent>
               <TagSelector tags={tags} onChange={setTags} />

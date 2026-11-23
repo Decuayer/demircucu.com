@@ -27,7 +27,7 @@ export async function uploadFileToStorage(
   file: Buffer | ArrayBuffer,
   fileName: string,
   contentType: string,
-  folder: string = "general"
+  folder: string = "general",
 ) {
   try {
     // Ensure bucket exists
@@ -48,12 +48,10 @@ export async function uploadFileToStorage(
     const filePath = `${folder}/${uniqueFileName}`;
 
     // Upload to Supabase Storage
-    const { data, error } = await supabaseAdmin.storage
-      .from(BUCKET_NAME)
-      .upload(filePath, file, {
-        contentType,
-        upsert: false,
-      });
+    const { data, error } = await supabaseAdmin.storage.from(BUCKET_NAME).upload(filePath, file, {
+      contentType,
+      upsert: false,
+    });
 
     if (error) throw error;
 
@@ -82,7 +80,7 @@ export async function deleteFileFromStorage(path: string) {
   try {
     const { error } = await supabaseAdmin.storage.from(BUCKET_NAME).remove([path]);
     if (error) throw error;
-    
+
     return { success: true };
   } catch (error: any) {
     console.error("Supabase storage delete error:", error);
