@@ -19,7 +19,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { MediaFile } from "@prisma/client";
+import { getErrorMessage } from "@/lib/errors";
+import { type MediaFile } from "@prisma/client";
 import { deleteMediaFile } from "@/app/actions/media";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -88,8 +89,8 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       } else {
         throw new Error(data.error || t("uploadFailed"));
       }
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -378,7 +379,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
 }
 
 // Helper icon component since Eye isn't imported above to avoid conflict
-function EyeIcon(props: any) {
+function EyeIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

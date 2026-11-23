@@ -7,11 +7,10 @@ import { Label } from "@/components/ui/label";
 import { FileIcon, Plus, Trash2, Upload, Link as LinkIcon, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/errors";
+import type { FileAttachment } from "@/lib/types/content";
 
-export interface FileAttachment {
-  name: string;
-  url: string;
-}
+export type { FileAttachment };
 
 interface FileUploaderProps {
   files: FileAttachment[];
@@ -66,8 +65,8 @@ export function FileUploader({ files, onChange, folder = "general", usedIn }: Fi
       } else {
         throw new Error(data.error || "Yükleme başarısız.");
       }
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     } finally {
       setIsUploading(false);
     }

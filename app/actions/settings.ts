@@ -3,6 +3,11 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "./auth";
 import { revalidatePath } from "next/cache";
+import type { Prisma } from "@prisma/client";
+import { getErrorMessage } from "@/lib/errors";
+
+// Phase 2 replaces this with a zod schema allowlisting editable fields (mass assignment, S5).
+export type SiteSettingsInput = Omit<Prisma.SiteSettingsCreateInput, "id">;
 
 // Middleware to check admin rights inside server actions
 async function requireAdmin() {
@@ -43,7 +48,7 @@ export async function getSiteSettings() {
  * Update Site Settings
  * Admin only
  */
-export async function updateSiteSettings(data: any) {
+export async function updateSiteSettings(data: SiteSettingsInput) {
   try {
     await requireAdmin();
 
@@ -63,8 +68,8 @@ export async function updateSiteSettings(data: any) {
     revalidatePath("/admin/settings");
 
     return { success: true, settings };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error updating site settings:", error);
-    return { error: error.message || "Ayarlar kaydedilemedi." };
+    return { error: getErrorMessage(error, "Ayarlar kaydedilemedi.") };
   }
 }

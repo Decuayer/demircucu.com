@@ -4,14 +4,13 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Code2, ExternalLink, ArrowRight } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
-import { Project, Tag } from "@prisma/client";
+import { type Project, type Tag } from "@prisma/client";
 
 interface ProjectsClientProps {
   projects: (Project & { tags: Tag[] })[];

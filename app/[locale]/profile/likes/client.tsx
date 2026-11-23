@@ -1,5 +1,16 @@
 "use client";
 
+import type { Prisma } from "@prisma/client";
+
+type LikeWithPost = Prisma.LikeGetPayload<{
+  include: {
+    post: { select: { id: true; titleTr: true; titleEn: true; slug: true; createdAt: true } };
+  };
+}>;
+type CommentWithPost = Prisma.CommentGetPayload<{
+  include: { post: { select: { titleTr: true; titleEn: true; slug: true } } };
+}>;
+
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,7 +19,13 @@ import { Heart, MessageSquare, Calendar, ChevronRight } from "lucide-react";
 import { getTranslated, formatDate } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
-export default function ProfileLikesClient({ likes, comments }: { likes: any[]; comments: any[] }) {
+export default function ProfileLikesClient({
+  likes,
+  comments,
+}: {
+  likes: LikeWithPost[];
+  comments: CommentWithPost[];
+}) {
   const t = useTranslations("nav");
   const params = useParams();
   const locale = params.locale as string;

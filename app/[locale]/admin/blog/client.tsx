@@ -13,7 +13,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import { deleteBlogPost } from "@/app/actions/admin";
-import { BlogPost } from "@prisma/client";
+import { type BlogPost } from "@prisma/client";
 import {
   AlertDialog,
   AlertDialogAction,

@@ -1,21 +1,11 @@
 "use client";
 
+import type { Profile } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { useState } from "react";
-import {
-  Menu,
-  X,
-  Globe,
-  User,
-  LogOut,
-  Settings,
-  Heart,
-  MessageSquare,
-  Shield,
-  LayoutDashboard,
-} from "lucide-react";
+import { Menu, Globe, User, LogOut, Settings, Heart, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -41,7 +31,7 @@ const navLinks = [
 import { signOut } from "@/app/actions/auth";
 
 interface HeaderClientProps {
-  user: any; // We can type this properly later, it's the Prisma Profile
+  user: Profile | null;
 }
 
 export default function HeaderClient({ user }: HeaderClientProps) {

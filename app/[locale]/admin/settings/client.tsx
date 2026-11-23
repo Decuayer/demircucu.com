@@ -1,5 +1,6 @@
 "use client";
 
+import type { SiteSettings } from "@prisma/client";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Settings, Save, Plus, Trash2, ChevronDown, Smile } from "lucide-react";
+import { Settings, Save, Plus, Trash2, Smile } from "lucide-react";
 import { toast } from "sonner";
 import { updateSiteSettings } from "@/app/actions/settings";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -188,8 +189,11 @@ const LUCIDE_ICONS = [
   "Search",
 ];
 
+type SkillState = { nameTr: string; nameEn: string; level: number };
+type HobbyState = { nameTr: string; nameEn: string; descTr: string; descEn: string; icon: string };
+
 interface AdminSettingsClientProps {
-  initialSettings: any;
+  initialSettings: SiteSettings | null;
 }
 
 export default function AdminSettingsClient({ initialSettings }: AdminSettingsClientProps) {
@@ -214,12 +218,12 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
     initialSettings?.aboutExperienceEn || "",
   );
 
-  const [skills, setSkills] = useState<{ nameTr: string; nameEn: string; level: number }[]>(
-    initialSettings?.skills || [],
+  const [skills, setSkills] = useState<SkillState[]>(
+    () => (initialSettings?.skills as SkillState[] | null) || [],
   );
-  const [hobbies, setHobbies] = useState<
-    { nameTr: string; nameEn: string; descTr: string; descEn: string; icon: string }[]
-  >(initialSettings?.hobbies || []);
+  const [hobbies, setHobbies] = useState<HobbyState[]>(
+    () => (initialSettings?.hobbies as HobbyState[] | null) || [],
+  );
 
   const [contactEmail, setContactEmail] = useState(initialSettings?.contactEmail || "");
   const [contactPhone, setContactPhone] = useState(initialSettings?.contactPhone || "");
@@ -314,7 +318,11 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
 
   const addSkill = () => setSkills([...skills, { nameTr: "", nameEn: "", level: 50 }]);
   const removeSkill = (index: number) => setSkills(skills.filter((_, i) => i !== index));
-  const updateSkill = (index: number, field: string, value: any) => {
+  const updateSkill = <K extends keyof SkillState>(
+    index: number,
+    field: K,
+    value: SkillState[K],
+  ) => {
     const newSkills = [...skills];
     newSkills[index] = { ...newSkills[index], [field]: value };
     setSkills(newSkills);
@@ -323,7 +331,11 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
   const addHobby = () =>
     setHobbies([...hobbies, { nameTr: "", nameEn: "", descTr: "", descEn: "", icon: "Heart" }]);
   const removeHobby = (index: number) => setHobbies(hobbies.filter((_, i) => i !== index));
-  const updateHobby = (index: number, field: string, value: any) => {
+  const updateHobby = <K extends keyof HobbyState>(
+    index: number,
+    field: K,
+    value: HobbyState[K],
+  ) => {
     const newHobbies = [...hobbies];
     newHobbies[index] = { ...newHobbies[index], [field]: value };
     setHobbies(newHobbies);

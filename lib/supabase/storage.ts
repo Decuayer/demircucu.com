@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
+import { getErrorMessage } from "@/lib/errors";
 
 // Create a Supabase client with the service role key for admin privileges
 // We use the service role key to bypass RLS for server-side uploads
@@ -63,11 +64,11 @@ export async function uploadFileToStorage(
       path: data.path,
       publicUrl: urlData.publicUrl,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Supabase storage upload error:", error);
     return {
       success: false,
-      error: error.message || "Failed to upload file to storage",
+      error: getErrorMessage(error, "Failed to upload file to storage"),
     };
   }
 }
@@ -82,11 +83,11 @@ export async function deleteFileFromStorage(path: string) {
     if (error) throw error;
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Supabase storage delete error:", error);
     return {
       success: false,
-      error: error.message || "Failed to delete file from storage",
+      error: getErrorMessage(error, "Failed to delete file from storage"),
     };
   }
 }

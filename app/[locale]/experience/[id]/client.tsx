@@ -9,9 +9,10 @@ import { ArrowLeft, Calendar, Building2 } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
 import { Link } from "@/i18n/navigation";
 import { getTranslated } from "@/lib/i18n-utils";
+import { toFileAttachments } from "@/lib/types/content";
 import { useParams } from "next/navigation";
 
-import { Experience } from "@prisma/client";
+import { type Experience } from "@prisma/client";
 import { FileIcon } from "lucide-react";
 
 interface ExperienceDetailClientProps {
@@ -89,7 +90,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
                 Ekli Dosyalar
               </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {(experience.files as any[]).map((file, i) => (
+                {toFileAttachments(experience.files).map((file, i) => (
                   <a key={i} href={file.url} target="_blank" rel="noopener noreferrer">
                     <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
                       <CardContent className="flex items-center justify-between p-4">

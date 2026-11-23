@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
-export async function signUp(data: any) {
+export async function signUp(data: { email: string; password: string; name: string }) {
   const t = await getTranslations("auth");
 
   const { email, password, name } = data;
@@ -44,7 +44,7 @@ export async function signUp(data: any) {
   return { error: t("unknownError") || "Bilinmeyen bir hata oluştu." };
 }
 
-export async function signIn(data: any) {
+export async function signIn(data: { email: string; password: string }) {
   const t = await getTranslations("auth");
 
   const { email, password } = data;
@@ -99,7 +99,7 @@ export async function updateProfile(data: { name: string }) {
       data: { name: data.name },
     });
     return { success: true };
-  } catch (e) {
+  } catch {
     return { error: t("profileUpdateError") || "Profil güncellenemedi." };
   }
 }

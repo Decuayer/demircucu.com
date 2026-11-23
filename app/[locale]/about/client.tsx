@@ -102,8 +102,11 @@ import {
 } from "@/components/icons";
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
+import type { LucideIcon } from "lucide-react";
+import type { SiteSettings } from "@prisma/client";
+import type { HobbySetting, SkillSetting } from "@/lib/types/content";
 
-const ICONS: Record<string, any> = {
+const ICONS: Record<string, LucideIcon> = {
   Camera,
   Gamepad2,
   BookOpen,
@@ -189,7 +192,7 @@ const ICONS: Record<string, any> = {
 };
 
 interface AboutClientProps {
-  settings: any;
+  settings: SiteSettings | null;
 }
 
 export default function AboutClient({ settings }: AboutClientProps) {
@@ -199,7 +202,7 @@ export default function AboutClient({ settings }: AboutClientProps) {
 
   const skills =
     Array.isArray(settings?.skills) && settings.skills.length > 0
-      ? settings.skills.map((s: any) => ({
+      ? (settings.skills as unknown as SkillSetting[]).map((s) => ({
           name: getTranslated(s, "name", locale),
           level: s.level,
         }))
@@ -211,7 +214,7 @@ export default function AboutClient({ settings }: AboutClientProps) {
 
   const hobbies =
     Array.isArray(settings?.hobbies) && settings.hobbies.length > 0
-      ? settings.hobbies.map((h: any) => ({
+      ? (settings.hobbies as unknown as HobbySetting[]).map((h) => ({
           icon: h.icon,
           name: getTranslated(h, "name", locale),
           desc: getTranslated(h, "desc", locale),
@@ -405,7 +408,7 @@ export default function AboutClient({ settings }: AboutClientProps) {
             {t("skills")}
           </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {skills.map((skill: any, i: number) => (
+            {skills.map((skill, i) => (
               <motion.div
                 key={skill.name}
                 initial={{ opacity: 0, x: -20 }}
@@ -445,10 +448,8 @@ export default function AboutClient({ settings }: AboutClientProps) {
             {t("hobbies")}
           </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-            {hobbies.map((hobby: any, i: number) => {
-              const IconComponent = ICONS[hobby.icon];
-              // If it's a single character or short string, it's likely an emoji
-              const isEmoji = !IconComponent && hobby.icon?.length <= 4;
+            {hobbies.map((hobby, i) => {
+              const IconComponent = hobby.icon ? ICONS[hobby.icon] : undefined;
 
               return (
                 <motion.div

@@ -8,7 +8,9 @@ export const DEFAULT_TEST_DATABASE_URL =
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "postgres"]);
 
-export function resolveTestDatabaseUrl(env: NodeJS.ProcessEnv = process.env): string {
+export function resolveTestDatabaseUrl(
+  env: Record<string, string | undefined> = process.env,
+): string {
   const url = env.TEST_DATABASE_URL ?? DEFAULT_TEST_DATABASE_URL;
   const host = new URL(url).hostname.replace(/^\[|\]$/g, "");
   if (!LOCAL_HOSTS.has(host)) {

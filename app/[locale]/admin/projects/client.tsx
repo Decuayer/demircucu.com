@@ -11,7 +11,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import { deleteProject } from "@/app/actions/admin";
-import { Project } from "@prisma/client";
+import { type Project } from "@prisma/client";
 import {
   AlertDialog,
   AlertDialogAction,

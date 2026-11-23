@@ -13,7 +13,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import { deleteExperience } from "@/app/actions/admin";
-import { Experience } from "@prisma/client";
+import { type Experience } from "@prisma/client";
 import {
   AlertDialog,
   AlertDialogAction,

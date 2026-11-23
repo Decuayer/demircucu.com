@@ -3,14 +3,13 @@
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Mail, Check, Eye } from "lucide-react";
+import { Mail } from "lucide-react";
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { deleteContactMessage } from "@/app/actions/admin";
-import { ContactMessage } from "@prisma/client";
+import { type ContactMessage } from "@prisma/client";
 import { Trash2 } from "lucide-react";
 import {
   AlertDialog,

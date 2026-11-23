@@ -10,7 +10,7 @@ import { Newspaper, Eye, Clock, ArrowRight, TrendingUp } from "lucide-react";
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
-import { BlogPost, Tag } from "@prisma/client";
+import { type BlogPost, type Tag } from "@prisma/client";
 
 type BlogPostWithTags = BlogPost & { tags: Tag[] };
 

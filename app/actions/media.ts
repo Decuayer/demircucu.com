@@ -5,6 +5,7 @@ import { getCurrentUser } from "./auth";
 import { deleteFileFromStorage } from "@/lib/supabase/storage";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import { getErrorMessage } from "@/lib/errors";
 
 // Middleware to check admin rights inside server actions
 async function requireAdmin() {
@@ -36,7 +37,7 @@ export async function getMediaFiles(typeFilter?: string) {
       where: whereClause,
       orderBy: { createdAt: "desc" },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching media files:", error);
     return [];
   }
@@ -70,9 +71,9 @@ export async function deleteMediaFile(id: string) {
 
     revalidatePath("/admin/media");
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error deleting media file:", error);
-    return { error: error.message || t("deleteError") };
+    return { error: getErrorMessage(error, t("deleteError")) };
   }
 }
 
@@ -107,8 +108,8 @@ export async function saveMediaFileToDB(data: {
 
     revalidatePath("/admin/media");
     return { success: true, mediaFile };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error saving media file to DB:", error);
-    return { error: error.message || t("saveError") };
+    return { error: getErrorMessage(error, t("saveError")) };
   }
 }

@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Briefcase, ArrowRight, Calendar } from "lucide-react";
 import { getTranslated } from "@/lib/i18n-utils";
 
-import { Experience } from "@prisma/client";
+import { type Experience } from "@prisma/client";
 
 interface ExperienceClientProps {
   experiences: (Experience & { tags: { id: string; nameTr: string; nameEn: string }[] })[];

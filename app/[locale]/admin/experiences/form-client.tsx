@@ -11,13 +11,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { TagSelector } from "@/components/ui/tag-selector";
-import { FileUploader, FileAttachment } from "@/components/ui/file-uploader";
+import { FileUploader } from "@/components/ui/file-uploader";
+import {
+  toFileAttachments,
+  type FileAttachment,
+  type ExperienceWithTags,
+} from "@/lib/types/content";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { createExperience, updateExperience } from "@/app/actions/admin";
 import { useTranslations } from "next-intl";
 
 interface ExperienceFormClientProps {
-  initialData?: any;
+  initialData?: ExperienceWithTags | null;
   isEdit?: boolean;
 }
 
@@ -48,13 +53,12 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
   // Tags (Mapping relations to simplified objects for the server action)
   const [tags, setTags] = useState<string[]>(() => {
     const initialTags =
-      initialData?.tags?.map((t: any) => t.nameTr || t.nameEn || t.name || "").filter(Boolean) ||
-      [];
+      initialData?.tags?.map((t) => t.nameTr || t.nameEn || "").filter(Boolean) || [];
     return Array.from(new Set(initialTags));
   });
 
   // Files
-  const [files, setFiles] = useState<FileAttachment[]>(initialData?.files || []);
+  const [files, setFiles] = useState<FileAttachment[]>(() => toFileAttachments(initialData?.files));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,5 +1,6 @@
 "use client";
 
+import type { SiteSettings } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +24,7 @@ import { toast } from "sonner";
 import { submitContactMessage } from "@/app/actions/contact";
 
 interface ContactClientProps {
-  settings: any;
+  settings: SiteSettings | null;
 }
 
 export default function ContactClient({ settings }: ContactClientProps) {

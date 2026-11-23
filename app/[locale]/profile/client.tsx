@@ -1,7 +1,8 @@
 "use client";
 
+import type { Profile } from "@prisma/client";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ import { toast } from "sonner";
 import { updateProfile, updatePassword } from "@/app/actions/auth";
 import { User, Lock, Settings } from "lucide-react";
 
-export default function ProfileClient({ user }: { user: any }) {
+export default function ProfileClient({ user }: { user: Profile }) {
   const t = useTranslations("nav");
   const [isPending, startTransition] = useTransition();
 
@@ -80,7 +81,7 @@ export default function ProfileClient({ user }: { user: any }) {
                 <Input
                   id="name"
                   name="name"
-                  defaultValue={user.name}
+                  defaultValue={user.name ?? ""}
                   required
                   className="bg-accent/30"
                 />

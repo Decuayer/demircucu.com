@@ -9,9 +9,10 @@ import { ArrowLeft, ExternalLink, Code2, FileIcon } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
 import { Link } from "@/i18n/navigation";
 import { getTranslated } from "@/lib/i18n-utils";
+import { toFileAttachments } from "@/lib/types/content";
 import { useParams } from "next/navigation";
 
-import { Project, Tag } from "@prisma/client";
+import { type Project, type Tag } from "@prisma/client";
 
 interface ProjectDetailClientProps {
   project: Project & { tags: Tag[] };
@@ -38,6 +39,8 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
             <div className="mb-4 flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20">
                 {project.logo ? (
+                  // TODO(phase-6): migrate to next/image once remotePatterns cover all logo hosts.
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={project.logo}
                     alt={getTranslated(project, "title", locale)}
@@ -114,7 +117,7 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
                 Ekli Dosyalar
               </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {(project.files as any[]).map((file, i) => (
+                {toFileAttachments(project.files).map((file, i) => (
                   <a key={i} href={file.url} target="_blank" rel="noopener noreferrer">
                     <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
                       <CardContent className="flex items-center justify-between p-4">

@@ -2,11 +2,10 @@
 
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import Image from "next/image";
+import { getErrorMessage } from "@/lib/errors";
 
 interface ImageUploadProps {
   value: string;
@@ -55,8 +54,8 @@ export function ImageUpload({ value, onChange, folder = "general", usedIn }: Ima
       } else {
         throw new Error(data.error || "Yükleme başarısız.");
       }
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     } finally {
       setIsUploading(false);
     }

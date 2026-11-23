@@ -19,12 +19,12 @@ const fadeUp = {
   }),
 };
 
-import { Project, BlogPost, Tag } from "@prisma/client";
+import type { Project, BlogPost, SiteSettings, Tag } from "@prisma/client";
 
 interface HomeClientProps {
   featuredProjects: (Project & { tags: Tag[] })[];
   latestPosts: (BlogPost & { tags: Tag[] })[];
-  settings?: any;
+  settings?: SiteSettings | null;
 }
 
 export default function HomeClient({ featuredProjects, latestPosts, settings }: HomeClientProps) {

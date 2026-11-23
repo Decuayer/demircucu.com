@@ -1,5 +1,6 @@
 "use client";
 
+import type { SiteSettings } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Mail } from "lucide-react";
@@ -24,7 +25,7 @@ const footerLinks = [
   { href: "/contact", key: "contact" },
 ] as const;
 
-export default function Footer({ settings }: { settings?: any }) {
+export default function Footer({ settings }: { settings?: SiteSettings | null }) {
   const t = useTranslations("nav");
   const params = useParams();
   const locale = params.locale as string;

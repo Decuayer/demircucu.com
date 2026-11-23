@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/app/actions/auth";
 import { uploadFileToStorage, BUCKET_NAME } from "@/lib/supabase/storage";
 import { saveMediaFileToDB } from "@/app/actions/media";
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       url: uploadRes.publicUrl,
       file: dbRes.mediaFile,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Upload API error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

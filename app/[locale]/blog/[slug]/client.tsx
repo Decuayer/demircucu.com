@@ -21,12 +21,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { getTranslated } from "@/lib/i18n-utils";
+import { toFileAttachments } from "@/lib/types/content";
 import { useParams } from "next/navigation";
 
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { addComment, toggleLike } from "@/app/actions/blog_interaction";
-import { BlogPost, Comment, Tag } from "@prisma/client";
+import type { BlogPost, Comment, Profile, Tag } from "@prisma/client";
 
 interface CommentWithAuthor extends Comment {
   author: {
@@ -40,7 +41,7 @@ interface BlogDetailClientProps {
   initialComments: CommentWithAuthor[];
   initialLikesCount: number;
   initialUserLiked: boolean;
-  currentUser: any | null;
+  currentUser: Profile | null;
 }
 
 export default function BlogDetailClient({
@@ -153,14 +154,14 @@ export default function BlogDetailClient({
             />
 
             {/* Files */}
-            {post.files && Array.isArray(post.files) && (post.files as any[]).length > 0 && (
+            {toFileAttachments(post.files).length > 0 && (
               <div className="mb-10 space-y-3">
                 <h3 className="flex items-center gap-2 text-lg font-semibold">
                   <FileIcon className="h-5 w-5 text-violet-400" />
                   Ekli Dosyalar
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {(post.files as any[]).map((file, i) => (
+                  {toFileAttachments(post.files).map((file, i) => (
                     <a key={i} href={file.url} target="_blank" rel="noopener noreferrer">
                       <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
                         <CardContent className="flex items-center gap-3 p-4">
