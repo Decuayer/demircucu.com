@@ -9,15 +9,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "@/i18n/navigation";
-import { ArrowLeft, Clock, Eye, Heart, MessageSquare, Calendar, User, FileIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  Eye,
+  Heart,
+  MessageSquare,
+  Calendar,
+  User,
+  FileIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { getTranslated } from "@/lib/i18n-utils";
+import { toFileAttachments } from "@/lib/types/content";
 import { useParams } from "next/navigation";
 
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { addComment, toggleLike } from "@/app/actions/blog_interaction";
-import { BlogPost, Comment, Tag } from "@prisma/client";
+import type { BlogPost, Comment, Profile, Tag } from "@prisma/client";
 
 interface CommentWithAuthor extends Comment {
   author: {
@@ -31,7 +41,7 @@ interface BlogDetailClientProps {
   initialComments: CommentWithAuthor[];
   initialLikesCount: number;
   initialUserLiked: boolean;
-  currentUser: any | null;
+  currentUser: Profile | null;
 }
 
 export default function BlogDetailClient({
@@ -47,7 +57,7 @@ export default function BlogDetailClient({
   const [liked, setLiked] = useState(initialUserLiked);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [isPending, startTransition] = useTransition();
-  
+
   const content = getTranslated(post, "content", locale);
 
   const handleLike = async () => {
@@ -61,7 +71,7 @@ export default function BlogDetailClient({
     setLikesCount(liked ? likesCount - 1 : likesCount + 1);
 
     const res = await toggleLike(post.id, `/blog/${post.slug}`);
-    
+
     // Revert if error
     if (res?.error) {
       setLiked(liked);
@@ -88,11 +98,8 @@ export default function BlogDetailClient({
 
   return (
     <div className="py-16 md:py-24">
-      <div className="container mx-auto px-4 md:px-6 max-w-3xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+      <div className="container mx-auto max-w-3xl px-4 md:px-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Link href="/blog">
             <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -103,20 +110,20 @@ export default function BlogDetailClient({
           {/* Article Header */}
           <article>
             <header className="mb-10">
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="mb-4 flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
                   <Badge key={tag.id} variant="secondary" className="bg-accent/50">
                     {getTranslated(tag, "name", locale)}
                   </Badge>
                 ))}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+              <h1 className="mb-4 text-3xl leading-tight font-bold md:text-4xl">
                 {getTranslated(post, "title", locale)}
               </h1>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-gradient-to-r from-violet-500 to-cyan-500 text-white text-xs">
+                    <AvatarFallback className="bg-gradient-to-r from-violet-500 to-cyan-500 text-xs text-white">
                       DC
                     </AvatarFallback>
                   </Avatar>
@@ -129,7 +136,9 @@ export default function BlogDetailClient({
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  <span>{Math.max(1, Math.ceil(content.length / 1000))} {t("readTime") || "dk"}</span>
+                  <span>
+                    {Math.max(1, Math.ceil(content.length / 1000))} {t("readTime") || "dk"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Eye className="h-3 w-3" />
@@ -140,30 +149,24 @@ export default function BlogDetailClient({
 
             {/* Article Content */}
             <div
-              className="prose dark:prose-invert prose-sm md:prose-base max-w-none mb-10 
-                prose-headings:font-bold prose-headings:text-foreground
-                prose-p:text-muted-foreground prose-p:leading-relaxed
-                prose-li:text-muted-foreground
-                prose-strong:text-foreground
-                prose-code:text-cyan-400 prose-code:bg-accent/50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-                prose-pre:bg-accent/30 prose-pre:border prose-pre:border-border/50 prose-pre:rounded-xl"
+              className="prose prose-sm mb-10 max-w-none md:prose-base dark:prose-invert prose-headings:font-bold prose-headings:text-foreground prose-p:leading-relaxed prose-p:text-muted-foreground prose-strong:text-foreground prose-code:rounded prose-code:bg-accent/50 prose-code:px-1 prose-code:py-0.5 prose-code:text-cyan-400 prose-pre:rounded-xl prose-pre:border prose-pre:border-border/50 prose-pre:bg-accent/30 prose-li:text-muted-foreground"
               dangerouslySetInnerHTML={{ __html: content }}
             />
 
             {/* Files */}
-            {post.files && Array.isArray(post.files) && (post.files as any[]).length > 0 && (
+            {toFileAttachments(post.files).length > 0 && (
               <div className="mb-10 space-y-3">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
+                <h3 className="flex items-center gap-2 text-lg font-semibold">
                   <FileIcon className="h-5 w-5 text-violet-400" />
                   Ekli Dosyalar
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {(post.files as any[]).map((file, i) => (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {toFileAttachments(post.files).map((file, i) => (
                     <a key={i} href={file.url} target="_blank" rel="noopener noreferrer">
-                      <Card className="border-border/50 bg-card/50 hover:bg-card hover:border-violet-500/30 transition-all cursor-pointer">
-                        <CardContent className="p-4 flex items-center gap-3">
-                          <FileIcon className="h-4 w-4 text-cyan-400 shrink-0" />
-                          <p className="text-sm font-medium truncate">{file.name}</p>
+                      <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
+                        <CardContent className="flex items-center gap-3 p-4">
+                          <FileIcon className="h-4 w-4 shrink-0 text-cyan-400" />
+                          <p className="truncate text-sm font-medium">{file.name}</p>
                         </CardContent>
                       </Card>
                     </a>
@@ -173,38 +176,47 @@ export default function BlogDetailClient({
             )}
 
             {/* Like Button */}
-            <div className="flex items-center gap-4 py-6 border-t border-b border-border/50 mb-10">
+            <div className="mb-10 flex items-center gap-4 border-t border-b border-border/50 py-6">
               <Button
                 variant={liked ? "default" : "outline"}
                 onClick={handleLike}
-                className={liked ? "bg-gradient-to-r from-pink-600 to-rose-600 text-white border-0" : "border-border/50"}
+                className={
+                  liked
+                    ? "border-0 bg-gradient-to-r from-pink-600 to-rose-600 text-white"
+                    : "border-border/50"
+                }
               >
                 <Heart className={`mr-2 h-4 w-4 ${liked ? "fill-current" : ""}`} />
-                {liked ? (t("liked") || "Beğenildi") : (t("like") || "Beğen")} ({likesCount})
+                {liked ? t("liked") || "Beğenildi" : t("like") || "Beğen"} ({likesCount})
               </Button>
             </div>
           </article>
 
           {/* Comments Section */}
           <section className="space-y-8">
-            <h2 className="text-xl font-bold flex items-center gap-2">
+            <h2 className="flex items-center gap-2 text-xl font-bold">
               <MessageSquare className="h-5 w-5 text-cyan-400" />
               {t("comments")} ({initialComments.length})
             </h2>
 
             {/* Comment Form */}
             <Card className="border-border/50 bg-card/50">
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="space-y-4 p-6">
                 {!currentUser ? (
                   <>
-                    <p className="text-sm text-muted-foreground">{t("loginToComment") || "Yorum yapmak için giriş yapmalısınız."}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {t("loginToComment") || "Yorum yapmak için giriş yapmalısınız."}
+                    </p>
                     <Textarea
                       placeholder={t("writeComment") || "Yorumunuzu buraya yazın..."}
-                      className="bg-accent/30 border-border/50 resize-none"
+                      className="resize-none border-border/50 bg-accent/30"
                       rows={3}
                       disabled
                     />
-                    <Button disabled className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
+                    <Button
+                      disabled
+                      className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+                    >
                       {t("submitComment") || "Yorum Gönder"}
                     </Button>
                   </>
@@ -213,16 +225,16 @@ export default function BlogDetailClient({
                     <Textarea
                       name="content"
                       placeholder={t("writeComment") || "Yorumunuzu buraya yazın..."}
-                      className="bg-accent/30 border-border/50 resize-none"
+                      className="resize-none border-border/50 bg-accent/30"
                       rows={3}
                       required
                     />
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       disabled={isPending}
-                      className="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-700 hover:to-cyan-700 text-white border-0"
+                      className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700"
                     >
-                      {isPending ? "Gönderiliyor..." : (t("submitComment") || "Yorum Gönder")}
+                      {isPending ? "Gönderiliyor..." : t("submitComment") || "Yorum Gönder"}
                     </Button>
                   </form>
                 )}
@@ -234,18 +246,22 @@ export default function BlogDetailClient({
               {initialComments.map((comment) => (
                 <Card key={comment.id} className="border-border/50 bg-card/50">
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="mb-3 flex items-center gap-3">
                       <Avatar className="h-8 w-8 border border-border/50">
-                        <AvatarFallback className="bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-violet-400 text-xs">
-                          {comment.author.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
+                        <AvatarFallback className="bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-xs text-violet-400">
+                          {comment.author.name?.charAt(0).toUpperCase() || (
+                            <User className="h-4 w-4" />
+                          )}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="text-sm font-medium">{comment.author.name || "Kullanıcı"}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(comment.createdAt).toLocaleDateString()}
+                        </p>
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
                       {comment.content}
                     </p>
                   </CardContent>

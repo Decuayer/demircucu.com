@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 
 export async function addComment(postId: string, content: string, pathToRevalidate: string) {
-  const t = await getTranslations("blog")
+  const t = await getTranslations("blog");
 
   const user = await getCurrentUser();
 
@@ -36,7 +36,7 @@ export async function addComment(postId: string, content: string, pathToRevalida
 }
 
 export async function toggleLike(postId: string, pathToRevalidate: string) {
-  const t = await getTranslations("blog")
+  const t = await getTranslations("blog");
 
   const user = await getCurrentUser();
 

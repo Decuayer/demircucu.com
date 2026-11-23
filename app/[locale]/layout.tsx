@@ -28,13 +28,17 @@ export async function generateMetadata({
   const { locale } = await params;
   const settings = await getSiteSettings();
 
-  const title = locale === "tr"
-    ? (settings?.siteTitleTr || "Demircucu | Bilgisayar Mühendisi")
-    : (settings?.siteTitleEn || "Demircucu | Computer Engineer");
+  const title =
+    locale === "tr"
+      ? settings?.siteTitleTr || "Demircucu | Bilgisayar Mühendisi"
+      : settings?.siteTitleEn || "Demircucu | Computer Engineer";
 
-  const description = locale === "tr"
-    ? (settings?.siteDescriptionTr || "Kişisel portfolio ve blog sitesi. Projeler, deneyimler ve yazılım dünyasından yazılar.")
-    : (settings?.siteDescriptionEn || "Personal portfolio and blog site. Projects, experiences and articles from the software world.");
+  const description =
+    locale === "tr"
+      ? settings?.siteDescriptionTr ||
+        "Kişisel portfolio ve blog sitesi. Projeler, deneyimler ve yazılım dünyasından yazılar."
+      : settings?.siteDescriptionEn ||
+        "Personal portfolio and blog site. Projects, experiences and articles from the software world.";
 
   return {
     title: {
@@ -42,13 +46,11 @@ export async function generateMetadata({
       template: `%s | ${title}}`,
     },
     description,
-    metadataBase: new URL(
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-    ),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
     icons: {
       icon: settings?.faviconUrl || "/favicon.ico",
       apple: settings?.faviconUrl || "/favicon.ico",
-    }
+    },
   };
 }
 
@@ -73,7 +75,7 @@ export default async function LocaleLayout({
       lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <body className="flex min-h-full flex-col bg-background text-foreground">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <TooltipProvider>
             <Header />

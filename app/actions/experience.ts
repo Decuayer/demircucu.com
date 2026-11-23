@@ -10,14 +10,14 @@ export async function getExperiences() {
   });
 }
 
-export async function getExperienceById(id: string) {  
+export async function getExperienceById(id: string) {
   return await prisma.experience.findFirst({
-    where: { 
-      id: id, 
-      published: true 
+    where: {
+      id: id,
+      published: true,
     },
-    include: { 
-      tags: true 
+    include: {
+      tags: true,
     },
   });
 }

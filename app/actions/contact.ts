@@ -3,7 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { getTranslations } from "next-intl/server";
 
-export async function submitContactMessage(data: any) {
+export async function submitContactMessage(data: {
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+}) {
   const t = await getTranslations("contact");
   const { name, email, subject, message } = data;
 

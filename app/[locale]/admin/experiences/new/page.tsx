@@ -2,7 +2,11 @@ import { getCurrentUser } from "@/app/actions/auth";
 import { redirect } from "next/navigation";
 import ExperienceFormClient from "../form-client";
 
-export default async function NewExperiencePage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function NewExperiencePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   const user = await getCurrentUser();
   if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);

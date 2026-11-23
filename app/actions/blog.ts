@@ -23,7 +23,7 @@ export async function getBlogPostBySlug(slug: string) {
   return await prisma.blogPost.findFirst({
     where: {
       slug: slug,
-      published: true
+      published: true,
     },
     include: { tags: true },
   });
@@ -33,8 +33,8 @@ export async function incrementViewCount(slug: string) {
   return await prisma.blogPost.update({
     where: { slug },
     data: {
-      viewCount: { increment: 1 }
-    }
+      viewCount: { increment: 1 },
+    },
   });
 }
 

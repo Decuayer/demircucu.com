@@ -10,8 +10,10 @@ export default async function HomePage() {
   const [featuredProjects, latestPosts, settings] = await Promise.all([
     getFeaturedProjects(),
     getFeaturedBlogPosts(3),
-    getSiteSettings()
+    getSiteSettings(),
   ]);
 
-  return <HomeClient featuredProjects={featuredProjects} latestPosts={latestPosts} settings={settings} />;
+  return (
+    <HomeClient featuredProjects={featuredProjects} latestPosts={latestPosts} settings={settings} />
+  );
 }

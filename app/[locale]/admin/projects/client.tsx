@@ -11,7 +11,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import { deleteProject } from "@/app/actions/admin";
-import { Project } from "@prisma/client";
+import { type Project } from "@prisma/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,20 +57,20 @@ export default function AdminProjectsClient({ initialProjects }: AdminProjectsCl
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-2xl font-bold flex items-center gap-3"
+          className="flex items-center gap-3 text-2xl font-bold"
         >
           <Code2 className="h-6 w-6 text-cyan-400" />
           {t("projects")}
         </motion.h1>
         <Link href="/admin/projects/new">
-          <Button className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white border-0">
+          <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
             <Plus className="mr-2 h-4 w-4" />
             {t("add") || "Ekle"}
           </Button>
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {projects.map((project, i) => (
           <motion.div
             key={project.id}
@@ -78,8 +78,8 @@ export default function AdminProjectsClient({ initialProjects }: AdminProjectsCl
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="border-border/50 bg-card/50 hover:bg-card transition-colors">
-              <CardContent className="p-5 space-y-3">
+            <Card className="border-border/50 bg-card/50 transition-colors hover:bg-card">
+              <CardContent className="space-y-3 p-5">
                 <div className="flex items-start justify-between">
                   <h3 className="font-semibold">{getTranslated(project, "title", locale)}</h3>
                   <div className="flex gap-1">
@@ -88,7 +88,12 @@ export default function AdminProjectsClient({ initialProjects }: AdminProjectsCl
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
                     </Link>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(project.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive"
+                      onClick={() => setDeleteId(project.id)}
+                    >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -98,7 +103,10 @@ export default function AdminProjectsClient({ initialProjects }: AdminProjectsCl
                     {project.published ? t("published") : t("unpublished")}
                   </Badge>
                   {project.featured && (
-                    <Badge variant="outline" className="text-xs text-yellow-400 border-yellow-400/30">
+                    <Badge
+                      variant="outline"
+                      className="border-yellow-400/30 text-xs text-yellow-400"
+                    >
                       {t("featured")}
                     </Badge>
                   )}
@@ -113,13 +121,15 @@ export default function AdminProjectsClient({ initialProjects }: AdminProjectsCl
         <AlertDialogContent className="border-border/50 bg-background">
           <AlertDialogHeader>
             <AlertDialogTitle>{t("confirmDelete")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("deleteConfirmation")}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("deleteConfirmation")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={isPending}>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+              disabled={isPending}
+            >
               {isPending ? t("deleting") : t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>

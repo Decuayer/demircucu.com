@@ -3,7 +3,11 @@ import { getSiteSettings } from "@/app/actions/settings";
 import { redirect } from "next/navigation";
 import AdminSettingsClient from "./client";
 
-export default async function AdminSettingsPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function AdminSettingsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   const user = await getCurrentUser();
   if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);

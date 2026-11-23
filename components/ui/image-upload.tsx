@@ -2,11 +2,10 @@
 
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import Image from "next/image";
+import { getErrorMessage } from "@/lib/errors";
 
 interface ImageUploadProps {
   value: string;
@@ -55,8 +54,8 @@ export function ImageUpload({ value, onChange, folder = "general", usedIn }: Ima
       } else {
         throw new Error(data.error || "Yükleme başarısız.");
       }
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     } finally {
       setIsUploading(false);
     }
@@ -92,20 +91,11 @@ export function ImageUpload({ value, onChange, folder = "general", usedIn }: Ima
   return (
     <div className="space-y-4">
       {value ? (
-        <div className="relative rounded-xl overflow-hidden border border-border/50 bg-accent/20 aspect-video flex items-center justify-center group max-w-sm">
+        <div className="group relative flex aspect-video max-w-sm items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-accent/20">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img 
-            src={value} 
-            alt="Uploaded image" 
-            className="object-contain w-full h-full"
-          />
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <Button 
-              type="button" 
-              variant="destructive" 
-              size="icon" 
-              onClick={() => onChange("")}
-            >
+          <img src={value} alt="Uploaded image" className="h-full w-full object-contain" />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+            <Button type="button" variant="destructive" size="icon" onClick={() => onChange("")}>
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -113,11 +103,7 @@ export function ImageUpload({ value, onChange, folder = "general", usedIn }: Ima
       ) : (
         <div className="space-y-3">
           <div
-            className={`
-              relative border-2 border-dashed rounded-xl p-8 transition-colors text-center cursor-pointer
-              ${dragActive ? "border-violet-500 bg-violet-500/10" : "border-border/50 hover:border-violet-500/50 hover:bg-accent/30"}
-              ${isUploading ? "opacity-50 pointer-events-none" : ""}
-            `}
+            className={`relative cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors ${dragActive ? "border-violet-500 bg-violet-500/10" : "border-border/50 hover:border-violet-500/50 hover:bg-accent/30"} ${isUploading ? "pointer-events-none opacity-50" : ""} `}
             onDragEnter={onDrag}
             onDragLeave={onDrag}
             onDragOver={onDrag}
@@ -135,7 +121,7 @@ export function ImageUpload({ value, onChange, folder = "general", usedIn }: Ima
                 }
               }}
             />
-            
+
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               {isUploading ? (
                 <>
@@ -144,24 +130,22 @@ export function ImageUpload({ value, onChange, folder = "general", usedIn }: Ima
                 </>
               ) : (
                 <>
-                  <div className="p-3 bg-background rounded-full shadow-sm mb-2">
+                  <div className="mb-2 rounded-full bg-background p-3 shadow-sm">
                     <Upload className="h-6 w-6 text-violet-400" />
                   </div>
                   <p className="text-sm font-medium">
                     Görsel yüklemek için tıklayın veya sürükleyin
                   </p>
-                  <p className="text-xs opacity-70">
-                    PNG, JPG, WEBP (Max 5MB)
-                  </p>
+                  <p className="text-xs opacity-70">PNG, JPG, WEBP (Max 5MB)</p>
                 </>
               )}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="h-px bg-border/50 flex-1"></div>
+            <div className="h-px flex-1 bg-border/50"></div>
             <span className="text-xs text-muted-foreground uppercase">veya</span>
-            <div className="h-px bg-border/50 flex-1"></div>
+            <div className="h-px flex-1 bg-border/50"></div>
           </div>
 
           {showManual ? (
@@ -170,9 +154,13 @@ export function ImageUpload({ value, onChange, folder = "general", usedIn }: Ima
                 value={manualUrl}
                 onChange={(e) => setManualUrl(e.target.value)}
                 placeholder="https://..."
-                className="bg-accent/30 flex-1"
+                className="flex-1 bg-accent/30"
               />
-              <Button type="button" onClick={handleManualUrlSubmit} className="bg-secondary text-secondary-foreground">
+              <Button
+                type="button"
+                onClick={handleManualUrlSubmit}
+                className="bg-secondary text-secondary-foreground"
+              >
                 Ekle
               </Button>
               <Button type="button" variant="ghost" onClick={() => setShowManual(false)}>

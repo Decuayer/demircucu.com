@@ -1,9 +1,18 @@
 "use client";
 
+import type { SiteSettings } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Mail } from "lucide-react";
-import { GithubIcon, LinkedinIcon, TwitterIcon, InstagramIcon, YoutubeIcon, MediumIcon, StackOverflowIcon } from "@/components/icons";
+import {
+  GithubIcon,
+  LinkedinIcon,
+  TwitterIcon,
+  InstagramIcon,
+  YoutubeIcon,
+  MediumIcon,
+  StackOverflowIcon,
+} from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
@@ -16,20 +25,31 @@ const footerLinks = [
   { href: "/contact", key: "contact" },
 ] as const;
 
-export default function Footer({ settings }: { settings?: any }) {
+export default function Footer({ settings }: { settings?: SiteSettings | null }) {
   const t = useTranslations("nav");
   const params = useParams();
   const locale = params.locale as string;
 
   const socialLinks = [];
-  if (settings?.socialGithub) socialLinks.push({ icon: GithubIcon, href: settings.socialGithub, label: "GitHub" });
-  if (settings?.socialLinkedin) socialLinks.push({ icon: LinkedinIcon, href: settings.socialLinkedin, label: "LinkedIn" });
-  if (settings?.socialTwitter) socialLinks.push({ icon: TwitterIcon, href: settings.socialTwitter, label: "Twitter" });
-  if (settings?.socialInstagram) socialLinks.push({ icon: InstagramIcon, href: settings.socialInstagram, label: "Instagram" });
-  if (settings?.socialYoutube) socialLinks.push({ icon: YoutubeIcon, href: settings.socialYoutube, label: "YouTube" });
-  if (settings?.socialMedium) socialLinks.push({ icon: MediumIcon, href: settings.socialMedium, label: "Medium" });
-  if (settings?.socialStackoverflow) socialLinks.push({ icon: StackOverflowIcon, href: settings.socialStackoverflow, label: "StackOverflow" });
-  
+  if (settings?.socialGithub)
+    socialLinks.push({ icon: GithubIcon, href: settings.socialGithub, label: "GitHub" });
+  if (settings?.socialLinkedin)
+    socialLinks.push({ icon: LinkedinIcon, href: settings.socialLinkedin, label: "LinkedIn" });
+  if (settings?.socialTwitter)
+    socialLinks.push({ icon: TwitterIcon, href: settings.socialTwitter, label: "Twitter" });
+  if (settings?.socialInstagram)
+    socialLinks.push({ icon: InstagramIcon, href: settings.socialInstagram, label: "Instagram" });
+  if (settings?.socialYoutube)
+    socialLinks.push({ icon: YoutubeIcon, href: settings.socialYoutube, label: "YouTube" });
+  if (settings?.socialMedium)
+    socialLinks.push({ icon: MediumIcon, href: settings.socialMedium, label: "Medium" });
+  if (settings?.socialStackoverflow)
+    socialLinks.push({
+      icon: StackOverflowIcon,
+      href: settings.socialStackoverflow,
+      label: "StackOverflow",
+    });
+
   if (settings?.contactEmail) {
     socialLinks.push({ icon: Mail, href: `mailto:${settings.contactEmail}`, label: "Email" });
   } else {
@@ -38,21 +58,22 @@ export default function Footer({ settings }: { settings?: any }) {
 
   return (
     <footer className="border-t border-border/40 bg-background/50">
-      <div className="container mx-auto px-4 md:px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="container mx-auto px-4 py-12 md:px-6">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {/* Brand */}
           <div className="space-y-4">
-            <span className="text-lg font-bold bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-lg font-bold text-transparent">
               {getTranslated(settings, "footerTitle", locale) || "demircucu.com"}
             </span>
-            <p className="text-sm text-muted-foreground max-w-xs">
-              {getTranslated(settings, "footerDescription", locale) || "Full-Stack Developer & Software Engineer. Yazılım, projeler ve teknoloji dünyasından yazılar."}
+            <p className="max-w-xs text-sm text-muted-foreground">
+              {getTranslated(settings, "footerDescription", locale) ||
+                "Full-Stack Developer & Software Engineer. Yazılım, projeler ve teknoloji dünyasından yazılar."}
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
               {t("fastlinks")}
             </h3>
             <nav className="flex flex-col gap-2">
@@ -60,7 +81,7 @@ export default function Footer({ settings }: { settings?: any }) {
                 <Link
                   key={link.key}
                   href={link.href}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {t(link.key)}
                 </Link>
@@ -70,7 +91,7 @@ export default function Footer({ settings }: { settings?: any }) {
 
           {/* Social */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
               {t("socialmedia")}
             </h3>
             <div className="flex gap-3">
@@ -80,7 +101,7 @@ export default function Footer({ settings }: { settings?: any }) {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent/50 text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/50 text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
                   aria-label={social.label}
                 >
                   <social.icon className="h-4 w-4" />
@@ -92,8 +113,10 @@ export default function Footer({ settings }: { settings?: any }) {
 
         <Separator className="my-8 opacity-50" />
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} demircucu.com. {t("copyright") || "Tüm hakları saklıdır."}</p>
+        <div className="flex flex-col items-center justify-between gap-4 text-xs text-muted-foreground md:flex-row">
+          <p>
+            © {new Date().getFullYear()} demircucu.com. {t("copyright") || "Tüm hakları saklıdır."}
+          </p>
         </div>
       </div>
     </footer>

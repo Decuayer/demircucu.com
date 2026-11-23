@@ -13,9 +13,30 @@ const stats = [
 ];
 
 const recentMessages = [
-  { id: "1", name: "Ali Veli", email: "ali@example.com", subject: "İş Birliği", date: "2024-12-15", read: false },
-  { id: "2", name: "Ayşe Fatma", email: "ayse@example.com", subject: "Proje Teklifi", date: "2024-12-14", read: true },
-  { id: "3", name: "Mehmet K.", email: "mehmet@example.com", subject: "Soru", date: "2024-12-13", read: true },
+  {
+    id: "1",
+    name: "Ali Veli",
+    email: "ali@example.com",
+    subject: "İş Birliği",
+    date: "2024-12-15",
+    read: false,
+  },
+  {
+    id: "2",
+    name: "Ayşe Fatma",
+    email: "ayse@example.com",
+    subject: "Proje Teklifi",
+    date: "2024-12-14",
+    read: true,
+  },
+  {
+    id: "3",
+    name: "Mehmet K.",
+    email: "mehmet@example.com",
+    subject: "Soru",
+    date: "2024-12-13",
+    read: true,
+  },
 ];
 
 export default function AdminDashboard() {
@@ -23,16 +44,13 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="text-3xl font-bold mb-2">{t("dashboard")}</h1>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <h1 className="mb-2 text-3xl font-bold">{t("dashboard")}</h1>
         <p className="text-muted-foreground">{t("overview")}</p>
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
           <motion.div
             key={stat.key}
@@ -40,18 +58,22 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
           >
-            <Card className="border-border/50 bg-card/50 hover:bg-card transition-colors">
+            <Card className="border-border/50 bg-card/50 transition-colors hover:bg-card">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-lg ${
-                    stat.color === "violet" ? "bg-violet-500/10" : "bg-cyan-500/10"
-                  }`}>
-                    <stat.icon className={`h-5 w-5 ${
-                      stat.color === "violet" ? "text-violet-400" : "text-cyan-400"
-                    }`} />
+                <div className="mb-4 flex items-center justify-between">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                      stat.color === "violet" ? "bg-violet-500/10" : "bg-cyan-500/10"
+                    }`}
+                  >
+                    <stat.icon
+                      className={`h-5 w-5 ${
+                        stat.color === "violet" ? "text-violet-400" : "text-cyan-400"
+                      }`}
+                    />
                   </div>
-                  <span className="flex items-center text-xs text-green-400 font-medium">
-                    <TrendingUp className="h-3 w-3 mr-1" />
+                  <span className="flex items-center text-xs font-medium text-green-400">
+                    <TrendingUp className="mr-1 h-3 w-3" />
                     {stat.change}
                   </span>
                 </div>
@@ -71,7 +93,7 @@ export default function AdminDashboard() {
       >
         <Card className="border-border/50 bg-card/50">
           <CardContent className="p-6">
-            <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
+            <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
               <Mail className="h-5 w-5 text-cyan-400" />
               {t("recentMessages")}
             </h2>
@@ -79,12 +101,10 @@ export default function AdminDashboard() {
               {recentMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className="flex items-center justify-between p-3 rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+                  className="flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors hover:bg-accent/50"
                 >
                   <div className="flex items-center gap-3">
-                    {!msg.read && (
-                      <div className="w-2 h-2 rounded-full bg-violet-500" />
-                    )}
+                    {!msg.read && <div className="h-2 w-2 rounded-full bg-violet-500" />}
                     <div>
                       <p className="text-sm font-medium">{msg.name}</p>
                       <p className="text-xs text-muted-foreground">{msg.subject}</p>

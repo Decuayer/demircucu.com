@@ -1,17 +1,28 @@
-import { createClient } from "@supabase/supabase-js";
+import "server-only";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
+import { getErrorMessage } from "@/lib/errors";
 
-// Create a Supabase client with the service role key for admin privileges
-// We use the service role key to bypass RLS for server-side uploads
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+let adminClient: SupabaseClient | undefined;
 
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
+/**
+ * Supabase client with the service role key (bypasses RLS). Server-only.
+ * Created on first use so builds and pages that never upload do not need the secret.
+ */
+export function getSupabaseAdmin(): SupabaseClient {
+  if (adminClient) return adminClient;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceRoleKey) {
+    throw new Error(
+      "Supabase storage is not configured: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.",
+    );
+  }
+  adminClient = createClient(url, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  return adminClient;
+}
 
 export const BUCKET_NAME = "media";
 
@@ -27,16 +38,16 @@ export async function uploadFileToStorage(
   file: Buffer | ArrayBuffer,
   fileName: string,
   contentType: string,
-  folder: string = "general"
+  folder: string = "general",
 ) {
   try {
     // Ensure bucket exists
-    const { data: buckets, error: bucketsError } = await supabaseAdmin.storage.listBuckets();
+    const { data: buckets, error: bucketsError } = await getSupabaseAdmin().storage.listBuckets();
     if (bucketsError) throw bucketsError;
 
     const bucketExists = buckets.some((b) => b.name === BUCKET_NAME);
     if (!bucketExists) {
-      const { error: createError } = await supabaseAdmin.storage.createBucket(BUCKET_NAME, {
+      const { error: createError } = await getSupabaseAdmin().storage.createBucket(BUCKET_NAME, {
         public: true,
       });
       if (createError) throw createError;
@@ -48,8 +59,8 @@ export async function uploadFileToStorage(
     const filePath = `${folder}/${uniqueFileName}`;
 
     // Upload to Supabase Storage
-    const { data, error } = await supabaseAdmin.storage
-      .from(BUCKET_NAME)
+    const { data, error } = await getSupabaseAdmin()
+      .storage.from(BUCKET_NAME)
       .upload(filePath, file, {
         contentType,
         upsert: false,
@@ -58,18 +69,18 @@ export async function uploadFileToStorage(
     if (error) throw error;
 
     // Get public URL
-    const { data: urlData } = supabaseAdmin.storage.from(BUCKET_NAME).getPublicUrl(data.path);
+    const { data: urlData } = getSupabaseAdmin().storage.from(BUCKET_NAME).getPublicUrl(data.path);
 
     return {
       success: true,
       path: data.path,
       publicUrl: urlData.publicUrl,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Supabase storage upload error:", error);
     return {
       success: false,
-      error: error.message || "Failed to upload file to storage",
+      error: getErrorMessage(error, "Failed to upload file to storage"),
     };
   }
 }
@@ -80,15 +91,15 @@ export async function uploadFileToStorage(
  */
 export async function deleteFileFromStorage(path: string) {
   try {
-    const { error } = await supabaseAdmin.storage.from(BUCKET_NAME).remove([path]);
+    const { error } = await getSupabaseAdmin().storage.from(BUCKET_NAME).remove([path]);
     if (error) throw error;
-    
+
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Supabase storage delete error:", error);
     return {
       success: false,
-      error: error.message || "Failed to delete file from storage",
+      error: getErrorMessage(error, "Failed to delete file from storage"),
     };
   }
 }

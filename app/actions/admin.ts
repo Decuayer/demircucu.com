@@ -3,7 +3,8 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "./auth";
 import { revalidatePath } from "next/cache";
-import { Project, Experience, BlogPost } from "@prisma/client";
+import { getErrorMessage } from "@/lib/errors";
+import type { BlogPostInput, ExperienceInput, ProjectInput, TagInput } from "@/lib/types/content";
 import { getTranslations } from "next-intl/server";
 
 // Middleware to check admin rights inside server actions
@@ -23,16 +24,16 @@ export async function getProjectById(id: string) {
     await requireAdmin();
     return await prisma.project.findUnique({
       where: { id },
-      include: { tags: true }
+      include: { tags: true },
     });
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
-export async function createProject(data: any) {
+export async function createProject(data: ProjectInput) {
   const t = await getTranslations("admin");
-  
+
   try {
     await requireAdmin();
     const project = await prisma.project.create({
@@ -46,16 +47,18 @@ export async function createProject(data: any) {
         descriptionEn: data.descriptionEn || null,
         logo: data.logo || null,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         githubUrl: data.githubUrl,
         liveUrl: data.liveUrl,
         order: data.order || 0,
@@ -67,13 +70,13 @@ export async function createProject(data: any) {
     revalidatePath("/projects");
     revalidatePath("/");
     return { success: true, project };
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
-    return { error: error.message || t("projectCreationFailed") };
+    return { error: getErrorMessage(error, t("projectCreationFailed")) };
   }
 }
 
-export async function updateProject(id: string, data: any) {
+export async function updateProject(id: string, data: Partial<ProjectInput>) {
   const t = await getTranslations("admin");
 
   try {
@@ -90,17 +93,19 @@ export async function updateProject(id: string, data: any) {
         descriptionEn: data.descriptionEn,
         logo: data.logo,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          set: [],
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              set: [],
+              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         githubUrl: data.githubUrl,
         liveUrl: data.liveUrl,
         order: data.order,
@@ -113,8 +118,8 @@ export async function updateProject(id: string, data: any) {
     revalidatePath(`/projects/${id}`);
     revalidatePath("/");
     return { success: true, project };
-  } catch (error: any) {
-    return { error: error.message || t("projectUpdateFailed") };
+  } catch (error) {
+    return { error: getErrorMessage(error, t("projectUpdateFailed")) };
   }
 }
 
@@ -128,8 +133,8 @@ export async function deleteProject(id: string) {
     revalidatePath("/projects");
     revalidatePath("/");
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message || t("projectDeleteFailed") };
+  } catch (error) {
+    return { error: getErrorMessage(error, t("projectDeleteFailed")) };
   }
 }
 
@@ -139,14 +144,14 @@ export async function getExperienceById(id: string) {
     await requireAdmin();
     return await prisma.experience.findUnique({
       where: { id },
-      include: { tags: true }
+      include: { tags: true },
     });
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
-export async function createExperience(data: any) {
+export async function createExperience(data: ExperienceInput) {
   const t = await getTranslations("admin");
 
   try {
@@ -164,16 +169,18 @@ export async function createExperience(data: any) {
         endDate: data.endDate,
         logo: data.logo || null,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         order: data.order || 0,
         published: data.published ?? true,
       },
@@ -181,12 +188,12 @@ export async function createExperience(data: any) {
     revalidatePath("/admin/experiences");
     revalidatePath("/experience");
     return { success: true, experience };
-  } catch (error: any) {
-    return { error: error.message || t("experienceCreationFailed") };
+  } catch (error) {
+    return { error: getErrorMessage(error, t("experienceCreationFailed")) };
   }
 }
 
-export async function updateExperience(id: string, data: any) {
+export async function updateExperience(id: string, data: Partial<ExperienceInput>) {
   const t = await getTranslations("admin");
 
   try {
@@ -205,17 +212,19 @@ export async function updateExperience(id: string, data: any) {
         endDate: data.endDate,
         logo: data.logo,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          set: [], // Clear existing relations
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              set: [], // Clear existing relations
+              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         order: data.order,
         published: data.published,
       },
@@ -224,8 +233,8 @@ export async function updateExperience(id: string, data: any) {
     revalidatePath("/experience");
     revalidatePath(`/experience/${id}`);
     return { success: true, experience };
-  } catch (error: any) {
-    return { error: error.message || t("experienceUpdateFailed") };
+  } catch (error) {
+    return { error: getErrorMessage(error, t("experienceUpdateFailed")) };
   }
 }
 
@@ -238,8 +247,8 @@ export async function deleteExperience(id: string) {
     revalidatePath("/admin/experiences");
     revalidatePath("/experience");
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message || t("experienceDeleteFailed") };
+  } catch (error) {
+    return { error: getErrorMessage(error, t("experienceDeleteFailed")) };
   }
 }
 
@@ -249,14 +258,14 @@ export async function getBlogPostById(id: string) {
     await requireAdmin();
     return await prisma.blogPost.findUnique({
       where: { id },
-      include: { tags: true }
+      include: { tags: true },
     });
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
-export async function createBlogPost(data: any) {
+export async function createBlogPost(data: BlogPostInput) {
   const t = await getTranslations("admin");
 
   try {
@@ -272,16 +281,18 @@ export async function createBlogPost(data: any) {
         contentEn: data.contentEn!,
         coverImage: data.coverImage,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         published: data.published ?? true,
         featured: data.featured ?? false,
         authorId: admin.id,
@@ -292,13 +303,13 @@ export async function createBlogPost(data: any) {
     revalidatePath("/blog");
     revalidatePath("/");
     return { success: true, post };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Blog creation error:", error);
-    return { error: error.message || t("blogCreationFailed") };
+    return { error: getErrorMessage(error, t("blogCreationFailed")) };
   }
 }
 
-export async function updateBlogPost(id: string, data: any) {
+export async function updateBlogPost(id: string, data: Partial<BlogPostInput>) {
   const t = await getTranslations("admin");
 
   try {
@@ -315,17 +326,19 @@ export async function updateBlogPost(id: string, data: any) {
         contentEn: data.contentEn,
         coverImage: data.coverImage,
         files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList ? {
-          set: [],
-          connectOrCreate: data.tagsList.map((tag: any) => ({
-            where: { slug: tag.slug },
-            create: { 
-              nameTr: tag.nameTr, 
-              nameEn: tag.nameEn, 
-              slug: tag.slug 
+        tags: data.tagsList
+          ? {
+              set: [],
+              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
+                where: { slug: tag.slug },
+                create: {
+                  nameTr: tag.nameTr,
+                  nameEn: tag.nameEn,
+                  slug: tag.slug,
+                },
+              })),
             }
-          }))
-        } : undefined,
+          : undefined,
         published: data.published,
         featured: data.featured,
       },
@@ -335,8 +348,8 @@ export async function updateBlogPost(id: string, data: any) {
     revalidatePath(`/blog/${post.slug}`);
     revalidatePath("/");
     return { success: true, post };
-  } catch (error: any) {
-    return { error: error.message || t("blogUpdateFailed") };
+  } catch (error) {
+    return { error: getErrorMessage(error, t("blogUpdateFailed")) };
   }
 }
 
@@ -350,8 +363,8 @@ export async function deleteBlogPost(id: string) {
     revalidatePath("/blog");
     revalidatePath("/");
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message || t("blogDeleteFailed") };
+  } catch (error) {
+    return { error: getErrorMessage(error, t("blogDeleteFailed")) };
   }
 }
 
@@ -362,7 +375,7 @@ export async function getContactMessages() {
     return await prisma.contactMessage.findMany({
       orderBy: { createdAt: "desc" },
     });
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -375,7 +388,7 @@ export async function deleteContactMessage(id: string) {
     await prisma.contactMessage.delete({ where: { id } });
     revalidatePath("/admin/contacts");
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message || t("contactDeleteFailed") };
+  } catch (error) {
+    return { error: getErrorMessage(error, t("contactDeleteFailed")) };
   }
 }
