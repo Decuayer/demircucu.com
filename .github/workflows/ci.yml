@@ -33,7 +33,8 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 3s --health-retries 30
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:54329/demircucu_shadow
+      # Main and shadow must be different databases (P3025); the drift check only uses the shadow.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:54329/postgres
       SHADOW_DATABASE_URL: postgresql://postgres:postgres@localhost:54329/demircucu_shadow
     steps:
       - uses: actions/checkout@v4
