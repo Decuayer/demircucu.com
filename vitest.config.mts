@@ -1,9 +1,15 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    tsconfigPaths: true,
+    alias: {
+      "server-only": fileURLToPath(new URL("./tests/setup/server-only-stub.ts", import.meta.url)),
+    },
+  },
   test: {
     projects: [
       {
@@ -45,10 +51,10 @@ export default defineConfig({
         autoUpdate: process.env.CI
           ? false
           : (newThreshold: number) => Math.floor(newThreshold * 100) / 100,
-        lines: 1.96,
-        statements: 2.33,
-        functions: 2.12,
-        branches: 2.67,
+        lines: 2.97,
+        statements: 3.37,
+        functions: 2.72,
+        branches: 3.41,
       },
     },
   },

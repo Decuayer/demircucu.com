@@ -1,3 +1,5 @@
 # Bulk formatting commits (git config blame.ignoreRevsFile .git-blame-ignore-revs)
 # style: format codebase with prettier
 1b700620fcc63eb1bed9ad38d2ef7049c949a851
+# style(prisma): format schema with prisma format
+2d47a2851e1e833fcafb733137fe78119d6e010d
