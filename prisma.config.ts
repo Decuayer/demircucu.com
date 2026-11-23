@@ -15,5 +15,7 @@ export default defineConfig({
     // Prisma CLI (migrate, introspection) needs a direct or session-mode connection.
     // The application runtime uses DATABASE_URL (transaction pooler) via lib/prisma.ts.
     url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
+    // Only needed for `migrate diff --from-migrations` (drift check) and `migrate dev`.
+    shadowDatabaseUrl: process.env["SHADOW_DATABASE_URL"],
   },
 });
