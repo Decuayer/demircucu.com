@@ -26,7 +26,8 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx scripts/assert-local-db.ts && prisma db seed",
     "db:reset": "tsx scripts/assert-local-db.ts && prisma migrate reset --force",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -60,6 +61,8 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^8.0.0",
@@ -77,7 +80,9 @@
     "eslint": "^9",
     "eslint-config-next": "^16.4.6",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
     "jsdom": "^31.0.1",
+    "lint-staged": "^17.6.2",
     "msw": "^3.0.7",
     "prettier": "^3.10.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
