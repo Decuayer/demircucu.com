@@ -38,6 +38,18 @@ export default defineConfig({
       reporter: ["text", "html", "json-summary", "lcov"],
       include: ["lib/**/*.{ts,tsx}", "app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}"],
       exclude: ["**/*.test.{ts,tsx}", "**/*.d.ts", "lib/generated/**", "components/ui/**"],
+      // Coverage ratchet: CI fails if coverage drops below these floors. Local runs
+      // (not CI) raise them automatically when coverage improves; commit the updated values.
+      // Target floors (lib >= 85%, overall >= 70%) are enforced in phase 9.
+      thresholds: {
+        autoUpdate: process.env.CI
+          ? false
+          : (newThreshold: number) => Math.floor(newThreshold * 100) / 100,
+        lines: 1.96,
+        statements: 2.33,
+        functions: 2.12,
+        branches: 2.67,
+      },
     },
   },
 });
