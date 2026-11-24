@@ -138,6 +138,11 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşleme dry-run'ını kulla
   rename + 301, kaybolan repo, otomatik yayın, hata kaydı), E2E 43 (README + Mermaid + PDF CSP
   altında, admin paneli).
 - **Bucket:** limit 25 MB'a çıkıyor (`ensure-storage-bucket.ts --apply`, staging ve prod).
+- **Staging:** Phase 5 migration'ı merge'den önce uygulandı (Preview build staging'i okuyor;
+  yeni kolonlar olmadan `ColumnNotFound` veriyordu). Lockdown ok.
+- **CI düzeltmeleri:** README testlerinde Shiki ilk kurulumu `beforeAll`'da (5 sn sınırı aşılıyordu);
+  `lib/projects` testleri eklendi (kapsama ratchet'in 0,01 altına düşmüştü); Supabase job'ında
+  geçici port aralığı 60000-65000 (543xx portlarıyla çakışma).
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
