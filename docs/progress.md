@@ -1,19 +1,19 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 2 production migration uygulandı, merge bekleniyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-24 (Faz 2 merge edildi; sıradaki Faz 3). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
 ## 1. Durum özeti
 
-| Faz / iş                         | Durum                                                                 | Branch / PR                       |
-| -------------------------------- | --------------------------------------------------------------------- | --------------------------------- |
-| Faz 0: Keşif                     | Tamamlandı, onaylandı                                                 | (PR #1 açıklamasında)             |
-| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                          | `chore/phase-1-test-infra`, PR #1 |
-| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı                | `fix/db-connection-pool`, PR #2   |
-| Faz 2: Güvenlik ve auth          | Kod tamam, PR #3 açık; production migration uygulandı, merge bekliyor | `feat/phase-2-security-auth`      |
-| Frankfurt mini fazı              | Plan henüz sunulmadı (Faz 2 merge'ünden sonra)                        | —                                 |
-| Faz 3–10                         | Başlamadı                                                             | —                                 |
+| Faz / iş                         | Durum                                                          | Branch / PR                       |
+| -------------------------------- | -------------------------------------------------------------- | --------------------------------- |
+| Faz 0: Keşif                     | Tamamlandı, onaylandı                                          | (PR #1 açıklamasında)             |
+| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                   | `chore/phase-1-test-infra`, PR #1 |
+| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı         | `fix/db-connection-pool`, PR #2   |
+| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı | `feat/phase-2-security-auth`      |
+| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor     | —                                 |
+| Faz 3–10                         | Başlamadı                                                      | —                                 |
 
 ## 2. Tamamlanan işler
 
@@ -59,10 +59,10 @@ SRI, enforce; rate limit = Postgres, Turnstile yok; kayıt = açık, e-posta + p
 | Coverage hedefleri yerine ratchet                                       | Hedefler Faz 9'da zorunlu olacak                                                   |
 | Hardcoded UI metinleri dokunulan fazda i18n'e taşınıyor                 | Faz 8'de lint kuralı veya script                                                   |
 | `npm audit` bulguları kabul edildi                                      | Sadece dev/build zamanı; `docs/security-review.md`                                 |
-| Vercel bölgesi `icn1` (geçici)                                          | Frankfurt mini fazında `fra1`                                                      |
+| Vercel bölgesi `icn1` (kalıcı)                                          | Production DB Seul'de kalıyor; Frankfurt taşıması iptal                            |
 | CSP nonce'suz (`'unsafe-inline'` script), SRI kısmi                     | PPR ile nonce mümkün değil; Next 16.4.6 SRI bazı chunk'larda `integrity` eklemiyor |
 | Upload limiti 5 MB yerine 4 MB                                          | Vercel fonksiyon gövde limiti 4,5 MB                                               |
-| Bilinmeyen slug'da ilk istek soft 404 (200 + noindex)                   | Partial Prefetching'in fallback shell'i; karar kullanıcıda (bkz. §8)               |
+| Bilinmeyen slug'da ilk istek soft 404 (200 + noindex)                   | Partial Prefetching'in fallback shell'i; kullanıcı kabul etti, testli              |
 
 ## 4. Ortamlar
 
@@ -72,7 +72,7 @@ Secret değerleri bu dosyada **yok**. Sadece konumları:
 | ---------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | Yerel      | Docker Postgres `localhost:54329`; yerel Supabase API 54321, DB 54322, Studio 54323, Mailpit 54324                        | `.env.local` (mode 600)                             | Supabase'te e-posta doğrulaması açık, parola min 10, şablonlar `supabase/templates/`  |
 | Staging    | Supabase `eu-west-1`; DATABASE_URL transaction pooler 6543, DIRECT_URL 5432                                               | `.env.staging.local` (mode 600); Vercel Preview env | 4 migration uygulandı, kilit doğrulandı, `media` bucket oluşturuldu, `sb_secret_` key |
-| Production | Supabase `ap-northeast-2` (Seul); DATABASE_URL transaction pooler 6543, DIRECT_URL session pooler 5432 (sadece migration) | `.env.prod.local`; Vercel Production env            | 3 migration **bekliyor** (onay); legacy JWT anahtarları                               |
+| Production | Supabase `ap-northeast-2` (Seul); DATABASE_URL transaction pooler 6543, DIRECT_URL session pooler 5432 (sadece migration) | `.env.prod.local`; Vercel Production env            | 4 migration uygulandı, kilit doğrulandı; Data API kapalı; legacy JWT anahtarları      |
 
 Kurallar:
 
@@ -80,8 +80,7 @@ Kurallar:
   hiçbir çıktıya yazılmaz. Kullanım: subshell içinde `set -a; . ./.env.prod.local; set +a`.
 - Staging'e migration: `DB_TARGET=staging npm run db:migrate:staging` (yerel) veya
   `staging-migrate.yml` (CI).
-- `.env.prod.local` mode **644**; `chmod 600` önerilir.
-- `.env.staging.local` içinde Vercel bypass secret'ı **yok** (kullanıcı eklemeli, bkz. §8).
+- Staging'e merge'de `staging-migrate.yml` otomatik çalışır (PR #3 merge'ünde yeşil, bekleyen yok).
 
 ## 5. Koruma script'leri
 
@@ -90,7 +89,7 @@ Kurallar:
   değişkenleri staging ref'ine ait olmalı (ref `.env.staging.local`'dan veya `STAGING_SUPABASE_REF`
   secret'ından), production her durumda reddedilir.
 - `lib/env/preview-guard.ts`: Preview'da production ref'i (yalnızca SHA-256 özeti repoda) build'i
-  ve sunucuyu durdurur. Frankfurt geçişinde yeni production ref'inin özeti eklenmeli.
+  ve sunucuyu durdurur. Production projesi değişirse yeni ref'in özeti eklenmeli.
 - `scripts/verify-db-lockdown.ts`: her ortamda salt-okunur RLS / grant / trigger raporu.
 - `scripts/e2e-build.ts`, `scripts/e2e-prepare.ts`: sadece yerel Supabase.
 
@@ -133,28 +132,33 @@ Kurallar:
 
 Seul tahmini: staging'deki ek süre (1,3 sn) RTT oranıyla (316/72) ölçeklendi. Vercel build'leri ABD
 doğusunda çalışıyor (Seul'e RTT ~180–200 ms), yani gerçek ek süre muhtemelen +3–4 sn. Vercel build
-loglarıyla doğrulanmalı; Frankfurt geçişinden sonra yeniden ölçülecek.
+loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ## 8. Açık konular, bekleyen manuel adımlar, bilinen riskler
 
 ### Kullanıcının bekleyen manuel adımları
 
-PR açıklamasında adım adım: production migration onayı, Supabase panel ayarları (staging ve
-production), GitHub secret'ları, Vercel env kontrolü, production anahtar geçişi planı, production
-`media` bucket limitleri, `chmod 600 .env.prod.local`, `.env.staging.local`'a bypass secret.
+- Yok (Faz 2 adımları tamamlandı).
 
 ### Kararlar (2026-11-24)
 
 - Soft 404: Partial Prefetching açık kalıyor; ilk istekte noindex ve sitemap koruması testli.
 - CSP değişmiyor; tek harici görsel (Vestel deneyim logosu) gösterilmiyor, deneyim tasarımı
   fazında kendi storage'ımıza taşınacak.
-- Yeni anahtar formatı Frankfurt taşımasıyla birlikte.
-- E-posta: dahili SMTP yalnızca takım üyelerine ve saatte 2 e-posta; production için custom SMTP
-  (Resend önerildi) kullanıcı kararında.
+- Frankfurt taşıması yapılmayacak: production Supabase Seul, Vercel `icn1`.
+- Leaked password protection yok (ücretsiz plan).
+- Faz 3: medya referansları tam URL yerine storage path olarak tutulacak.
+
+### Açık konular
+
+- **Custom SMTP (Resend önerildi):** ertelendi; kayıt sisteminin geleceğiyle birlikte karar
+  verilecek. O zamana kadar production'da doğrulama ve şifre sıfırlama e-postaları yalnızca
+  Supabase takım üyelerine gider (dahili servis, saatte 2 e-posta).
+- **Yeni API anahtar formatı** (`sb_publishable_` / `sb_secret_`) production'da: ileride ayrı küçük
+  bir iş; şimdi değil.
 
 ### Sonraki planlar
 
-- **Frankfurt mini fazı** (Faz 2 merge'ünden sonra, Faz 3'ten önce).
 - **Faz 3:** medya referansları storage path olarak; **Faz 4:** etiket sistemi (geçici `connectTags`
   eşlemesi kalkacak); **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
