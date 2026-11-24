@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 4 PR açık; etiket taşıması bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-24 (Faz 4 kapandı; Faz 5 onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -14,7 +14,7 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı  | `feat/phase-2-security-auth`      |
 | Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor      | —                                 |
 | Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod | `feat/phase-3-*`                  |
-| Faz 4: Etiket / skill sistemi    | PR açık; `migrate-tags` production'da çalıştırılmadı            | `feat/phase-4-tags`               |
+| Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da        | `feat/phase-4-tags`, PR #8        |
 | Faz 5–10                         | Başlamadı                                                       | —                                 |
 
 ## 2. Tamamlanan işler
@@ -80,7 +80,7 @@ içinde, `SkillCategory` yerine `parentId`, `images` / `url` / `usedIn` kaldır�
   yok; 12 etiket, 12 etiket bağlantısı (0 proje, 11 deneyim, 1 blog).
 - **Staging:** iki migration uygulandı, `verify-db-lockdown` hepsi ok, drift yok.
 
-### Faz 4 (bu PR)
+### Faz 4 (PR #8, kapanış PR'ı)
 
 Kararlar (kullanıcı, 2026-11-24): eşleşmeyen topic otomatik etiket olur ve hemen görünür (manuel
 kuyruk yok), hatalar admin "Etiketler" sayfasında düzeltilir; önerilen ağaç başlangıç taksonomisi
@@ -102,9 +102,16 @@ kuyruk yok), hatalar admin "Etiketler" sayfasında düzeltilir; önerilen ağaç
   geçersizleştirir.
 - **Taşıma:** `scripts/migrate-tags.ts` (varsayılan dry-run, transaction + rollback; `--apply`).
   Mantık `lib/tags/migrate.ts`, idempotent (testli).
-- **Kullanılmayan:** `UnmappedTopic` tablosu (otomatik oluşturma kararıyla gereksiz); Faz 5'te de
-  kullanılmazsa daraltma migration'ıyla silinebilir.
-- **Testler:** unit 278, integration 180, supabase 16, E2E 40. `admin-media` E2E bir kez zaman aşımına
+- **Kullanılmayan:** `UnmappedTopic` tablosu (otomatik oluşturma kararıyla gereksiz). Silme kararı
+  Faz 5'te verilecek (kullanıcı kararı).
+- **Production taşıması (2026-11-24, kullanıcı çalıştırdı):** dry-run sonra `--apply`. Birleştirme 0;
+  slug düzeltme 2 (`c-` → `cpp`, `linux-kernel-` → `linux-kernel`); taksonomi 7; kopya çeviri temizliği
+  5; `SiteSettings.skills`'ten 13 etiket; 8 üst düğüm; toplam 33 etiket. Script önce ortak
+  `createPrismaClient`'ın transaction-pooler kontrolüne takıldı (`DIRECT_URL` session pooler);
+  kendi tek bağlantılı havuzuyla düzeltildi (`cecabc7`).
+- **Kapanış düzeltmesi:** deneyim liste ve detay sayfaları `logoUrl`'i hiç göstermiyordu (detayda sabit
+  ikon). İkisi de logoyu gösteriyor; E2E testi eklendi (admin yükler → liste ve detayda görsel).
+- **Testler:** unit 283, integration 180, supabase 16, E2E 41. `admin-media` E2E bir kez zaman aşımına
   düştü (paralel yük), tekrarlarda geçti.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
@@ -168,7 +175,8 @@ Kurallar:
 | `20261125090000_phase3_contract`                   | `migrate deploy` (onaylı, kod deploy'dan sonra), ok      | 2026-11-24 |
 
 - **Faz 4 etiket taşıması yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-phase4-tags.dump`
-  (474 KB, mode 600; public 26, auth 27, storage 10 tablo verisi). `migrate-tags` henüz çalışmadı.
+  (474 KB, mode 600; public 26, auth 27, storage 10 tablo verisi). `migrate-tags --apply` sonrası
+  33 etiket (ayrıntı Faz 4 bölümünde).
 - **Daraltma yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-contract.dump` (daraltmadan hemen
   önce, 483 KB, mode 600; public 29, auth 27, storage 10 tablo verisi). Sonuç: eski kolon ve
   `_XToTag` tablosu kalmadı; join tabloları 0/11/1, `MediaUsage` 1, hem `url` hem `path` taşıyan ek
@@ -215,16 +223,14 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Kullanıcının bekleyen manuel adımları
 
-- `migrate-tags` dry-run → `--apply` → PR merge (sıra önemli: build etiketleri DB'den okur).
-
-- Vestel logosunu deneyim formundaki "Şirket Logosu" alanından yüklemek (doğrudan yükleme
-  çalışıyor; medya kütüphanesinden seçme Faz 6'da).
+- Admin "Etiketler"de taşıma sonrası düzeltmeler (isteğe bağlı): `swfit` → "Swift"; `git-github`
+  → `git`'e birleştir; Numpy / Tensorflow'u AI altına taşı ve yazımını düzelt; gerrit, linux
+  (kernel), matter, ocpp, qt creator adları küçük harfli ve kategorisiz.
 
 ### Kararlar (2026-11-24)
 
 - Soft 404: Partial Prefetching açık kalıyor; ilk istekte noindex ve sitemap koruması testli.
-- CSP değişmiyor; tek harici görsel (Vestel deneyim logosu) gösterilmiyor, deneyim tasarımı
-  fazında kendi storage'ımıza taşınacak.
+- CSP değişmiyor. Vestel logosu kendi storage'ımıza yüklendi (Faz 4 sonrası, kullanıcı).
 - Frankfurt taşıması yapılmayacak: production Supabase Seul, Vercel `icn1`.
 - Leaked password protection yok (ücretsiz plan).
 - Faz 3: medya referansları storage path + `MediaFile.path` FK; analitik kendi Postgres'imiz, ham
@@ -240,7 +246,7 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 5:** başında senkron tetikleme seçenekleri (admin butonu, cron, GitHub App/webhook) kısaca
+- **Faz 5:** `UnmappedTopic` silinsin mi kararı bu fazda. Başında senkron tetikleme seçenekleri (admin butonu, cron, GitHub App/webhook) kısaca
   sunulacak; kullanıcı yeni repo için mümkün olduğunca hızlı güncelleme istiyor. Sync,
   `TagResolver.ensureAll` + `selectRepoLanguages` kullanacak. **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
