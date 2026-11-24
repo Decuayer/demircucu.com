@@ -107,6 +107,8 @@ async function main(): Promise<void> {
           githubUrl: match.repo.html_url,
           syncStatus: "PENDING",
         },
+        // Only existing columns are read back, so the script also runs before the Phase 5 migration.
+        select: { id: true },
       });
     }
   });
