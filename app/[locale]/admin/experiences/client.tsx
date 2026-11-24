@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ export default function AdminExperiencesClient({
   initialExperiences,
 }: AdminExperiencesClientProps) {
   const t = useTranslations("admin");
+  const errorMessage = useActionErrorMessage();
   const params = useParams();
   const locale = params.locale as string;
   const [experiences, setExperiences] = useState(initialExperiences);
@@ -43,7 +45,7 @@ export default function AdminExperiencesClient({
     if (!deleteId) return;
     startTransition(async () => {
       const res = await deleteExperience(deleteId);
-      if (res.error) toast.error(res.error);
+      if (res.error) toast.error(errorMessage(res.error));
       else {
         toast.success("Deneyim silindi.");
         setExperiences((prev) => prev.filter((e) => e.id !== deleteId));

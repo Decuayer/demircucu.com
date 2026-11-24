@@ -1,9 +1,7 @@
-import { getProjects } from "@/app/actions/projects";
+import { getPublishedProjects } from "@/lib/data/projects";
 import ProjectsClient from "./client";
 
-export const revalidate = 3600;
-
 export default async function ProjectsPage() {
-  const projects = await getProjects();
+  const projects = await getPublishedProjects();
   return <ProjectsClient projects={projects} />;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ interface BlogFormClientProps {
 
 export default function BlogFormClient({ initialData, isEdit }: BlogFormClientProps) {
   const t = useTranslations("admin");
+  const errorMessage = useActionErrorMessage();
   const router = useRouter();
   const params = useParams();
   const locale = params.locale;
@@ -87,7 +89,7 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
       }
 
       if (res.error) {
-        toast.error(res.error);
+        toast.error(errorMessage(res.error));
       } else {
         toast.success(isEdit ? t("blogUpdated") : t("blogUpdated"));
         router.push(`/${locale}/admin/blog`);

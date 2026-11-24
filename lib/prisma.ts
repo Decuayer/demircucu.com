@@ -2,7 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { attachDatabasePool } from "@vercel/functions";
-import { createPoolConfig } from "@/lib/db/pool-config";
+import { createPoolConfig, isBuildPhase } from "@/lib/db/pool-config";
+import { withBuildReadOnlyGuard } from "@/lib/db/build-guard";
 
 export function createPrismaClient(connectionString = process.env.DATABASE_URL): PrismaClient {
   const pool = new Pool(createPoolConfig(connectionString));
@@ -13,7 +14,9 @@ export function createPrismaClient(connectionString = process.env.DATABASE_URL):
   // On Vercel Fluid compute, keeps the instance alive until idle connections are closed.
   // No-op outside Vercel and during builds.
   attachDatabasePool(pool);
-  return new PrismaClient({ adapter: new PrismaPg(pool) });
+  const client = new PrismaClient({ adapter: new PrismaPg(pool) });
+  // `next build` may read content for prerendering but must never write.
+  return isBuildPhase() ? withBuildReadOnlyGuard(client) : client;
 }
 
 const globalForPrisma = globalThis as unknown as {

@@ -1,49 +1,30 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "./auth";
-import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
-import { getErrorMessage } from "@/lib/errors";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth/guards";
+import { invalidate } from "@/lib/cache/tags";
+import { ok, toActionFailure, type ActionResult } from "@/lib/actions/result";
+import { siteSettingsSchema, type SiteSettingsInput } from "@/lib/validation/content";
 
-// Phase 2 replaces this with a zod schema allowlisting editable fields (mass assignment, S5).
-export type SiteSettingsInput = Omit<Prisma.SiteSettingsCreateInput, "id">;
-
-// Middleware to check admin rights inside server actions
-async function requireAdmin() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") {
-    throw new Error("Bu işlemi yapmak için yetkiniz yok.");
-  }
-  return user;
-}
-
-/**
- * Update Site Settings
- * Admin only
- */
-export async function updateSiteSettings(data: SiteSettingsInput) {
+/** Admin only. Unknown keys are rejected (`.strict()`), so no other column can be written. */
+export async function updateSiteSettings(input: SiteSettingsInput): Promise<ActionResult> {
   try {
     await requireAdmin();
-
-    const settings = await prisma.siteSettings.upsert({
+    const { skills, hobbies, ...fields } = siteSettingsSchema.parse(input);
+    const data = {
+      ...fields,
+      ...(skills ? { skills: skills as Prisma.InputJsonValue } : {}),
+      ...(hobbies ? { hobbies: hobbies as Prisma.InputJsonValue } : {}),
+    };
+    await prisma.siteSettings.upsert({
       where: { id: "main" },
       update: data,
-      create: {
-        id: "main",
-        ...data,
-      },
+      create: { id: "main", ...data },
     });
-
-    // Revalidate relevant paths
-    revalidatePath("/");
-    revalidatePath("/about");
-    revalidatePath("/contact");
-    revalidatePath("/admin/settings");
-
-    return { success: true, settings };
+    invalidate({ entity: "settings" });
+    return ok();
   } catch (error) {
-    console.error("Error updating site settings:", error);
-    return { error: getErrorMessage(error, "Ayarlar kaydedilemedi.") };
+    return toActionFailure(error, "updateSiteSettings");
   }
 }

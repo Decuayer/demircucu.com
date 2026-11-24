@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import type { SiteSettings } from "@prisma/client";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
@@ -198,6 +199,7 @@ interface AdminSettingsClientProps {
 
 export default function AdminSettingsClient({ initialSettings }: AdminSettingsClientProps) {
   const t = useTranslations("admin");
+  const errorMessage = useActionErrorMessage();
   const [isPending, startTransition] = useTransition();
 
   // Settings State
@@ -309,7 +311,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
       const res = await updateSiteSettings(payload);
 
       if (res.error) {
-        toast.error(res.error);
+        toast.error(errorMessage(res.error));
       } else {
         toast.success(t("settingsSaved") || "Ayarlar başarıyla kaydedildi!");
       }

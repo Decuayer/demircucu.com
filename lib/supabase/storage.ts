@@ -1,105 +1,76 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { v4 as uuidv4 } from "uuid";
-import { getErrorMessage } from "@/lib/errors";
+import type { UPLOAD_FOLDERS } from "@/lib/upload/policy";
 
 let adminClient: SupabaseClient | undefined;
 
 /**
- * Supabase client with the service role key (bypasses RLS). Server-only.
- * Created on first use so builds and pages that never upload do not need the secret.
+ * Supabase client with the secret key. Server-only; used for Storage uploads and deletes.
+ *
+ * `SUPABASE_SERVICE_ROLE_KEY` holds either a legacy `service_role` JWT or a new `sb_secret_...`
+ * key; supabase-js accepts both. Created on first use so builds and pages that never upload do
+ * not need the secret.
  */
 export function getSupabaseAdmin(): SupabaseClient {
   if (adminClient) return adminClient;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRoleKey) {
+  const secretKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !secretKey) {
     throw new Error(
       "Supabase storage is not configured: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.",
     );
   }
-  adminClient = createClient(url, serviceRoleKey, {
+  adminClient = createClient(url, secretKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
   return adminClient;
 }
 
+/** Public bucket; created once per environment (see docs/security-review.md, S6). */
 export const BUCKET_NAME = "media";
 
+/** Uploaded files never change (random names), so browsers and the CDN may cache them for a year. */
+const IMMUTABLE_CACHE_SECONDS = "31536000";
+
+export type UploadResult =
+  | { success: true; path: string; publicUrl: string }
+  | { success: false; error: "storageUnavailable" };
+
 /**
- * Uploads a file to Supabase Storage
- * @param file The file to upload as an ArrayBuffer or Buffer
- * @param fileName The original file name
- * @param contentType The MIME type of the file
- * @param folder Optional folder path (e.g., "blog", "projects")
- * @returns Object with path, url, and full publicUrl, or error
+ * Stores an already validated file under `<folder>/<uuid>.<ext>`. The object name never uses
+ * the client-supplied file name.
  */
 export async function uploadFileToStorage(
-  file: Buffer | ArrayBuffer,
-  fileName: string,
-  contentType: string,
-  folder: string = "general",
-) {
+  file: Uint8Array,
+  options: { ext: string; contentType: string; folder: (typeof UPLOAD_FOLDERS)[number] },
+): Promise<UploadResult> {
   try {
-    // Ensure bucket exists
-    const { data: buckets, error: bucketsError } = await getSupabaseAdmin().storage.listBuckets();
-    if (bucketsError) throw bucketsError;
-
-    const bucketExists = buckets.some((b) => b.name === BUCKET_NAME);
-    if (!bucketExists) {
-      const { error: createError } = await getSupabaseAdmin().storage.createBucket(BUCKET_NAME, {
-        public: true,
-      });
-      if (createError) throw createError;
-    }
-
-    // Generate unique filename to avoid collisions
-    const fileExt = fileName.split(".").pop();
-    const uniqueFileName = `${uuidv4()}.${fileExt}`;
-    const filePath = `${folder}/${uniqueFileName}`;
-
-    // Upload to Supabase Storage
-    const { data, error } = await getSupabaseAdmin()
-      .storage.from(BUCKET_NAME)
-      .upload(filePath, file, {
-        contentType,
-        upsert: false,
-      });
-
+    const storage = getSupabaseAdmin().storage.from(BUCKET_NAME);
+    const path = `${options.folder}/${randomUUID()}.${options.ext}`;
+    const { data, error } = await storage.upload(path, file, {
+      contentType: options.contentType,
+      cacheControl: IMMUTABLE_CACHE_SECONDS,
+      upsert: false,
+    });
     if (error) throw error;
-
-    // Get public URL
-    const { data: urlData } = getSupabaseAdmin().storage.from(BUCKET_NAME).getPublicUrl(data.path);
-
-    return {
-      success: true,
-      path: data.path,
-      publicUrl: urlData.publicUrl,
-    };
+    const { data: urlData } = storage.getPublicUrl(data.path);
+    return { success: true, path: data.path, publicUrl: urlData.publicUrl };
   } catch (error) {
-    console.error("Supabase storage upload error:", error);
-    return {
-      success: false,
-      error: getErrorMessage(error, "Failed to upload file to storage"),
-    };
+    console.error("[storage] upload failed:", (error as Error).message);
+    return { success: false, error: "storageUnavailable" };
   }
 }
 
-/**
- * Deletes a file from Supabase Storage
- * @param path The storage path of the file to delete
- */
-export async function deleteFileFromStorage(path: string) {
+export async function deleteFileFromStorage(
+  path: string,
+): Promise<{ success: true } | { success: false; error: "storageUnavailable" }> {
   try {
     const { error } = await getSupabaseAdmin().storage.from(BUCKET_NAME).remove([path]);
     if (error) throw error;
-
     return { success: true };
   } catch (error) {
-    console.error("Supabase storage delete error:", error);
-    return {
-      success: false,
-      error: getErrorMessage(error, "Failed to delete file from storage"),
-    };
+    console.error("[storage] delete failed:", (error as Error).message);
+    return { success: false, error: "storageUnavailable" };
   }
 }

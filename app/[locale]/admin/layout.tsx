@@ -1,36 +1,22 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
-import { prisma } from "@/lib/prisma";
+import { Suspense } from "react";
+import { requireAdminPage } from "@/lib/auth/guards";
+import { PageSpinner } from "@/components/layout/page-spinner";
 import AdminClientLayout from "./client-layout";
 
-export default async function AdminLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}) {
+async function AdminGate({ children, params }: LayoutProps<"/[locale]/admin">) {
   const { locale } = await params;
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect(`/${locale}/auth/login`);
-  }
-
-  // Check role in database
-  const profile = await prisma.profile.findUnique({
-    where: { id: user.id },
-  });
-
-  if (!profile || profile.role !== "ADMIN") {
-    redirect("/"); // If logged in but not admin, send to homepage
-  }
-
+  await requireAdminPage(locale);
   return <AdminClientLayout>{children}</AdminClientLayout>;
+}
+
+/**
+ * Admin pages always render per request. The gate redirects visitors without the ADMIN role;
+ * every admin read (lib/data/admin.ts) and action checks the role again on its own.
+ */
+export default function AdminLayout(props: LayoutProps<"/[locale]/admin">) {
+  return (
+    <Suspense fallback={<PageSpinner />}>
+      <AdminGate {...props} />
+    </Suspense>
+  );
 }

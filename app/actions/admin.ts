@@ -1,394 +1,273 @@
 "use server";
 
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "./auth";
-import { revalidatePath } from "next/cache";
-import { getErrorMessage } from "@/lib/errors";
-import type { BlogPostInput, ExperienceInput, ProjectInput, TagInput } from "@/lib/types/content";
-import { getTranslations } from "next-intl/server";
+import { requireAdmin } from "@/lib/auth/guards";
+import { invalidate } from "@/lib/cache/tags";
+import { ok, toActionFailure, type ActionResult } from "@/lib/actions/result";
+import { id as idSchema } from "@/lib/validation/common";
+import {
+  blogPostSchema,
+  experienceSchema,
+  projectSchema,
+  type BlogPostInput,
+  type ExperienceInput,
+  type ProjectInput,
+  type TagInput,
+} from "@/lib/validation/content";
+import { z } from "zod";
 
-// Middleware to check admin rights inside server actions
-async function requireAdmin() {
-  const t = await getTranslations("admin");
-
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") {
-    throw new Error(t("unauthorized"));
+/**
+ * Resolves the tag selector's free-text tags to existing tags (by slug, then by either name) and
+ * creates only the ones that are really new. The selector derives slugs from names
+ * ("Next.js" -> "next-js"), which used to miss the existing "nextjs" tag and then fail on the
+ * unique name. Replaced by the canonical tag system in Phase 4.
+ */
+async function connectTags(tags: TagInput[] | undefined, replace: boolean) {
+  if (!tags) return undefined;
+  const existing = await prisma.tag.findMany({
+    where: {
+      OR: [
+        { slug: { in: tags.map((t) => t.slug) } },
+        { nameTr: { in: tags.map((t) => t.nameTr) } },
+        { nameEn: { in: tags.map((t) => t.nameEn) } },
+      ],
+    },
+    select: { id: true, slug: true, nameTr: true, nameEn: true },
+  });
+  const connect: { id: string }[] = [];
+  const create: TagInput[] = [];
+  for (const tag of tags) {
+    const match = existing.find(
+      (e) => e.slug === tag.slug || e.nameTr === tag.nameTr || e.nameEn === tag.nameEn,
+    );
+    if (match) connect.push({ id: match.id });
+    else if (!create.some((c) => c.slug === tag.slug)) create.push(tag);
   }
-  return user;
+  return {
+    ...(replace ? { set: [] } : {}),
+    connect,
+    create: create.map(({ slug, nameTr, nameEn }) => ({ slug, nameTr, nameEn })),
+  };
 }
 
-// --- PROJECTS ---
-export async function getProjectById(id: string) {
-  try {
-    await requireAdmin();
-    return await prisma.project.findUnique({
-      where: { id },
-      include: { tags: true },
-    });
-  } catch {
-    return null;
-  }
+function filesJson(files: { name: string; url: string; type?: string }[] | undefined) {
+  return files ? (files as Prisma.InputJsonValue) : undefined;
 }
 
-export async function createProject(data: ProjectInput) {
-  const t = await getTranslations("admin");
+// --- PROJECTS -------------------------------------------------------------------------------
 
+export async function createProject(input: ProjectInput): Promise<ActionResult<{ id: string }>> {
   try {
     await requireAdmin();
+    const { tagsList, filesList, ...data } = projectSchema.parse(input);
     const project = await prisma.project.create({
-      data: {
-        titleTr: data.titleTr!,
-        titleEn: data.titleEn!,
-        slug: data.slug!,
-        summaryTr: data.summaryTr || "Özet",
-        summaryEn: data.summaryEn || "Summary",
-        descriptionTr: data.descriptionTr || null,
-        descriptionEn: data.descriptionEn || null,
-        logo: data.logo || null,
-        files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList
-          ? {
-              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
-                where: { slug: tag.slug },
-                create: {
-                  nameTr: tag.nameTr,
-                  nameEn: tag.nameEn,
-                  slug: tag.slug,
-                },
-              })),
-            }
-          : undefined,
-        githubUrl: data.githubUrl,
-        liveUrl: data.liveUrl,
-        order: data.order || 0,
-        published: data.published ?? true,
-        featured: data.featured ?? false,
-      },
+      data: { ...data, files: filesJson(filesList), tags: await connectTags(tagsList, false) },
+      select: { id: true, slug: true },
     });
-    revalidatePath("/admin/projects");
-    revalidatePath("/projects");
-    revalidatePath("/");
-    return { success: true, project };
+    invalidate({ entity: "project", slug: project.slug });
+    return ok({ id: project.id });
   } catch (error) {
-    console.error(error);
-    return { error: getErrorMessage(error, t("projectCreationFailed")) };
+    return toActionFailure(error, "createProject");
   }
 }
 
-export async function updateProject(id: string, data: Partial<ProjectInput>) {
-  const t = await getTranslations("admin");
-
+export async function updateProject(idInput: string, input: ProjectInput): Promise<ActionResult> {
   try {
     await requireAdmin();
+    const id = idSchema.parse(idInput);
+    const { tagsList, filesList, ...data } = projectSchema.parse(input);
+    const previous = await prisma.project.findUniqueOrThrow({
+      where: { id },
+      select: { slug: true },
+    });
     const project = await prisma.project.update({
       where: { id },
-      data: {
-        titleTr: data.titleTr,
-        titleEn: data.titleEn,
-        slug: data.slug,
-        summaryTr: data.summaryTr,
-        summaryEn: data.summaryEn,
-        descriptionTr: data.descriptionTr,
-        descriptionEn: data.descriptionEn,
-        logo: data.logo,
-        files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList
-          ? {
-              set: [],
-              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
-                where: { slug: tag.slug },
-                create: {
-                  nameTr: tag.nameTr,
-                  nameEn: tag.nameEn,
-                  slug: tag.slug,
-                },
-              })),
-            }
-          : undefined,
-        githubUrl: data.githubUrl,
-        liveUrl: data.liveUrl,
-        order: data.order,
-        published: data.published,
-        featured: data.featured,
-      },
+      data: { ...data, files: filesJson(filesList), tags: await connectTags(tagsList, true) },
+      select: { slug: true },
     });
-    revalidatePath("/admin/projects");
-    revalidatePath("/projects");
-    revalidatePath(`/projects/${id}`);
-    revalidatePath("/");
-    return { success: true, project };
+    invalidate({ entity: "project", slug: project.slug, previousSlug: previous.slug });
+    return ok();
   } catch (error) {
-    return { error: getErrorMessage(error, t("projectUpdateFailed")) };
+    return toActionFailure(error, "updateProject");
   }
 }
 
-export async function deleteProject(id: string) {
-  const t = await getTranslations("admin");
-
+export async function deleteProject(idInput: string): Promise<ActionResult> {
   try {
     await requireAdmin();
-    await prisma.project.delete({ where: { id } });
-    revalidatePath("/admin/projects");
-    revalidatePath("/projects");
-    revalidatePath("/");
-    return { success: true };
+    const id = idSchema.parse(idInput);
+    const project = await prisma.project.delete({ where: { id }, select: { slug: true } });
+    invalidate({ entity: "project", slug: project.slug });
+    return ok();
   } catch (error) {
-    return { error: getErrorMessage(error, t("projectDeleteFailed")) };
+    return toActionFailure(error, "deleteProject");
   }
 }
 
-// --- EXPERIENCES ---
-export async function getExperienceById(id: string) {
+// --- EXPERIENCES ----------------------------------------------------------------------------
+
+export async function createExperience(
+  input: ExperienceInput,
+): Promise<ActionResult<{ id: string }>> {
   try {
     await requireAdmin();
-    return await prisma.experience.findUnique({
-      where: { id },
-      include: { tags: true },
-    });
-  } catch {
-    return null;
-  }
-}
-
-export async function createExperience(data: ExperienceInput) {
-  const t = await getTranslations("admin");
-
-  try {
-    await requireAdmin();
+    const { tagsList, filesList, endDate, ...data } = experienceSchema.parse(input);
     const experience = await prisma.experience.create({
       data: {
-        company: data.company!,
-        positionTr: data.positionTr!,
-        positionEn: data.positionEn!,
-        descriptionTr: data.descriptionTr!,
-        descriptionEn: data.descriptionEn!,
-        detailsTr: data.detailsTr || null,
-        detailsEn: data.detailsEn || null,
-        startDate: data.startDate || new Date(),
-        endDate: data.endDate,
-        logo: data.logo || null,
-        files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList
-          ? {
-              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
-                where: { slug: tag.slug },
-                create: {
-                  nameTr: tag.nameTr,
-                  nameEn: tag.nameEn,
-                  slug: tag.slug,
-                },
-              })),
-            }
-          : undefined,
-        order: data.order || 0,
-        published: data.published ?? true,
+        ...data,
+        endDate: endDate ?? null,
+        files: filesJson(filesList),
+        tags: await connectTags(tagsList, false),
       },
+      select: { id: true },
     });
-    revalidatePath("/admin/experiences");
-    revalidatePath("/experience");
-    return { success: true, experience };
+    invalidate({ entity: "experience", id: experience.id });
+    return ok({ id: experience.id });
   } catch (error) {
-    return { error: getErrorMessage(error, t("experienceCreationFailed")) };
+    return toActionFailure(error, "createExperience");
   }
 }
 
-export async function updateExperience(id: string, data: Partial<ExperienceInput>) {
-  const t = await getTranslations("admin");
-
+export async function updateExperience(
+  idInput: string,
+  input: ExperienceInput,
+): Promise<ActionResult> {
   try {
     await requireAdmin();
-    const experience = await prisma.experience.update({
+    const id = idSchema.parse(idInput);
+    const { tagsList, filesList, endDate, ...data } = experienceSchema.parse(input);
+    await prisma.experience.update({
       where: { id },
       data: {
-        company: data.company,
-        positionTr: data.positionTr,
-        positionEn: data.positionEn,
-        descriptionTr: data.descriptionTr,
-        descriptionEn: data.descriptionEn,
-        detailsTr: data.detailsTr,
-        detailsEn: data.detailsEn,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        logo: data.logo,
-        files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList
-          ? {
-              set: [], // Clear existing relations
-              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
-                where: { slug: tag.slug },
-                create: {
-                  nameTr: tag.nameTr,
-                  nameEn: tag.nameEn,
-                  slug: tag.slug,
-                },
-              })),
-            }
-          : undefined,
-        order: data.order,
-        published: data.published,
+        ...data,
+        // The form omits endDate for ongoing positions; clear it instead of keeping the old one.
+        endDate: endDate ?? null,
+        files: filesJson(filesList),
+        tags: await connectTags(tagsList, true),
       },
     });
-    revalidatePath("/admin/experiences");
-    revalidatePath("/experience");
-    revalidatePath(`/experience/${id}`);
-    return { success: true, experience };
+    invalidate({ entity: "experience", id });
+    return ok();
   } catch (error) {
-    return { error: getErrorMessage(error, t("experienceUpdateFailed")) };
+    return toActionFailure(error, "updateExperience");
   }
 }
 
-export async function deleteExperience(id: string) {
-  const t = await getTranslations("admin");
-
+export async function deleteExperience(idInput: string): Promise<ActionResult> {
   try {
     await requireAdmin();
+    const id = idSchema.parse(idInput);
     await prisma.experience.delete({ where: { id } });
-    revalidatePath("/admin/experiences");
-    revalidatePath("/experience");
-    return { success: true };
+    invalidate({ entity: "experience", id });
+    return ok();
   } catch (error) {
-    return { error: getErrorMessage(error, t("experienceDeleteFailed")) };
+    return toActionFailure(error, "deleteExperience");
   }
 }
 
-// --- BLOG POSTS ---
-export async function getBlogPostById(id: string) {
-  try {
-    await requireAdmin();
-    return await prisma.blogPost.findUnique({
-      where: { id },
-      include: { tags: true },
-    });
-  } catch {
-    return null;
-  }
-}
+// --- BLOG POSTS -----------------------------------------------------------------------------
 
-export async function createBlogPost(data: BlogPostInput) {
-  const t = await getTranslations("admin");
-
+export async function createBlogPost(input: BlogPostInput): Promise<ActionResult<{ id: string }>> {
   try {
     const admin = await requireAdmin();
+    const { tagsList, filesList, ...data } = blogPostSchema.parse(input);
     const post = await prisma.blogPost.create({
       data: {
-        titleTr: data.titleTr!,
-        titleEn: data.titleEn!,
-        slug: data.slug!,
-        excerptTr: data.excerptTr!,
-        excerptEn: data.excerptEn!,
-        contentTr: data.contentTr!,
-        contentEn: data.contentEn!,
-        coverImage: data.coverImage,
-        files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList
-          ? {
-              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
-                where: { slug: tag.slug },
-                create: {
-                  nameTr: tag.nameTr,
-                  nameEn: tag.nameEn,
-                  slug: tag.slug,
-                },
-              })),
-            }
-          : undefined,
-        published: data.published ?? true,
-        featured: data.featured ?? false,
+        ...data,
+        files: filesJson(filesList),
+        tags: await connectTags(tagsList, false),
         authorId: admin.id,
-        viewCount: 0,
       },
+      select: { id: true, slug: true },
     });
-    revalidatePath("/admin/blog");
-    revalidatePath("/blog");
-    revalidatePath("/");
-    return { success: true, post };
+    invalidate({ entity: "post", slug: post.slug });
+    return ok({ id: post.id });
   } catch (error) {
-    console.error("Blog creation error:", error);
-    return { error: getErrorMessage(error, t("blogCreationFailed")) };
+    return toActionFailure(error, "createBlogPost");
   }
 }
 
-export async function updateBlogPost(id: string, data: Partial<BlogPostInput>) {
-  const t = await getTranslations("admin");
-
+export async function updateBlogPost(idInput: string, input: BlogPostInput): Promise<ActionResult> {
   try {
     await requireAdmin();
+    const id = idSchema.parse(idInput);
+    const { tagsList, filesList, ...data } = blogPostSchema.parse(input);
+    const previous = await prisma.blogPost.findUniqueOrThrow({
+      where: { id },
+      select: { slug: true },
+    });
     const post = await prisma.blogPost.update({
       where: { id },
-      data: {
-        titleTr: data.titleTr,
-        titleEn: data.titleEn,
-        slug: data.slug,
-        excerptTr: data.excerptTr,
-        excerptEn: data.excerptEn,
-        contentTr: data.contentTr,
-        contentEn: data.contentEn,
-        coverImage: data.coverImage,
-        files: data.filesList ? JSON.parse(JSON.stringify(data.filesList)) : null,
-        tags: data.tagsList
-          ? {
-              set: [],
-              connectOrCreate: data.tagsList.map((tag: TagInput) => ({
-                where: { slug: tag.slug },
-                create: {
-                  nameTr: tag.nameTr,
-                  nameEn: tag.nameEn,
-                  slug: tag.slug,
-                },
-              })),
-            }
-          : undefined,
-        published: data.published,
-        featured: data.featured,
-      },
+      data: { ...data, files: filesJson(filesList), tags: await connectTags(tagsList, true) },
+      select: { slug: true },
     });
-    revalidatePath("/admin/blog");
-    revalidatePath("/blog");
-    revalidatePath(`/blog/${post.slug}`);
-    revalidatePath("/");
-    return { success: true, post };
+    invalidate(
+      { entity: "post", slug: post.slug, previousSlug: previous.slug },
+      { entity: "postInteractions", postId: id },
+    );
+    return ok();
   } catch (error) {
-    return { error: getErrorMessage(error, t("blogUpdateFailed")) };
+    return toActionFailure(error, "updateBlogPost");
   }
 }
 
-export async function deleteBlogPost(id: string) {
-  const t = await getTranslations("admin");
-
+export async function deleteBlogPost(idInput: string): Promise<ActionResult> {
   try {
     await requireAdmin();
-    await prisma.blogPost.delete({ where: { id } });
-    revalidatePath("/admin/blog");
-    revalidatePath("/blog");
-    revalidatePath("/");
-    return { success: true };
+    const id = idSchema.parse(idInput);
+    const post = await prisma.blogPost.delete({ where: { id }, select: { slug: true } });
+    invalidate({ entity: "post", slug: post.slug }, { entity: "postInteractions", postId: id });
+    return ok();
   } catch (error) {
-    return { error: getErrorMessage(error, t("blogDeleteFailed")) };
+    return toActionFailure(error, "deleteBlogPost");
   }
 }
 
-// --- CONTACT MESSAGES ---
-export async function getContactMessages() {
+// --- COMMENT MODERATION ---------------------------------------------------------------------
+
+const moderationSchema = z.object({ id: idSchema, hidden: z.boolean() });
+
+export async function setCommentHidden(
+  input: z.input<typeof moderationSchema>,
+): Promise<ActionResult> {
   try {
     await requireAdmin();
-    return await prisma.contactMessage.findMany({
-      orderBy: { createdAt: "desc" },
+    const { id, hidden } = moderationSchema.parse(input);
+    const comment = await prisma.comment.update({
+      where: { id },
+      data: { hidden },
+      select: { postId: true },
     });
-  } catch {
-    return [];
+    invalidate({ entity: "postInteractions", postId: comment.postId });
+    return ok();
+  } catch (error) {
+    return toActionFailure(error, "setCommentHidden");
   }
 }
 
-export async function deleteContactMessage(id: string) {
-  const t = await getTranslations("admin");
-
+export async function deleteComment(idInput: string): Promise<ActionResult> {
   try {
     await requireAdmin();
+    const id = idSchema.parse(idInput);
+    const comment = await prisma.comment.delete({ where: { id }, select: { postId: true } });
+    invalidate({ entity: "postInteractions", postId: comment.postId });
+    return ok();
+  } catch (error) {
+    return toActionFailure(error, "deleteComment");
+  }
+}
+
+// --- CONTACT MESSAGES -----------------------------------------------------------------------
+
+export async function deleteContactMessage(idInput: string): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    const id = idSchema.parse(idInput);
     await prisma.contactMessage.delete({ where: { id } });
-    revalidatePath("/admin/contacts");
-    return { success: true };
+    invalidate({ entity: "contactMessage" });
+    return ok();
   } catch (error) {
-    return { error: getErrorMessage(error, t("contactDeleteFailed")) };
+    return toActionFailure(error, "deleteContactMessage");
   }
 }

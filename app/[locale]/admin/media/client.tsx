@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useState, useRef, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -40,6 +41,7 @@ interface AdminMediaClientProps {
 
 export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps) {
   const t = useTranslations("admin");
+  const errorMessage = useActionErrorMessage();
   const [files, setFiles] = useState<MediaFile[]>(initialFiles);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"all" | "image" | "document">("all");
@@ -104,7 +106,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
     startTransition(async () => {
       const res = await deleteMediaFile(deleteId);
       if (res.error) {
-        toast.error(res.error);
+        toast.error(errorMessage(res.error));
       } else {
         toast.success(t("fileDeleted"));
         setFiles((prev) => prev.filter((f) => f.id !== deleteId));

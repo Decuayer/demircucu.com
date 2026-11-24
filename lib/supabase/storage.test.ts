@@ -43,7 +43,54 @@ describe("getSupabaseAdmin", () => {
     vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "");
     vi.spyOn(console, "error").mockImplementation(() => {});
     const { uploadFileToStorage } = await import("./storage");
-    const result = await uploadFileToStorage(Buffer.from("x"), "a.png", "image/png");
-    expect(result).toEqual({ success: false, error: expect.stringMatching(/not configured/) });
+    const result = await uploadFileToStorage(new Uint8Array([1]), {
+      ext: "png",
+      contentType: "image/png",
+      folder: "general",
+    });
+    expect(result).toEqual({ success: false, error: "storageUnavailable" });
+  });
+});
+
+describe("uploadFileToStorage", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "sb_secret_test");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("uploads under a random name with an immutable cache header and never lists buckets", async () => {
+    const upload = vi.fn(async (path: string) => ({ data: { path }, error: null }));
+    const listBuckets = vi.fn();
+    const getPublicUrl = vi.fn((path: string) => ({
+      data: { publicUrl: `https://cdn.test/${path}` },
+    }));
+    createClient.mockReturnValueOnce({
+      storage: { listBuckets, from: () => ({ upload, getPublicUrl }) },
+    } as never);
+    const { uploadFileToStorage } = await import("./storage");
+    const result = await uploadFileToStorage(new Uint8Array([1]), {
+      ext: "png",
+      contentType: "image/png",
+      folder: "blog",
+    });
+    expect(result).toMatchObject({
+      success: true,
+      path: expect.stringMatching(/^blog\/[0-9a-f-]{36}\.png$/),
+    });
+    expect(upload).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.any(Uint8Array),
+      expect.objectContaining({
+        contentType: "image/png",
+        cacheControl: "31536000",
+        upsert: false,
+      }),
+    );
+    expect(listBuckets).not.toHaveBeenCalled();
   });
 });

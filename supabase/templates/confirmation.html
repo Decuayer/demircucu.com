@@ -1,0 +1,15 @@
+<!-- Supabase "Confirm signup" template. RedirectTo is the app's /<locale>/auth/callback?next=... URL. -->
+<h2>E-postanızı doğrulayın / Confirm your e-mail</h2>
+<p>
+  demircucu.com hesabınızı etkinleştirmek için bağlantıya tıklayın.<br />
+  Click the link to activate your demircucu.com account.
+</p>
+<p>
+  <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email"
+    >E-postayı doğrula / Confirm e-mail</a
+  >
+</p>
+<p>
+  Bu isteği siz yapmadıysanız bu e-postayı yok sayabilirsiniz. / If you did not sign up, ignore this
+  e-mail.
+</p>

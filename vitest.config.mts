@@ -18,7 +18,13 @@ export default defineConfig({
           name: "unit",
           environment: "jsdom",
           include: ["**/*.test.{ts,tsx}"],
-          exclude: ["node_modules/**", ".next/**", "e2e/**", "**/*.int.test.ts"],
+          exclude: [
+            "node_modules/**",
+            ".next/**",
+            "e2e/**",
+            "**/*.int.test.ts",
+            "**/*.supabase.test.ts",
+          ],
           setupFiles: ["./tests/setup/unit.ts"],
           restoreMocks: true,
         },
@@ -38,6 +44,18 @@ export default defineConfig({
           hookTimeout: 60_000,
         },
       },
+      {
+        extends: true,
+        test: {
+          name: "supabase",
+          environment: "node",
+          include: ["tests/supabase/**/*.supabase.test.ts"],
+          globalSetup: ["./tests/supabase/global-setup.ts"],
+          fileParallelism: false,
+          testTimeout: 30_000,
+          hookTimeout: 120_000,
+        },
+      },
     ],
     coverage: {
       provider: "v8",
@@ -51,10 +69,10 @@ export default defineConfig({
         autoUpdate: process.env.CI
           ? false
           : (newThreshold: number) => Math.floor(newThreshold * 100) / 100,
-        lines: 3.22,
-        statements: 3.6,
-        functions: 3.01,
-        branches: 4.13,
+        lines: 12.03,
+        statements: 12.97,
+        functions: 11.31,
+        branches: 16.48,
       },
     },
   },

@@ -108,11 +108,15 @@ model Comment {
   content   String
   postId    String
   authorId  String
+  // Hidden by an admin (moderation); hidden comments are not shown publicly.
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   author Profile  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, hidden, createdAt])
 }
 
 model Like {
@@ -196,4 +200,14 @@ model SiteSettings {
   faviconUrl          String?
   // Meta
   updatedAt           DateTime @updatedAt
+}
+
+/// Fixed-window rate limit counters (lib/rate-limit). `key` is `<bucket>:<sha256(identifier)>`;
+/// raw IP addresses and e-mail addresses are never stored. Rows expire after a day.
+model RateLimitBucket {
+  key         String   @id
+  count       Int
+  windowStart DateTime @default(now())
+
+  @@index([windowStart])
 }

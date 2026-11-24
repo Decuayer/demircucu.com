@@ -1,5 +1,6 @@
 "use client";
 
+import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,8 +30,8 @@ export function ImageUpload({ value, onChange, folder = "general", usedIn }: Ima
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Görsel boyutu 5MB'dan küçük olmalıdır.");
+    if (file.size > MAX_UPLOAD_BYTES) {
+      toast.error("Görsel boyutu 4MB'dan küçük olmalıdır.");
       return;
     }
 
@@ -136,7 +137,7 @@ export function ImageUpload({ value, onChange, folder = "general", usedIn }: Ima
                   <p className="text-sm font-medium">
                     Görsel yüklemek için tıklayın veya sürükleyin
                   </p>
-                  <p className="text-xs opacity-70">PNG, JPG, WEBP (Max 5MB)</p>
+                  <p className="text-xs opacity-70">PNG, JPG, GIF, WEBP, AVIF (Max 4MB)</p>
                 </>
               )}
             </div>

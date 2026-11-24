@@ -1,0 +1,59 @@
+name: Preview E2E
+
+# Runs the environment-independent E2E suites (smoke, security headers, i18n) and the admin
+# read-your-own-writes check against every
+# successful Vercel Preview deployment. Preview deployments sit behind Vercel Deployment
+# Protection; the automation bypass secret is sent as x-vercel-protection-bypass.
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment_status.environment != 'Production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      E2E_BASE_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      # Staging automation admin (scripts/staging-set-role.ts --create); without them the
+      # admin read-your-own-writes spec skips itself.
+      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+    steps:
+      - name: Require the deployment protection bypass secret
+        id: bypass
+        run: |
+          if [ -z "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
+            echo "::warning::VERCEL_AUTOMATION_BYPASS_SECRET is not set; skipping Preview E2E (see PR #3)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.bypass.outputs.ready == 'true'
+        with:
+          ref: ${{ github.event.deployment.sha }}
+      - uses: actions/setup-node@v4
+        if: steps.bypass.outputs.ready == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+        if: steps.bypass.outputs.ready == 'true'
+      - run: npx playwright install --with-deps chromium
+        if: steps.bypass.outputs.ready == 'true'
+      - run: npx playwright test e2e/smoke.spec.ts e2e/security.spec.ts e2e/i18n-cache.spec.ts e2e/preview-admin-cache.spec.ts
+        if: steps.bypass.outputs.ready == 'true'
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: preview-playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

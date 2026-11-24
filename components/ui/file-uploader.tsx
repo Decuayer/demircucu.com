@@ -1,5 +1,6 @@
 "use client";
 
+import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
 import { useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -40,8 +41,8 @@ export function FileUploader({ files, onChange, folder = "general", usedIn }: Fi
   const handleUpload = async (file: File) => {
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Dosya boyutu 5MB'dan küçük olmalıdır.");
+    if (file.size > MAX_UPLOAD_BYTES) {
+      toast.error("Dosya boyutu 4MB'dan küçük olmalıdır.");
       return;
     }
 
@@ -115,7 +116,9 @@ export function FileUploader({ files, onChange, folder = "general", usedIn }: Fi
                     <Upload className="h-6 w-6 text-violet-400" />
                   </div>
                   <p className="text-sm font-medium">Dosya seçmek için tıklayın</p>
-                  <p className="text-xs opacity-70">PDF, DOC, ZIP, vb. (Max 5MB)</p>
+                  <p className="text-xs opacity-70">
+                    PNG, JPG, GIF, WEBP, AVIF, ICO, PDF (Max 4MB)
+                  </p>
                 </>
               )}
             </div>

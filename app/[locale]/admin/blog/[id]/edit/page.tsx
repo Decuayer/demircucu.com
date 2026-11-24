@@ -1,22 +1,13 @@
-import { getCurrentUser } from "@/app/actions/auth";
-import { getBlogPostById } from "@/app/actions/admin";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import { adminGetPost } from "@/lib/data/admin";
 import BlogFormClient from "../../form-client";
 
-interface PageProps {
-  params: Promise<{ id: string; locale: string }>;
-}
-
-export default async function EditBlogPostPage({ params }: PageProps) {
-  const { id, locale } = await params;
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);
-
-  const post = await getBlogPostById(id);
-
-  if (!post) {
-    redirect(`/${locale}/admin/blog`);
-  }
+export default async function EditBlogPage({
+  params,
+}: PageProps<"/[locale]/admin/blog/[id]/edit">) {
+  const { id } = await params;
+  const post = await adminGetPost(id);
+  if (!post) notFound();
 
   return (
     <div className="container mx-auto px-4 py-8">
