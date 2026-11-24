@@ -129,8 +129,9 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("projectTitle")} (TR) *</Label>
+                  <Label htmlFor="titleTr">{t("projectTitle")} (TR) *</Label>
                   <Input
+                    id="titleTr"
                     value={titleTr}
                     onChange={(e) => setTitleTr(e.target.value)}
                     required
@@ -138,8 +139,9 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("projectTitle")} (EN) *</Label>
+                  <Label htmlFor="titleEn">{t("projectTitle")} (EN) *</Label>
                   <Input
+                    id="titleEn"
                     value={titleEn}
                     onChange={(e) => setTitleEn(e.target.value)}
                     required

@@ -34,7 +34,23 @@ for (const [browserLocale, expected] of [
   });
 }
 
-test("unknown project slug returns 404", async ({ page }) => {
-  const response = await page.goto("/tr/projects/does-not-exist");
-  expect(response?.status()).toBe(404);
-});
+/**
+ * With Partial Prefetching the first request for an unlisted slug is answered from the route's
+ * fallback shell, so the status is already 200 when notFound() runs: Next.js marks the page
+ * noindex and renders the not-found UI (soft 404). Once that result is cached, later requests get
+ * a real 404. Either way the page must not be indexable. Known trade-off, docs/security-review.md.
+ */
+for (const path of [
+  "/tr/projects/does-not-exist",
+  "/en/blog/does-not-exist",
+  "/tr/experience/nope",
+]) {
+  test(`unknown slug ${path} is a (soft) 404`, async ({ page }) => {
+    const response = await page.goto(path);
+    if (response?.status() !== 404) {
+      expect(response?.status()).toBe(200);
+      await expect(page.locator('meta[name="robots"][content="noindex"]')).toHaveCount(1);
+    }
+    await expect(page.locator("body")).toContainText(/404|bulunamadı|could not be found/i);
+  });
+}

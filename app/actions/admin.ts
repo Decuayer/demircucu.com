@@ -17,14 +17,37 @@ import {
 } from "@/lib/validation/content";
 import { z } from "zod";
 
-function connectTags(tags: TagInput[] | undefined, replace: boolean) {
+/**
+ * Resolves the tag selector's free-text tags to existing tags (by slug, then by either name) and
+ * creates only the ones that are really new. The selector derives slugs from names
+ * ("Next.js" -> "next-js"), which used to miss the existing "nextjs" tag and then fail on the
+ * unique name. Replaced by the canonical tag system in Phase 4.
+ */
+async function connectTags(tags: TagInput[] | undefined, replace: boolean) {
   if (!tags) return undefined;
+  const existing = await prisma.tag.findMany({
+    where: {
+      OR: [
+        { slug: { in: tags.map((t) => t.slug) } },
+        { nameTr: { in: tags.map((t) => t.nameTr) } },
+        { nameEn: { in: tags.map((t) => t.nameEn) } },
+      ],
+    },
+    select: { id: true, slug: true, nameTr: true, nameEn: true },
+  });
+  const connect: { id: string }[] = [];
+  const create: TagInput[] = [];
+  for (const tag of tags) {
+    const match = existing.find(
+      (e) => e.slug === tag.slug || e.nameTr === tag.nameTr || e.nameEn === tag.nameEn,
+    );
+    if (match) connect.push({ id: match.id });
+    else if (!create.some((c) => c.slug === tag.slug)) create.push(tag);
+  }
   return {
     ...(replace ? { set: [] } : {}),
-    connectOrCreate: tags.map((tag) => ({
-      where: { slug: tag.slug },
-      create: { nameTr: tag.nameTr, nameEn: tag.nameEn, slug: tag.slug },
-    })),
+    connect,
+    create: create.map(({ slug, nameTr, nameEn }) => ({ slug, nameTr, nameEn })),
   };
 }
 
@@ -39,7 +62,7 @@ export async function createProject(input: ProjectInput): Promise<ActionResult<{
     await requireAdmin();
     const { tagsList, filesList, ...data } = projectSchema.parse(input);
     const project = await prisma.project.create({
-      data: { ...data, files: filesJson(filesList), tags: connectTags(tagsList, false) },
+      data: { ...data, files: filesJson(filesList), tags: await connectTags(tagsList, false) },
       select: { id: true, slug: true },
     });
     invalidate({ entity: "project", slug: project.slug });
@@ -60,7 +83,7 @@ export async function updateProject(idInput: string, input: ProjectInput): Promi
     });
     const project = await prisma.project.update({
       where: { id },
-      data: { ...data, files: filesJson(filesList), tags: connectTags(tagsList, true) },
+      data: { ...data, files: filesJson(filesList), tags: await connectTags(tagsList, true) },
       select: { slug: true },
     });
     invalidate({ entity: "project", slug: project.slug, previousSlug: previous.slug });
@@ -95,7 +118,7 @@ export async function createExperience(
         ...data,
         endDate: endDate ?? null,
         files: filesJson(filesList),
-        tags: connectTags(tagsList, false),
+        tags: await connectTags(tagsList, false),
       },
       select: { id: true },
     });
@@ -121,7 +144,7 @@ export async function updateExperience(
         // The form omits endDate for ongoing positions; clear it instead of keeping the old one.
         endDate: endDate ?? null,
         files: filesJson(filesList),
-        tags: connectTags(tagsList, true),
+        tags: await connectTags(tagsList, true),
       },
     });
     invalidate({ entity: "experience", id });
@@ -153,7 +176,7 @@ export async function createBlogPost(input: BlogPostInput): Promise<ActionResult
       data: {
         ...data,
         files: filesJson(filesList),
-        tags: connectTags(tagsList, false),
+        tags: await connectTags(tagsList, false),
         authorId: admin.id,
       },
       select: { id: true, slug: true },
@@ -176,7 +199,7 @@ export async function updateBlogPost(idInput: string, input: BlogPostInput): Pro
     });
     const post = await prisma.blogPost.update({
       where: { id },
-      data: { ...data, files: filesJson(filesList), tags: connectTags(tagsList, true) },
+      data: { ...data, files: filesJson(filesList), tags: await connectTags(tagsList, true) },
       select: { slug: true },
     });
     invalidate(

@@ -286,3 +286,30 @@ describe("error responses", () => {
     expect(post.contentTr).toBe('<p>ok</p><img src="x">');
   });
 });
+
+describe("tag resolution", () => {
+  beforeEach(async () => {
+    await resetDatabase();
+    await seed(prisma);
+    await setRole("ADMIN");
+  });
+
+  it("reuses existing tags matched by name when the selector's slug differs", async () => {
+    const project = await sampleProject();
+    const result = await admin.updateProject(project.id, {
+      ...projectInput,
+      slug: "sample-project",
+      tagsList: [
+        { nameTr: "Next.js", nameEn: "Next.js", slug: "next-js" },
+        { nameTr: "rust", nameEn: "rust", slug: "rust" },
+      ],
+    });
+    expect(result).toEqual({ success: true });
+    const tags = await prisma.project.findUniqueOrThrow({
+      where: { id: project.id },
+      select: { tags: { select: { slug: true }, orderBy: { slug: "asc" } } },
+    });
+    expect(tags.tags.map((t) => t.slug)).toEqual(["nextjs", "rust"]);
+    expect(await prisma.tag.count()).toBe(5);
+  });
+});
