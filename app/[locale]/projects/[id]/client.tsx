@@ -1,9 +1,8 @@
 "use client";
 
+import { formatDate } from "@/lib/format-date";
 import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
-import { enUS, tr } from "date-fns/locale";
 import {
   Archive,
   ArrowLeft,
@@ -227,9 +226,7 @@ export default function ProjectDetailClient({
                   <li className="inline-flex items-center gap-1.5">
                     <History className="h-4 w-4" />
                     {t("meta.updated", {
-                      date: format(new Date(project.pushedAt), "d MMM yyyy", {
-                        locale: locale === "tr" ? tr : enUS,
-                      }),
+                      date: formatDate(project.pushedAt, locale),
                     })}
                   </li>
                 )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -63,10 +64,8 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
                 <span>
-                  {new Date(experience.startDate).toLocaleDateString()} —{" "}
-                  {experience.endDate
-                    ? new Date(experience.endDate).toLocaleDateString()
-                    : t("present")}
+                  {formatDate(experience.startDate, locale)} —{" "}
+                  {experience.endDate ? formatDate(experience.endDate, locale) : t("present")}
                 </span>
               </div>
             </div>

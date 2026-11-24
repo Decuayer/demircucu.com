@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { motion } from "framer-motion";
@@ -39,7 +40,7 @@ function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
               <span>{post.viewCount}</span>
             </div>
             <span>·</span>
-            <time>{new Date(post.createdAt).toLocaleDateString()}</time>
+            <time>{formatDate(post.createdAt, locale)}</time>
           </div>
           <h3 className="text-lg font-semibold transition-colors group-hover:text-cyan-400">
             {/* Stretched link: the whole card opens the post; tag chips sit above it. */}
