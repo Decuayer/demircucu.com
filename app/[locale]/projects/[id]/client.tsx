@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, ExternalLink, Code2, FileIcon } from "lucide-react";
@@ -13,7 +12,7 @@ import { attachmentHref, toAttachments } from "@/lib/media/attachments";
 import { useParams } from "next/navigation";
 
 import type { PublicProject } from "@/lib/types/content";
-import { tagLabel } from "@/lib/tags/view";
+import { TagChips } from "@/components/tags/tag-chips";
 
 interface ProjectDetailClientProps {
   project: PublicProject;
@@ -86,13 +85,7 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
               <h3 className="mb-3 text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                 {t("techStack")}
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {project.tags.map((tag) => (
-                  <Badge key={tag.id} variant="secondary" className="bg-accent/50">
-                    {tagLabel(tag, locale)}
-                  </Badge>
-                ))}
-              </div>
+              <TagChips tags={project.tags} locale={locale} />
             </div>
           )}
 

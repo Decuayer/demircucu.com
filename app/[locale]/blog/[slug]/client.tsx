@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,7 +27,7 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { addComment, toggleLike } from "@/app/actions/blog_interaction";
 import type { PublicPost } from "@/lib/types/content";
-import { tagLabel } from "@/lib/tags/view";
+import { TagChips } from "@/components/tags/tag-chips";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 
 interface PublicComment {
@@ -114,13 +113,7 @@ export default function BlogDetailClient({
           {/* Article Header */}
           <article>
             <header className="mb-10">
-              <div className="mb-4 flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <Badge key={tag.id} variant="secondary" className="bg-accent/50">
-                    {tagLabel(tag, locale)}
-                  </Badge>
-                ))}
-              </div>
+              <TagChips tags={post.tags} locale={locale} className="mb-4" />
               <h1 className="mb-4 text-3xl leading-tight font-bold md:text-4xl">
                 {getTranslated(post, "title", locale)}
               </h1>

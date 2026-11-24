@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 3 kapandı; sıradaki Faz 4). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-24 (Faz 4 PR açık; etiket taşıması bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -14,7 +14,8 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı  | `feat/phase-2-security-auth`      |
 | Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor      | —                                 |
 | Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod | `feat/phase-3-*`                  |
-| Faz 4–10                         | Başlamadı                                                       | —                                 |
+| Faz 4: Etiket / skill sistemi    | PR açık; `migrate-tags` production'da çalıştırılmadı            | `feat/phase-4-tags`               |
+| Faz 5–10                         | Başlamadı                                                       | —                                 |
 
 ## 2. Tamamlanan işler
 
@@ -79,6 +80,33 @@ içinde, `SkillCategory` yerine `parentId`, `images` / `url` / `usedIn` kaldır�
   yok; 12 etiket, 12 etiket bağlantısı (0 proje, 11 deneyim, 1 blog).
 - **Staging:** iki migration uygulandı, `verify-db-lockdown` hepsi ok, drift yok.
 
+### Faz 4 (bu PR)
+
+Kararlar (kullanıcı, 2026-11-24): eşleşmeyen topic otomatik etiket olur ve hemen görünür (manuel
+kuyruk yok), hatalar admin "Etiketler" sayfasında düzeltilir; önerilen ağaç başlangıç taksonomisi
+(`lib/tags/taxonomy.ts`); GitHub dilleri `source: LANGUAGE`, %10 eşiği; bilinen yazım hataları alias;
+`SiteSettings.skills` silinmez, içeriği etikete taşınır; GitHub topic düzeltmesi yapılmayacak.
+
+- **Çekirdek:** `lib/tags/normalize.ts` (canonicalize, resolveTag; %100 test), `taxonomy.ts` (yalnızca
+  etiket oluşturulurken uygulanır, admin düzenlemelerinin üzerine yazmaz), `languages.ts`,
+  `service.ts` (`TagResolver`: çözümle/oluştur + ataları; `mergeTags`; `deleteUnusedTag`), `tree.ts`.
+- **Admin:** `/admin/tags` (ağaç, arama, yeniden adlandırma, slug değişince eski slug alias olur, alias
+  ekle/kaldır, birleştir, gizle, skill değil, üst etiket ve sıra). Sürükle-bırak yerine üst etiket
+  seçimi + yukarı/aşağı. Formlarda yeni `TagSelector` (alias ile arama, oluşturma diyaloğu,
+  GitHub/dil etiketleri kilitli, yalnızca o içerikte gizlenir). Ayarlar'daki yüzdelik skill editörü
+  kaldırıldı (kolon duruyor).
+- **Public:** `/skills`, `/skills/[slug]` (alt dal içeriği, ilk/son kullanım, ilgili skill'ler, alias →
+  301), tüm chip'ler tıklanabilir (kartlarda stretched link), `?skill=` / `?tag=` filtreleri,
+  Hakkımda'da etiket ağacı, `sitemap.xml` (yalnızca yayımlanmış içerik). Popover yapılmadı.
+- **Cache:** yeni `tags` etiketi; içerik değişimi `tags`'i, etiket değişimi tüm içerik etiketlerini
+  geçersizleştirir.
+- **Taşıma:** `scripts/migrate-tags.ts` (varsayılan dry-run, transaction + rollback; `--apply`).
+  Mantık `lib/tags/migrate.ts`, idempotent (testli).
+- **Kullanılmayan:** `UnmappedTopic` tablosu (otomatik oluşturma kararıyla gereksiz); Faz 5'te de
+  kullanılmazsa daraltma migration'ıyla silinebilir.
+- **Testler:** unit 278, integration 180, supabase 16, E2E 40. `admin-media` E2E bir kez zaman aşımına
+  düştü (paralel yük), tekrarlarda geçti.
+
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
 | Sapma                                                                   | Gerekçe                                                                            |
@@ -96,6 +124,8 @@ içinde, `SkillCategory` yerine `parentId`, `images` / `url` / `usedIn` kaldır�
 | `githubRepoId` `BigInt`                                                 | GitHub repo id'leri int32 sınırına yaklaşıyor                                      |
 | Engagement ayrı tablo değil, `PageView` alanları                        | Tek satır, daha basit sorgu                                                        |
 | `SkillCategory` yok; kategoriler `parentId` kök düğümleri               | Tek ağaç; etiket sayısı az                                                         |
+| `UnmappedTopic` kuyruğu yerine otomatik etiket                          | Kullanıcı kararı (Faz 4); düzeltme admin araçlarıyla                               |
+| Admin ağaçta sürükle-bırak yok                                          | Üst etiket seçimi + yukarı/aşağı; yeni bağımlılık gerekmez                         |
 
 ## 4. Ortamlar
 
@@ -137,6 +167,8 @@ Kurallar:
 | `20261124120000_phase3_expand`                     | `migrate deploy` (onaylı), lockdown ok, drift yok        | 2026-11-24 |
 | `20261125090000_phase3_contract`                   | `migrate deploy` (onaylı, kod deploy'dan sonra), ok      | 2026-11-24 |
 
+- **Faz 4 etiket taşıması yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-phase4-tags.dump`
+  (474 KB, mode 600; public 26, auth 27, storage 10 tablo verisi). `migrate-tags` henüz çalışmadı.
 - **Daraltma yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-contract.dump` (daraltmadan hemen
   önce, 483 KB, mode 600; public 29, auth 27, storage 10 tablo verisi). Sonuç: eski kolon ve
   `_XToTag` tablosu kalmadı; join tabloları 0/11/1, `MediaUsage` 1, hem `url` hem `path` taşıyan ek
@@ -183,6 +215,8 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Kullanıcının bekleyen manuel adımları
 
+- `migrate-tags` dry-run → `--apply` → PR merge (sıra önemli: build etiketleri DB'den okur).
+
 - Vestel logosunu deneyim formundaki "Şirket Logosu" alanından yüklemek (doğrudan yükleme
   çalışıyor; medya kütüphanesinden seçme Faz 6'da).
 
@@ -206,9 +240,9 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 4:** etiket sistemi ve `scripts/migrate-tags.ts` (geçici `resolveTagIds` eşlemesi kalkacak;
-  mevcut etiketlerde `nameTr = nameEn = name`, çeviri olmayanlar temizlenecek; `SiteSettings.skills`
-  etiketlere taşınacak); **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
+- **Faz 5:** başında senkron tetikleme seçenekleri (admin butonu, cron, GitHub App/webhook) kısaca
+  sunulacak; kullanıcı yeni repo için mümkün olduğunca hızlı güncelleme istiyor. Sync,
+  `TagResolver.ensureAll` + `selectRepoLanguages` kullanacak. **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
 
 ### Bilinen riskler

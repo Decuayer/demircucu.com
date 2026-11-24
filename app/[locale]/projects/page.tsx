@@ -1,7 +1,8 @@
 import { getPublishedProjects } from "@/lib/data/projects";
-import ProjectsClient from "./client";
+import { getTagFilterData } from "@/lib/data/skills";
+import FilteredProjects from "./filtered";
 
-export default async function ProjectsPage() {
-  const projects = await getPublishedProjects();
-  return <ProjectsClient projects={projects} />;
+export default async function Page() {
+  const [projects, filterData] = await Promise.all([getPublishedProjects(), getTagFilterData()]);
+  return <FilteredProjects projects={projects} filterData={filterData} />;
 }

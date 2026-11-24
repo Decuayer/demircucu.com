@@ -4,6 +4,7 @@ import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import type { AdminSiteSettings } from "@/lib/types/content";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -190,7 +191,6 @@ const LUCIDE_ICONS = [
   "Search",
 ];
 
-type SkillState = { nameTr: string; nameEn: string; level: number };
 type HobbyState = { nameTr: string; nameEn: string; descTr: string; descEn: string; icon: string };
 
 interface AdminSettingsClientProps {
@@ -220,9 +220,6 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
     initialSettings?.aboutExperienceEn || "",
   );
 
-  const [skills, setSkills] = useState<SkillState[]>(
-    () => (initialSettings?.skills as SkillState[] | null) || [],
-  );
   const [hobbies, setHobbies] = useState<HobbyState[]>(
     () => (initialSettings?.hobbies as HobbyState[] | null) || [],
   );
@@ -281,7 +278,6 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         aboutLocationEn,
         aboutExperienceTr,
         aboutExperienceEn,
-        skills,
         hobbies,
         contactEmail,
         contactPhone,
@@ -316,18 +312,6 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         toast.success(t("settingsSaved") || "Ayarlar başarıyla kaydedildi!");
       }
     });
-  };
-
-  const addSkill = () => setSkills([...skills, { nameTr: "", nameEn: "", level: 50 }]);
-  const removeSkill = (index: number) => setSkills(skills.filter((_, i) => i !== index));
-  const updateSkill = <K extends keyof SkillState>(
-    index: number,
-    field: K,
-    value: SkillState[K],
-  ) => {
-    const newSkills = [...skills];
-    newSkills[index] = { ...newSkills[index], [field]: value };
-    setSkills(newSkills);
   };
 
   const addHobby = () =>
@@ -709,73 +693,15 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         {/* YETENEKLER & HOBİLER */}
         <TabsContent value="skills" className="space-y-6">
           <Card className="border-border/50 bg-card/50">
-            <CardContent className="space-y-4 p-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{t("skillsSettings")}</h2>
-                <Button type="button" onClick={addSkill} variant="outline" size="sm">
-                  <Plus className="mr-2 h-4 w-4" /> {t("addSkill")}
-                </Button>
-              </div>
-
-              {skills.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("noSkills")}</p>
-              ) : (
-                <div className="space-y-3">
-                  {skills.map((skill, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col items-end gap-3 rounded-lg border border-border/50 bg-accent/20 p-3 md:flex-row"
-                    >
-                      <div className="w-full flex-[2]">
-                        <Label className="mb-1 block text-xs text-muted-foreground">
-                          {t("skillName")} (TR)
-                        </Label>
-                        <Input
-                          value={skill.nameTr}
-                          onChange={(e) => updateSkill(index, "nameTr", e.target.value)}
-                          className="h-8 bg-background"
-                          placeholder="Örn: React"
-                        />
-                      </div>
-                      <div className="w-full flex-[2]">
-                        <Label className="mb-1 block text-xs text-muted-foreground">
-                          {t("skillName")} (EN)
-                        </Label>
-                        <Input
-                          value={skill.nameEn}
-                          onChange={(e) => updateSkill(index, "nameEn", e.target.value)}
-                          className="h-8 bg-background"
-                          placeholder="E.g. React"
-                        />
-                      </div>
-                      <div className="w-full flex-1">
-                        <Label className="mb-1 block text-xs text-muted-foreground">
-                          {t("level")} (0-100)
-                        </Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={skill.level}
-                          onChange={(e) =>
-                            updateSkill(index, "level", parseInt(e.target.value) || 0)
-                          }
-                          className="h-8 bg-background"
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive"
-                        onClick={() => removeSkill(index)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <CardContent className="space-y-2 p-6">
+              <h2 className="text-lg font-semibold">{t("skillsSettings")}</h2>
+              <p className="text-sm text-muted-foreground">{t("skillsMovedToTags")}</p>
+              <Link
+                href="/admin/tags"
+                className="text-sm font-medium text-cyan-400 hover:underline"
+              >
+                {t("tags")}
+              </Link>
             </CardContent>
           </Card>
 

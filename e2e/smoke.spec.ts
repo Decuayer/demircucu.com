@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const PUBLIC_PATHS = ["/", "/about", "/experience", "/projects", "/blog", "/contact"];
+const PUBLIC_PATHS = ["/", "/about", "/experience", "/projects", "/blog", "/skills", "/contact"];
 const LOCALES = ["tr", "en"] as const;
 
 for (const locale of LOCALES) {

@@ -17,7 +17,7 @@ import {
 import { attachmentPaths, type Attachment } from "@/lib/media/attachments";
 import { mediaPathsInHtml } from "@/lib/media/url";
 import { clearMediaUsage, syncMediaUsage } from "@/lib/media/usage";
-import { replaceManualTags, resolveTagIds } from "@/lib/tags/content-tags";
+import { applyContentTags } from "@/lib/tags/content-tags";
 import { z } from "zod";
 
 function filesJson(files: Attachment[] | undefined) {
@@ -32,14 +32,14 @@ const htmlPaths = (...html: (string | null | undefined)[]) =>
 export async function createProject(input: ProjectInput): Promise<ActionResult<{ id: string }>> {
   try {
     await requireAdmin();
-    const { tagsList, filesList, ...data } = projectSchema.parse(input);
+    const { tagIds, hiddenTagIds, filesList, ...data } = projectSchema.parse(input);
     const files: Attachment[] | undefined = filesList;
     const project = await prisma.$transaction(async (tx) => {
       const created = await tx.project.create({
         data: { ...data, files: filesJson(files) },
         select: { id: true, slug: true },
       });
-      await replaceManualTags(tx, "project", created.id, await resolveTagIds(tx, tagsList ?? []));
+      await applyContentTags(tx, "project", created.id, { tagIds, hiddenTagIds });
       await syncMediaUsage(tx, "PROJECT", created.id, {
         required: { files: attachmentPaths(files) },
         optional: { description: htmlPaths(data.descriptionTr, data.descriptionEn) },
@@ -57,7 +57,7 @@ export async function updateProject(idInput: string, input: ProjectInput): Promi
   try {
     await requireAdmin();
     const id = idSchema.parse(idInput);
-    const { tagsList, filesList, ...data } = projectSchema.parse(input);
+    const { tagIds, hiddenTagIds, filesList, ...data } = projectSchema.parse(input);
     const files: Attachment[] | undefined = filesList;
     const { previous, project } = await prisma.$transaction(async (tx) => {
       const previous = await tx.project.findUniqueOrThrow({
@@ -69,7 +69,7 @@ export async function updateProject(idInput: string, input: ProjectInput): Promi
         data: { ...data, files: filesJson(files) },
         select: { slug: true },
       });
-      if (tagsList) await replaceManualTags(tx, "project", id, await resolveTagIds(tx, tagsList));
+      await applyContentTags(tx, "project", id, { tagIds, hiddenTagIds });
       await syncMediaUsage(tx, "PROJECT", id, {
         required: { files: attachmentPaths(files) },
         optional: { description: htmlPaths(data.descriptionTr, data.descriptionEn) },
@@ -105,19 +105,14 @@ export async function createExperience(
 ): Promise<ActionResult<{ id: string }>> {
   try {
     await requireAdmin();
-    const { tagsList, filesList, endDate, ...data } = experienceSchema.parse(input);
+    const { tagIds, hiddenTagIds, filesList, endDate, ...data } = experienceSchema.parse(input);
     const files: Attachment[] | undefined = filesList;
     const experience = await prisma.$transaction(async (tx) => {
       const created = await tx.experience.create({
         data: { ...data, endDate: endDate ?? null, files: filesJson(files) },
         select: { id: true },
       });
-      await replaceManualTags(
-        tx,
-        "experience",
-        created.id,
-        await resolveTagIds(tx, tagsList ?? []),
-      );
+      await applyContentTags(tx, "experience", created.id, { tagIds, hiddenTagIds });
       await syncMediaUsage(tx, "EXPERIENCE", created.id, {
         required: { files: attachmentPaths(files) },
         optional: { details: htmlPaths(data.detailsTr, data.detailsEn) },
@@ -138,7 +133,7 @@ export async function updateExperience(
   try {
     await requireAdmin();
     const id = idSchema.parse(idInput);
-    const { tagsList, filesList, endDate, ...data } = experienceSchema.parse(input);
+    const { tagIds, hiddenTagIds, filesList, endDate, ...data } = experienceSchema.parse(input);
     const files: Attachment[] | undefined = filesList;
     await prisma.$transaction(async (tx) => {
       await tx.experience.update({
@@ -150,8 +145,7 @@ export async function updateExperience(
           files: filesJson(files),
         },
       });
-      if (tagsList)
-        await replaceManualTags(tx, "experience", id, await resolveTagIds(tx, tagsList));
+      await applyContentTags(tx, "experience", id, { tagIds, hiddenTagIds });
       await syncMediaUsage(tx, "EXPERIENCE", id, {
         required: { files: attachmentPaths(files) },
         optional: { details: htmlPaths(data.detailsTr, data.detailsEn) },
@@ -184,14 +178,14 @@ export async function deleteExperience(idInput: string): Promise<ActionResult> {
 export async function createBlogPost(input: BlogPostInput): Promise<ActionResult<{ id: string }>> {
   try {
     const admin = await requireAdmin();
-    const { tagsList, filesList, ...data } = blogPostSchema.parse(input);
+    const { tagIds, hiddenTagIds, filesList, ...data } = blogPostSchema.parse(input);
     const files: Attachment[] | undefined = filesList;
     const post = await prisma.$transaction(async (tx) => {
       const created = await tx.blogPost.create({
         data: { ...data, files: filesJson(files), authorId: admin.id },
         select: { id: true, slug: true },
       });
-      await replaceManualTags(tx, "blogPost", created.id, await resolveTagIds(tx, tagsList ?? []));
+      await applyContentTags(tx, "blogPost", created.id, { tagIds, hiddenTagIds });
       await syncMediaUsage(tx, "BLOG_POST", created.id, {
         required: { files: attachmentPaths(files) },
         optional: { content: htmlPaths(data.contentTr, data.contentEn) },
@@ -209,7 +203,7 @@ export async function updateBlogPost(idInput: string, input: BlogPostInput): Pro
   try {
     await requireAdmin();
     const id = idSchema.parse(idInput);
-    const { tagsList, filesList, ...data } = blogPostSchema.parse(input);
+    const { tagIds, hiddenTagIds, filesList, ...data } = blogPostSchema.parse(input);
     const files: Attachment[] | undefined = filesList;
     const { previous, post } = await prisma.$transaction(async (tx) => {
       const previous = await tx.blogPost.findUniqueOrThrow({
@@ -221,7 +215,7 @@ export async function updateBlogPost(idInput: string, input: BlogPostInput): Pro
         data: { ...data, files: filesJson(files) },
         select: { slug: true },
       });
-      if (tagsList) await replaceManualTags(tx, "blogPost", id, await resolveTagIds(tx, tagsList));
+      await applyContentTags(tx, "blogPost", id, { tagIds, hiddenTagIds });
       await syncMediaUsage(tx, "BLOG_POST", id, {
         required: { files: attachmentPaths(files) },
         optional: { content: htmlPaths(data.contentTr, data.contentEn) },

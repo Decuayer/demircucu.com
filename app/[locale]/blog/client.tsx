@@ -11,7 +11,7 @@ import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
 import type { PublicPost } from "@/lib/types/content";
-import { tagLabel } from "@/lib/tags/view";
+import { TagChips } from "@/components/tags/tag-chips";
 
 type BlogPostWithTags = PublicPost;
 
@@ -26,51 +26,48 @@ function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
     >
-      <Link href={`/blog/${post.slug}`}>
-        <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
-          <CardContent className="space-y-4 p-6">
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                <span>{Math.max(1, Math.ceil(content.length / 1000))} dk</span>
-              </div>
-              <span>·</span>
-              <div className="flex items-center gap-1">
-                <Eye className="h-3 w-3" />
-                <span>{post.viewCount}</span>
-              </div>
-              <span>·</span>
-              <time>{new Date(post.createdAt).toLocaleDateString()}</time>
+      <Card className="group relative h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
+        <CardContent className="space-y-4 p-6">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              <span>{Math.max(1, Math.ceil(content.length / 1000))} dk</span>
             </div>
-            <h3 className="text-lg font-semibold transition-colors group-hover:text-cyan-400">
+            <span>·</span>
+            <div className="flex items-center gap-1">
+              <Eye className="h-3 w-3" />
+              <span>{post.viewCount}</span>
+            </div>
+            <span>·</span>
+            <time>{new Date(post.createdAt).toLocaleDateString()}</time>
+          </div>
+          <h3 className="text-lg font-semibold transition-colors group-hover:text-cyan-400">
+            {/* Stretched link: the whole card opens the post; tag chips sit above it. */}
+            <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
               {getTranslated(post, "title", locale)}
-            </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {getTranslated(post, "excerpt", locale)}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <Badge key={tag.id} variant="secondary" className="bg-accent/50 text-xs">
-                  {tagLabel(tag, locale)}
-                </Badge>
-              ))}
-            </div>
-            <div className="flex items-center pt-1 text-sm font-medium text-cyan-400">
-              Devamını Oku{" "}
-              <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" />
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
+            </Link>
+          </h3>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {getTranslated(post, "excerpt", locale)}
+          </p>
+          <TagChips tags={post.tags} locale={locale} chipClassName="text-xs" />
+          <div className="flex items-center pt-1 text-sm font-medium text-cyan-400">
+            Devamını Oku{" "}
+            <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" />
+          </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 }
 
-interface BlogClientProps {
+export interface BlogClientProps {
   posts: BlogPostWithTags[];
+  /** Active tag filter bar (from the filtered wrapper). */
+  filter?: React.ReactNode;
 }
 
-export default function BlogClient({ posts }: BlogClientProps) {
+export default function BlogClient({ posts, filter }: BlogClientProps) {
   const t = useTranslations("blog");
   const mostRead = [...posts].sort((a, b) => b.viewCount - a.viewCount);
   const latest = [...posts].sort(
@@ -95,6 +92,8 @@ export default function BlogClient({ posts }: BlogClientProps) {
           </Badge>
           <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
         </motion.div>
+
+        {filter}
 
         {/* Tabs */}
         <Tabs defaultValue="latest" className="w-full">

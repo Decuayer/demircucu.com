@@ -12,6 +12,7 @@ import { resetDatabase } from "../helpers/db";
 const admin = await import("@/app/actions/admin");
 const settings = await import("@/app/actions/settings");
 const media = await import("@/app/actions/media");
+const tags = await import("@/app/actions/tags");
 const adminData = await import("@/lib/data/admin");
 const mediaData = await import("@/lib/data/media");
 
@@ -55,6 +56,7 @@ const postInput = {
 };
 
 const sampleProject = () => prisma.project.findUniqueOrThrow({ where: { slug: "sample-project" } });
+const tagId = async (slug: string) => (await prisma.tag.findUniqueOrThrow({ where: { slug } })).id;
 const helloPost = () => prisma.blogPost.findUniqueOrThrow({ where: { slug: "hello-world" } });
 
 const ADMIN_ACTIONS: ActionCase[] = [
@@ -156,6 +158,45 @@ const ADMIN_ACTIONS: ActionCase[] = [
     state: () => prisma.mediaFile.count(),
   },
   {
+    name: "createTag",
+    run: () => tags.createTag({ name: "Rust" }),
+    state: () => prisma.tag.count(),
+  },
+  {
+    name: "updateTag",
+    run: async () => tags.updateTag(await tagId("python"), { name: "Hacked" }),
+    state: () => prisma.tag.findUnique({ where: { slug: "python" } }),
+  },
+  {
+    name: "reorderTag",
+    run: async () => tags.reorderTag(await tagId("nextjs"), "down"),
+    state: () =>
+      prisma.tag.findMany({ select: { slug: true, order: true }, orderBy: { slug: "asc" } }),
+  },
+  {
+    name: "addTagAlias",
+    run: async () => tags.addTagAlias(await tagId("python"), "py"),
+    state: () => prisma.tagAlias.count(),
+  },
+  {
+    name: "removeTagAlias",
+    run: () => tags.removeTagAlias("next-js"),
+    state: () => prisma.tagAlias.count(),
+  },
+  {
+    name: "mergeTag",
+    run: async () => tags.mergeTag(await tagId("typescript"), await tagId("nextjs")),
+    state: () => prisma.tag.count(),
+  },
+  {
+    name: "deleteTag",
+    prepare: async () => {
+      await prisma.tag.create({ data: { slug: "unused", name: "Unused" } });
+    },
+    run: async () => tags.deleteTag(await tagId("unused")),
+    state: () => prisma.tag.count(),
+  },
+  {
     name: "saveMediaFile (upload route)",
     run: () =>
       mediaData.saveMediaFile({
@@ -183,6 +224,8 @@ const ADMIN_READS: { name: string; run: () => Promise<unknown> }[] = [
   { name: "adminListMediaFiles", run: () => adminData.adminListMediaFiles() },
   { name: "adminListComments", run: () => adminData.adminListComments() },
   { name: "adminGetSiteSettings", run: () => adminData.adminGetSiteSettings() },
+  { name: "adminListTags", run: () => adminData.adminListTags() },
+  { name: "adminListTagOptions", run: () => adminData.adminListTagOptions() },
 ];
 
 async function setRole(role: Role): Promise<void> {
@@ -285,22 +328,19 @@ describe("error responses", () => {
   });
 });
 
-describe("tag resolution", () => {
+describe("content tags", () => {
   beforeEach(async () => {
     await resetDatabase();
     await seed(prisma);
     await setRole("ADMIN");
   });
 
-  it("reuses existing tags matched by name when the selector's slug differs", async () => {
+  it("sets the manual tags by id and rejects unknown ids", async () => {
     const project = await sampleProject();
     const result = await admin.updateProject(project.id, {
       ...projectInput,
       slug: "sample-project",
-      tagsList: [
-        { nameTr: "Next.js", nameEn: "Next.js", slug: "next-js" },
-        { nameTr: "rust", nameEn: "rust", slug: "rust" },
-      ],
+      tagIds: [await tagId("nextjs"), await tagId("python")],
     });
     expect(result).toEqual({ success: true });
     const rows = await prisma.projectTag.findMany({
@@ -310,8 +350,14 @@ describe("tag resolution", () => {
     });
     expect(rows).toEqual([
       { source: "MANUAL", tag: { slug: "nextjs" } },
-      { source: "MANUAL", tag: { slug: "rust" } },
+      { source: "MANUAL", tag: { slug: "python" } },
     ]);
-    expect(await prisma.tag.count()).toBe(7);
+    expect(
+      await admin.updateProject(project.id, {
+        ...projectInput,
+        slug: "sample-project",
+        tagIds: ["does-not-exist"],
+      }),
+    ).toEqual({ error: "invalidInput" });
   });
 });

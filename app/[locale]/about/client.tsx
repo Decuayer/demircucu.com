@@ -104,7 +104,10 @@ import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import type { PublicSiteSettings } from "@/lib/types/content";
-import type { HobbySetting, SkillSetting } from "@/lib/types/content";
+import type { HobbySetting } from "@/lib/types/content";
+import { Link } from "@/i18n/navigation";
+import type { SkillForest } from "@/lib/tags/tree";
+import { SkillForestView } from "@/components/tags/skill-forest";
 
 const ICONS: Record<string, LucideIcon> = {
   Camera,
@@ -193,24 +196,13 @@ const ICONS: Record<string, LucideIcon> = {
 
 interface AboutClientProps {
   settings: PublicSiteSettings | null;
+  skillForest: SkillForest;
 }
 
-export default function AboutClient({ settings }: AboutClientProps) {
+export default function AboutClient({ settings, skillForest }: AboutClientProps) {
   const t = useTranslations("about");
   const params = useParams();
   const locale = params.locale as string;
-
-  const skills =
-    Array.isArray(settings?.skills) && settings.skills.length > 0
-      ? (settings.skills as unknown as SkillSetting[]).map((s) => ({
-          name: getTranslated(s, "name", locale),
-          level: s.level,
-        }))
-      : [
-          { name: "JavaScript / TypeScript", level: 95 },
-          { name: "React / Next.js", level: 92 },
-          { name: "Node.js / Express", level: 88 },
-        ];
 
   const hobbies =
     Array.isArray(settings?.hobbies) && settings.hobbies.length > 0
@@ -407,32 +399,13 @@ export default function AboutClient({ settings }: AboutClientProps) {
             </div>
             {t("skills")}
           </h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {skills.map((skill, i) => (
-              <motion.div
-                key={skill.name}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="space-y-2"
-              >
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium">{skill.name}</span>
-                  <span className="text-muted-foreground">{skill.level}%</span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-accent">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${skill.level}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: i * 0.05 }}
-                    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-500"
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <SkillForestView forest={skillForest} locale={locale} headingLevel="h3" />
+          <Link
+            href="/skills"
+            className="mt-6 inline-flex items-center text-sm font-medium text-cyan-400 hover:underline"
+          >
+            {t("allSkills")}
+          </Link>
         </motion.section>
 
         {/* Hobbies */}

@@ -13,17 +13,24 @@ const { CacheTags, invalidate, SETTLE_MS, tagsFor } = await import("./tags");
 describe("tagsFor", () => {
   it.each([
     [{ entity: "settings" } as const, ["settings"]],
-    [{ entity: "project", slug: "a" } as const, ["projects", "project:a"]],
+    [{ entity: "project", slug: "a" } as const, ["projects", "project:a", "tags"]],
     [
       { entity: "project", slug: "b", previousSlug: "a" } as const,
-      ["projects", "project:b", "project:a"],
+      ["projects", "project:b", "tags", "project:a"],
     ],
-    [{ entity: "project", slug: "a", previousSlug: "a" } as const, ["projects", "project:a"]],
-    [{ entity: "experience", id: "e1" } as const, ["experiences", "experience:e1"]],
-    [{ entity: "post", slug: "p", previousSlug: "old" } as const, ["posts", "post:p", "post:old"]],
+    [
+      { entity: "project", slug: "a", previousSlug: "a" } as const,
+      ["projects", "project:a", "tags"],
+    ],
+    [{ entity: "experience", id: "e1" } as const, ["experiences", "experience:e1", "tags"]],
+    [
+      { entity: "post", slug: "p", previousSlug: "old" } as const,
+      ["posts", "post:p", "tags", "post:old"],
+    ],
     [{ entity: "postInteractions", postId: "x" } as const, ["post-interactions:x"]],
     [{ entity: "contactMessage" } as const, []],
     [{ entity: "media" } as const, []],
+    [{ entity: "tags" } as const, ["tags", "projects", "experiences", "posts"]],
   ])("%o -> %o", (change, tags) => {
     expect(tagsFor(change)).toEqual(tags);
   });
@@ -42,8 +49,8 @@ describe("invalidate", () => {
 
   it("expires each tag once", () => {
     const tags = invalidate({ entity: "project", slug: "a" }, { entity: "project", slug: "a" });
-    expect(tags).toEqual(["projects", "project:a"]);
-    expect(updateTag).toHaveBeenCalledTimes(2);
+    expect(tags).toEqual(["projects", "project:a", "tags"]);
+    expect(updateTag).toHaveBeenCalledTimes(3);
   });
 
   it("expires the same tags again after the settle delay, once the response is sent", async () => {
@@ -58,6 +65,7 @@ describe("invalidate", () => {
       expect(revalidateTag.mock.calls).toEqual([
         ["posts", { expire: 0 }],
         ["post:p", { expire: 0 }],
+        ["tags", { expire: 0 }],
       ]);
     } finally {
       vi.useRealTimers();

@@ -10,13 +10,15 @@ import { Briefcase, ArrowRight, Calendar } from "lucide-react";
 import { getTranslated } from "@/lib/i18n-utils";
 
 import type { PublicExperience } from "@/lib/types/content";
-import { tagLabel } from "@/lib/tags/view";
+import { TagChips } from "@/components/tags/tag-chips";
 
-interface ExperienceClientProps {
+export interface ExperienceClientProps {
   experiences: PublicExperience[];
+  /** Active tag filter bar (from the filtered wrapper). */
+  filter?: React.ReactNode;
 }
 
-export default function ExperienceClient({ experiences }: ExperienceClientProps) {
+export default function ExperienceClient({ experiences, filter }: ExperienceClientProps) {
   const t = useTranslations("experience");
   const params = useParams();
   const locale = (params.locale as string) || "en";
@@ -46,6 +48,8 @@ export default function ExperienceClient({ experiences }: ExperienceClientProps)
           </Badge>
           <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
         </motion.div>
+
+        {filter}
 
         {/* Timeline */}
         <div className="relative">
@@ -82,37 +86,30 @@ export default function ExperienceClient({ experiences }: ExperienceClientProps)
 
                 {/* Card */}
                 <div className={`pl-8 md:w-1/2 md:pl-0 ${i % 2 === 0 ? "md:pl-12" : "md:pr-12"}`}>
-                  <Link href={`/experience/${exp.id}`}>
-                    <Card className="group cursor-pointer border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card hover:shadow-lg hover:shadow-violet-500/5">
-                      <CardContent className="space-y-3 p-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-lg font-semibold transition-colors group-hover:text-violet-400">
-                              {exp.company}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              {getTranslated(exp, "position", locale)}
-                            </p>
-                          </div>
-                          <ArrowRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-violet-400" />
-                        </div>
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {getTranslated(exp, "description", locale)}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {exp.tags.map((tag) => (
-                            <Badge
-                              key={tag.id}
-                              variant="secondary"
-                              className="bg-accent/50 text-xs"
+                  <Card className="group relative border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card hover:shadow-lg hover:shadow-violet-500/5">
+                    <CardContent className="space-y-3 p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold transition-colors group-hover:text-violet-400">
+                            <Link
+                              href={`/experience/${exp.id}`}
+                              className="after:absolute after:inset-0"
                             >
-                              {tagLabel(tag, locale)}
-                            </Badge>
-                          ))}
+                              {exp.company}
+                            </Link>
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {getTranslated(exp, "position", locale)}
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-violet-400" />
+                      </div>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {getTranslated(exp, "description", locale)}
+                      </p>
+                      <TagChips tags={exp.tags} locale={locale} chipClassName="text-xs" />
+                    </CardContent>
+                  </Card>
                 </div>
               </motion.div>
             ))}

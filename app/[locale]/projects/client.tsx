@@ -11,13 +11,15 @@ import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
 import type { PublicProject } from "@/lib/types/content";
-import { tagLabel } from "@/lib/tags/view";
+import { TagChips } from "@/components/tags/tag-chips";
 
-interface ProjectsClientProps {
+export interface ProjectsClientProps {
   projects: PublicProject[];
+  /** Active tag filter bar (from the filtered wrapper). */
+  filter?: React.ReactNode;
 }
 
-export default function ProjectsClient({ projects }: ProjectsClientProps) {
+export default function ProjectsClient({ projects, filter }: ProjectsClientProps) {
   const t = useTranslations("projects");
   const params = useParams();
   const locale = params.locale as string;
@@ -40,6 +42,8 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
           </Badge>
           <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
         </motion.div>
+
+        {filter}
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -97,13 +101,7 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
                   </div>
 
                   {/* Tags */}
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <Badge key={tag.id} variant="secondary" className="bg-accent/50 text-xs">
-                        {tagLabel(tag, locale)}
-                      </Badge>
-                    ))}
-                  </div>
+                  <TagChips tags={project.tags} locale={locale} chipClassName="text-xs" />
 
                   {/* View details */}
                   <Link href={`/projects/${project.slug}`}>

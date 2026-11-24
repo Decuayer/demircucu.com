@@ -20,7 +20,7 @@ const fadeUp = {
 };
 
 import type { PublicPost, PublicProject, PublicSiteSettings } from "@/lib/types/content";
-import { tagLabel } from "@/lib/tags/view";
+import { TagChips } from "@/components/tags/tag-chips";
 
 interface HomeClientProps {
   featuredProjects: PublicProject[];
@@ -153,32 +153,25 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Link href={`/projects/${project.slug}`}>
-                  <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card hover:shadow-lg hover:shadow-violet-500/5">
-                    <CardContent className="space-y-4 p-6">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold transition-colors group-hover:text-violet-400">
+                <Card className="group relative h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card hover:shadow-lg hover:shadow-violet-500/5">
+                  <CardContent className="space-y-4 p-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold transition-colors group-hover:text-violet-400">
+                        <Link
+                          href={`/projects/${project.slug}`}
+                          className="after:absolute after:inset-0"
+                        >
                           {getTranslated(project, "title", locale)}
-                        </h3>
-                        <ArrowRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-violet-400" />
-                      </div>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {getTranslated(project, "summary", locale)}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.tags.map((tag) => (
-                          <Badge
-                            key={tag.id}
-                            variant="secondary"
-                            className="bg-accent/50 text-xs hover:bg-accent"
-                          >
-                            {tagLabel(tag, locale)}
-                          </Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                        </Link>
+                      </h3>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-violet-400" />
+                    </div>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {getTranslated(project, "summary", locale)}
+                    </p>
+                    <TagChips tags={project.tags} locale={locale} chipClassName="text-xs" />
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
           </div>

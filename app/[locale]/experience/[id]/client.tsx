@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Building2 } from "lucide-react";
@@ -13,7 +12,7 @@ import { attachmentHref, toAttachments } from "@/lib/media/attachments";
 import { useParams } from "next/navigation";
 
 import type { PublicExperience } from "@/lib/types/content";
-import { tagLabel } from "@/lib/tags/view";
+import { TagChips } from "@/components/tags/tag-chips";
 import { FileIcon } from "lucide-react";
 
 interface ExperienceDetailClientProps {
@@ -64,13 +63,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
           </div>
 
           {/* Tags */}
-          <div className="mb-8 flex flex-wrap gap-2">
-            {experience.tags.map((tag) => (
-              <Badge key={tag.id} variant="secondary" className="bg-accent/50">
-                {tagLabel(tag, locale)}
-              </Badge>
-            ))}
-          </div>
+          <TagChips tags={experience.tags} locale={locale} className="mb-8" />
 
           {/* Details */}
           <Card className="mb-8 border-border/50 bg-card/50">
