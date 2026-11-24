@@ -33,7 +33,8 @@
     "supabase:status": "supabase status",
     "test:supabase": "vitest run --project supabase",
     "e2e:prepare": "tsx scripts/e2e-prepare.ts",
-    "e2e:build": "tsx scripts/e2e-build.ts"
+    "e2e:build": "tsx scripts/e2e-build.ts",
+    "db:migrate:staging": "tsx scripts/migrate-staging.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

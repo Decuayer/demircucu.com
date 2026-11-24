@@ -96,19 +96,7 @@ jobs:
       - run: npm run test:integration
 
   build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      - run: npm run build
-
-  e2e:
-    name: E2E (Playwright)
+    name: Build (read-only database)
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -120,8 +108,7 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 3s --health-retries 30
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:54329/demircucu_dev
-      DIRECT_URL: postgresql://postgres:postgres@localhost:54329/demircucu_dev
+      ADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:54329/demircucu_dev
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -129,9 +116,54 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npx prisma migrate deploy
-      - run: npm run db:seed
-      - run: npm run build
+      - name: Migrate and seed
+        env:
+          DATABASE_URL: ${{ env.ADMIN_DATABASE_URL }}
+          DIRECT_URL: ${{ env.ADMIN_DATABASE_URL }}
+        run: |
+          npx prisma migrate deploy
+          npm run db:seed
+      # Cache Components prerenders content at build time. The build connects with a role that
+      # can only read (BYPASSRLS because every table has RLS without policies): any write fails.
+      - name: Create read-only build role
+        run: |
+          docker exec -i ${{ job.services.postgres.id }} psql -U postgres -d demircucu_dev -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE build_reader LOGIN PASSWORD 'build_reader' BYPASSRLS;
+          GRANT USAGE ON SCHEMA public TO build_reader;
+          GRANT SELECT ON ALL TABLES IN SCHEMA public TO build_reader;
+          ALTER ROLE build_reader SET default_transaction_read_only = on;
+          SQL
+      - name: Build
+        env:
+          DATABASE_URL: postgresql://build_reader:build_reader@localhost:54329/demircucu_dev
+          DIRECT_URL: postgresql://build_reader:build_reader@localhost:54329/demircucu_dev
+        run: npm run build
+      - name: The build role really cannot write
+        run: |
+          if PGPASSWORD=build_reader docker exec -e PGPASSWORD -i ${{ job.services.postgres.id }} \
+            psql -h localhost -U build_reader -d demircucu_dev -c 'DELETE FROM "Comment"'; then
+            echo "build_reader could write" && exit 1
+          fi
+
+  supabase:
+    name: Supabase (RLS, auth trigger) and E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Start local Supabase (auth, API gateway, PostgREST, Mailpit)
+        run: >-
+          npx supabase start
+          -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Supabase tests (RLS, grants, Data API, auth.users trigger)
+        run: npm run test:supabase
+      - run: npm run e2e:prepare
+      - run: npm run e2e:build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4

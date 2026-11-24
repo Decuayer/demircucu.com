@@ -13,7 +13,8 @@ const E2E_DATABASE_URL =
  */
 export default defineConfig({
   testDir: "./e2e",
-  globalSetup: "./e2e/global-setup.ts",
+  // Local Supabase fixtures (admin account) are only needed when the suite starts its own server.
+  globalSetup: process.env.E2E_BASE_URL ? undefined : "./e2e/global-setup.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -21,6 +22,13 @@ export default defineConfig({
   reporter: process.env.CI ? [["html", { open: "never" }], ["github"]] : [["list"]],
   use: {
     baseURL: BASE_URL,
+    // Vercel Deployment Protection bypass for Preview runs (secret from CI, never committed).
+    extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+      ? {
+          "x-vercel-protection-bypass": process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+          "x-vercel-set-bypass-cookie": "true",
+        }
+      : undefined,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },

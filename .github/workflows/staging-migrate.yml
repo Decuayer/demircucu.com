@@ -1,0 +1,45 @@
+name: Staging migrations
+
+# Applies Prisma migrations to the staging Supabase project after they reach main, or on demand.
+# Production migrations are never run from here.
+on:
+  push:
+    branches: [main]
+    paths: ["prisma/migrations/**", "prisma/schema.prisma"]
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: Also run the idempotent seed
+        type: boolean
+        default: false
+
+concurrency:
+  group: staging-migrate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    name: prisma migrate deploy (staging)
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      DB_TARGET: staging
+      # Session pooler or direct connection (port 5432); migrations cannot use port 6543.
+      DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
+      DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      # Project ref of the staging project; the script refuses any other project and production.
+      STAGING_SUPABASE_REF: ${{ secrets.STAGING_SUPABASE_REF }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Migrate
+        run: npm run db:migrate:staging -- ${{ inputs.seed && '--seed' || '' }}
+      - name: Verify lockdown (RLS, grants, auth trigger)
+        run: npx tsx scripts/verify-db-lockdown.ts
