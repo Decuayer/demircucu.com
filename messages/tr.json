@@ -244,7 +244,7 @@
     "deleting": "Siliniyor...",
     "deleteConfirmation": "Bu proje veritabanından kalıcı olarak silinecektir. Bu işlem geri alınamaz.",
     "confirmDelete": "Emin misiniz?",
-    "fileSizeLimit": "Dosya boyutu 5MB'dan küçük olmalıdır.",
+    "fileSizeLimit": "Dosya boyutu 4MB'dan küçük olmalıdır.",
     "fileUploaded": "Dosya başarıyla yüklendi.",
     "uploadFailed": "Yükleme başarısız.",
     "fileDeleted": "Dosya başarıyla silindi.",

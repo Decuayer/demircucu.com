@@ -244,7 +244,7 @@
     "deleting": "Deleting...",
     "deleteConfirmation": "This project will be permanently deleted from the database. This action cannot be undone.",
     "confirmDelete": "Are you sure?",
-    "fileSizeLimit": "File size must be smaller than 5MB.",
+    "fileSizeLimit": "File size must be smaller than 4MB.",
     "fileUploaded": "File uploaded successfully.",
     "uploadFailed": "Upload failed.",
     "fileDeleted": "File deleted successfully.",
