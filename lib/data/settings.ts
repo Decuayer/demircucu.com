@@ -12,7 +12,7 @@ import { sanitizeOptionalHtml } from "@/lib/sanitize/html";
  * so builds and anonymous requests never write. Returns null on an empty database.
  */
 export async function getSiteSettings() {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.settings);
   cacheLife("hours");
   const settings = await prisma.siteSettings.findUnique({ where: { id: "main" } });

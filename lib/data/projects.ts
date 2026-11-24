@@ -5,7 +5,7 @@ import { CacheTags } from "@/lib/cache/tags";
 import { sanitizeOptionalHtml } from "@/lib/sanitize/html";
 
 export async function getPublishedProjects() {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.projects);
   cacheLife("hours");
   return prisma.project.findMany({
@@ -16,7 +16,7 @@ export async function getPublishedProjects() {
 }
 
 export async function getFeaturedProjects() {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.projects);
   cacheLife("hours");
   return prisma.project.findMany({
@@ -27,7 +27,7 @@ export async function getFeaturedProjects() {
 }
 
 export async function getPublishedProjectBySlug(slug: string) {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.projects, CacheTags.project(slug));
   cacheLife("hours");
   const project = await prisma.project.findFirst({

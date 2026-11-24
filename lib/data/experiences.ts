@@ -5,7 +5,7 @@ import { CacheTags } from "@/lib/cache/tags";
 import { sanitizeOptionalHtml } from "@/lib/sanitize/html";
 
 export async function getPublishedExperiences() {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.experiences);
   cacheLife("hours");
   return prisma.experience.findMany({
@@ -16,7 +16,7 @@ export async function getPublishedExperiences() {
 }
 
 export async function getPublishedExperience(id: string) {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.experiences, CacheTags.experience(id));
   cacheLife("hours");
   const experience = await prisma.experience.findFirst({

@@ -5,7 +5,7 @@ import { CacheTags } from "@/lib/cache/tags";
 
 /** Public comments and like count of a post. Shared by every visitor, so cached. */
 export async function getPostEngagement(postId: string) {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.postInteractions(postId));
   cacheLife("hours");
   const [comments, likesCount] = await Promise.all([

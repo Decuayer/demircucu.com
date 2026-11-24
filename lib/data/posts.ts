@@ -5,7 +5,7 @@ import { CacheTags } from "@/lib/cache/tags";
 import { sanitizeHtml } from "@/lib/sanitize/html";
 
 export async function getPublishedPosts() {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.posts);
   cacheLife("hours");
   return prisma.blogPost.findMany({
@@ -17,7 +17,7 @@ export async function getPublishedPosts() {
 
 /** Home page list. Ordering by views is revisited in the design phase (task doc 2.3). */
 export async function getFeaturedPosts(limit = 3) {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.posts);
   cacheLife("hours");
   return prisma.blogPost.findMany({
@@ -29,7 +29,7 @@ export async function getFeaturedPosts(limit = 3) {
 }
 
 export async function getPublishedPostBySlug(slug: string) {
-  "use cache";
+  "use cache: remote";
   cacheTag(CacheTags.posts, CacheTags.post(slug));
   cacheLife("hours");
   const post = await prisma.blogPost.findFirst({
