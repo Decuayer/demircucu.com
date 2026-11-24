@@ -4,7 +4,7 @@ import type { Element } from "hast";
 import rehypeParse from "rehype-parse";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import {
   noAssets,
   renderReadme,
@@ -47,6 +47,15 @@ function fakeResolver(options: { links?: string[]; documents?: Record<string, st
   };
   return { resolve, seen };
 }
+
+/**
+ * The first render creates Shiki's highlighter (regex engine, themes, grammars), which takes
+ * several seconds on a cold CI runner with coverage on. Pay it once here, under its own timeout,
+ * instead of inside the 5 s budget of whichever test happens to run first.
+ */
+beforeAll(async () => {
+  await renderReadme("```ts\nconst a = 1;\n```\n```bash\nls\n```", ctx("warmup"), noAssets);
+}, 60_000);
 
 describe("renderReadme: aegis-dispatch fixture", () => {
   it("renders badges, mirrored images, alerts, mermaid, tables, tasks and documents", async () => {
