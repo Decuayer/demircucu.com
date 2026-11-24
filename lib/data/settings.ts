@@ -1,27 +1,33 @@
 import "server-only";
-import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { CacheTags } from "@/lib/cache/tags";
+import { sanitizeOptionalHtml } from "@/lib/sanitize/html";
 
 /**
- * Site settings for public pages.
+ * Site settings for public pages. Cached across requests and invalidated by
+ * `updateSiteSettings` through the `settings` tag.
  *
- * Wrapped in React `cache` so that `generateMetadata`, the layout and the page share one query
- * per request instead of each opening a database round trip.
+ * Read-only: the row is created by the seed (and by the first admin save), never on a read path,
+ * so builds and anonymous requests never write. Returns null on an empty database.
  */
-export const getSiteSettings = cache(async () => {
-  try {
-    const settings = await prisma.siteSettings.findUnique({ where: { id: "main" } });
-    if (settings) return settings;
+export async function getSiteSettings() {
+  "use cache";
+  cacheTag(CacheTags.settings);
+  cacheLife("hours");
+  const settings = await prisma.siteSettings.findUnique({ where: { id: "main" } });
+  return (
+    settings && {
+      ...settings,
+      aboutBioTr: sanitizeOptionalHtml(settings.aboutBioTr),
+      aboutBioEn: sanitizeOptionalHtml(settings.aboutBioEn),
+    }
+  );
+}
 
-    // First run on an empty database: create the default row. upsert avoids a unique
-    // violation when concurrent requests race to create it.
-    return await prisma.siteSettings.upsert({
-      where: { id: "main" },
-      update: {},
-      create: { id: "main" },
-    });
-  } catch (error) {
-    console.error("Error fetching site settings:", error);
-    return null;
-  }
-});
+/** Current calendar year, refreshed daily; keeps the footer free of request-time `new Date()`. */
+export async function getCurrentYear(): Promise<number> {
+  "use cache";
+  cacheLife("days");
+  return new Date().getUTCFullYear();
+}

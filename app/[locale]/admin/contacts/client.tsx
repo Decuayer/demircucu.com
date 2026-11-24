@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +29,7 @@ interface AdminContactsClientProps {
 
 export default function AdminContactsClient({ initialMessages }: AdminContactsClientProps) {
   const t = useTranslations("admin");
+  const errorMessage = useActionErrorMessage();
   const [messages, setMessages] = useState(initialMessages);
   const [isPending, startTransition] = useTransition();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -36,7 +38,7 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
     if (!deleteId) return;
     startTransition(async () => {
       const res = await deleteContactMessage(deleteId);
-      if (res.error) toast.error(res.error);
+      if (res.error) toast.error(errorMessage(res.error));
       else {
         toast.success("Mesaj silindi.");
         setMessages((prev) => prev.filter((m) => m.id !== deleteId));

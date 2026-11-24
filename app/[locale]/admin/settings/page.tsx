@@ -1,22 +1,10 @@
-import { getCurrentUser } from "@/app/actions/auth";
-import { getSiteSettings } from "@/lib/data/settings";
-import { redirect } from "next/navigation";
+import { adminGetSiteSettings } from "@/lib/data/admin";
 import AdminSettingsClient from "./client";
 
-export default async function AdminSettingsPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);
-
-  const settings = await getSiteSettings();
-
+export default async function AdminSettingsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <AdminSettingsClient initialSettings={settings} />
+      <AdminSettingsClient initialSettings={await adminGetSiteSettings()} />
     </div>
   );
 }

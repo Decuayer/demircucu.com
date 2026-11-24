@@ -1,7 +1,21 @@
+import { Suspense } from "react";
 import HeaderClient from "./header-client";
-import { getCurrentUser } from "@/app/actions/auth";
+import { DesktopAuth, MobileAuth } from "./header-auth";
+import { AuthSlotSkeleton } from "./user-menu";
 
-export default async function Header() {
-  const user = await getCurrentUser();
-  return <HeaderClient user={user} />;
+export default function Header() {
+  return (
+    <HeaderClient
+      desktopAuth={
+        <Suspense fallback={<AuthSlotSkeleton />}>
+          <DesktopAuth />
+        </Suspense>
+      }
+      mobileAuth={
+        <Suspense fallback={null}>
+          <MobileAuth />
+        </Suspense>
+      }
+    />
+  );
 }

@@ -1,36 +1,19 @@
 /**
- * Authorization matrix for privileged server actions.
+ * Authorization matrix for privileged server actions and admin data reads.
  * Every admin mutation is listed once and exercised as anonymous, USER and ADMIN.
  * New privileged actions must be added to `ADMIN_ACTIONS`.
  */
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Profile } from "@prisma/client";
+import { auth } from "../helpers/action-mocks";
+import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { seed, SEED_ADMIN_ID, SEED_USER_ID } from "@/prisma/seed";
 import { resetDatabase } from "../helpers/db";
 
-const auth = vi.hoisted(() => ({ current: null as Profile | null }));
-
-vi.mock("@/app/actions/auth", () => ({
-  getCurrentUser: vi.fn(async () => auth.current),
-}));
-vi.mock("next-intl/server", () => ({
-  getTranslations: vi.fn(async () => (key: string) => key),
-}));
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-  revalidateTag: vi.fn(),
-  updateTag: vi.fn(),
-}));
-vi.mock("@/lib/supabase/storage", () => ({
-  BUCKET_NAME: "media",
-  deleteFileFromStorage: vi.fn(async () => ({ success: true })),
-  uploadFileToStorage: vi.fn(),
-}));
-
 const admin = await import("@/app/actions/admin");
 const settings = await import("@/app/actions/settings");
 const media = await import("@/app/actions/media");
+const adminData = await import("@/lib/data/admin");
+const mediaData = await import("@/lib/data/media");
 
 type Role = "anonymous" | "USER" | "ADMIN";
 
@@ -52,6 +35,28 @@ const projectInput = {
   summaryEn: "Summary",
 };
 
+const experienceInput = {
+  company: "X",
+  positionTr: "X",
+  positionEn: "X",
+  descriptionTr: "X",
+  descriptionEn: "X",
+  startDate: new Date("2024-01-01"),
+};
+
+const postInput = {
+  titleTr: "X",
+  titleEn: "X",
+  slug: "authz-post",
+  excerptTr: "X",
+  excerptEn: "X",
+  contentTr: "<p>X</p>",
+  contentEn: "<p>X</p>",
+};
+
+const sampleProject = () => prisma.project.findUniqueOrThrow({ where: { slug: "sample-project" } });
+const helloPost = () => prisma.blogPost.findUniqueOrThrow({ where: { slug: "hello-world" } });
+
 const ADMIN_ACTIONS: ActionCase[] = [
   {
     name: "createProject",
@@ -60,62 +65,64 @@ const ADMIN_ACTIONS: ActionCase[] = [
   },
   {
     name: "updateProject",
-    run: async () => {
-      const p = await prisma.project.findUniqueOrThrow({ where: { slug: "sample-project" } });
-      return admin.updateProject(p.id, { titleEn: "Hacked" });
-    },
+    run: async () =>
+      admin.updateProject((await sampleProject()).id, {
+        ...projectInput,
+        slug: "sample-project",
+        titleEn: "Hacked",
+      }),
     state: () => prisma.project.findUnique({ where: { slug: "sample-project" } }),
   },
   {
     name: "deleteProject",
-    run: async () => {
-      const p = await prisma.project.findUniqueOrThrow({ where: { slug: "sample-project" } });
-      return admin.deleteProject(p.id);
-    },
+    run: async () => admin.deleteProject((await sampleProject()).id),
     state: () => prisma.project.count(),
   },
   {
     name: "createExperience",
-    run: () =>
-      admin.createExperience({
-        company: "X",
-        positionTr: "X",
-        positionEn: "X",
-        descriptionTr: "X",
-        descriptionEn: "X",
-        startDate: new Date("2024-01-01"),
-      }),
+    run: () => admin.createExperience(experienceInput),
     state: () => prisma.experience.count(),
   },
   {
+    name: "updateExperience",
+    run: async () =>
+      admin.updateExperience((await prisma.experience.findFirstOrThrow()).id, {
+        ...experienceInput,
+        company: "Hacked",
+      }),
+    state: () => prisma.experience.findFirst(),
+  },
+  {
     name: "deleteExperience",
-    run: async () => {
-      const e = await prisma.experience.findFirstOrThrow();
-      return admin.deleteExperience(e.id);
-    },
+    run: async () => admin.deleteExperience((await prisma.experience.findFirstOrThrow()).id),
     state: () => prisma.experience.count(),
   },
   {
     name: "createBlogPost",
-    run: () =>
-      admin.createBlogPost({
-        titleTr: "X",
-        titleEn: "X",
-        slug: "authz-post",
-        excerptTr: "X",
-        excerptEn: "X",
-        contentTr: "X",
-        contentEn: "X",
-      }),
+    run: () => admin.createBlogPost(postInput),
     state: () => prisma.blogPost.count(),
   },
   {
+    name: "updateBlogPost",
+    run: async () =>
+      admin.updateBlogPost((await helloPost()).id, { ...postInput, slug: "hello-world" }),
+    state: () => prisma.blogPost.findUnique({ where: { slug: "hello-world" } }),
+  },
+  {
     name: "deleteBlogPost",
-    run: async () => {
-      const p = await prisma.blogPost.findUniqueOrThrow({ where: { slug: "hello-world" } });
-      return admin.deleteBlogPost(p.id);
-    },
+    run: async () => admin.deleteBlogPost((await helloPost()).id),
     state: () => prisma.blogPost.count(),
+  },
+  {
+    name: "setCommentHidden",
+    run: async () =>
+      admin.setCommentHidden({ id: (await prisma.comment.findFirstOrThrow()).id, hidden: true }),
+    state: () => prisma.comment.findFirst(),
+  },
+  {
+    name: "deleteComment",
+    run: async () => admin.deleteComment((await prisma.comment.findFirstOrThrow()).id),
+    state: () => prisma.comment.count(),
   },
   {
     name: "deleteContactMessage",
@@ -124,10 +131,8 @@ const ADMIN_ACTIONS: ActionCase[] = [
         data: { name: "a", email: "a@example.test", message: "m" },
       });
     },
-    run: async () => {
-      const m = await prisma.contactMessage.findFirstOrThrow();
-      return admin.deleteContactMessage(m.id);
-    },
+    run: async () =>
+      admin.deleteContactMessage((await prisma.contactMessage.findFirstOrThrow()).id),
     state: () => prisma.contactMessage.count(),
   },
   {
@@ -136,18 +141,50 @@ const ADMIN_ACTIONS: ActionCase[] = [
     state: () => prisma.siteSettings.findUnique({ where: { id: "main" } }),
   },
   {
-    name: "saveMediaFileToDB",
+    name: "deleteMediaFile",
+    prepare: async () => {
+      await prisma.mediaFile.create({
+        data: {
+          name: "x.png",
+          url: "https://example.test/x.png",
+          type: "image/png",
+          size: 1,
+          path: "general/x.png",
+        },
+      });
+    },
+    run: async () => media.deleteMediaFile((await prisma.mediaFile.findFirstOrThrow()).id),
+    state: () => prisma.mediaFile.count(),
+  },
+  {
+    name: "saveMediaFile (upload route)",
     run: () =>
-      media.saveMediaFileToDB({
+      mediaData.saveMediaFile({
         name: "x.png",
-        url: "https://example.test/x.png",
+        url: "https://example.test/y.png",
         type: "image/png",
         size: 1,
         bucket: "media",
-        path: "x.png",
+        path: "general/y.png",
       }),
     state: () => prisma.mediaFile.count(),
   },
+];
+
+/** Admin reads must reject non-admins too (drafts and messages are private). */
+const ADMIN_READS: { name: string; run: () => Promise<unknown> }[] = [
+  { name: "adminListProjects", run: () => adminData.adminListProjects() },
+  {
+    name: "adminGetProject",
+    run: async () => adminData.adminGetProject((await sampleProject()).id),
+  },
+  { name: "adminListExperiences", run: () => adminData.adminListExperiences() },
+  { name: "adminListPosts", run: () => adminData.adminListPosts() },
+  { name: "adminGetPost", run: async () => adminData.adminGetPost((await helloPost()).id) },
+  { name: "adminListContactMessages", run: () => adminData.adminListContactMessages() },
+  { name: "adminListMediaFiles", run: () => adminData.adminListMediaFiles() },
+  { name: "adminListComments", run: () => adminData.adminListComments() },
+  { name: "adminGetSiteSettings", run: () => adminData.adminGetSiteSettings() },
 ];
 
 async function setRole(role: Role): Promise<void> {
@@ -186,6 +223,11 @@ describe("authorization matrix: admin actions", () => {
       expect(isRejected(result)).toBe(true);
       expect(await action.state()).toEqual(before);
     });
+
+    it.each(ADMIN_READS)("$name is rejected", async (read) => {
+      await setRole(role);
+      await expect(read.run()).rejects.toThrow(/Authentication required|Insufficient permissions/);
+    });
   });
 
   describe("as ADMIN", () => {
@@ -197,5 +239,50 @@ describe("authorization matrix: admin actions", () => {
       expect(isRejected(result)).toBe(false);
       expect(await action.state()).not.toEqual(before);
     });
+
+    it.each(ADMIN_READS)("$name succeeds", async (read) => {
+      await setRole("ADMIN");
+      await expect(read.run()).resolves.toBeDefined();
+    });
+  });
+});
+
+describe("error responses", () => {
+  beforeEach(async () => {
+    await resetDatabase();
+    await seed(prisma);
+  });
+
+  it("returns codes, never internal messages", async () => {
+    await setRole("USER");
+    expect(await admin.deleteProject("whatever")).toEqual({ error: "forbidden" });
+    await setRole("anonymous");
+    expect(await admin.deleteProject("whatever")).toEqual({ error: "unauthenticated" });
+    await setRole("ADMIN");
+    expect(await admin.deleteProject("does-not-exist")).toEqual({ error: "notFound" });
+    expect(await admin.createProject({ ...projectInput, slug: "sample-project" })).toEqual({
+      error: "conflict",
+    });
+  });
+
+  it("rejects mass assignment of unknown settings columns", async () => {
+    await setRole("ADMIN");
+    const result = await settings.updateSiteSettings({
+      heroTitleEn: "ok",
+      id: "other",
+      updatedAt: new Date(0),
+    } as never);
+    expect(result).toMatchObject({ error: "invalidInput" });
+    expect(await prisma.siteSettings.count()).toBe(1);
+  });
+
+  it("sanitizes rich text on save", async () => {
+    await setRole("ADMIN");
+    await admin.createBlogPost({
+      ...postInput,
+      contentTr: '<p>ok</p><script>alert(1)</script><img src="x" onerror="alert(1)">',
+    });
+    const post = await prisma.blogPost.findUniqueOrThrow({ where: { slug: "authz-post" } });
+    expect(post.contentTr).toBe('<p>ok</p><img src="x">');
   });
 });

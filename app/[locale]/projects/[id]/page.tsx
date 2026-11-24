@@ -1,20 +1,19 @@
-import { getProjectBySlug } from "@/app/actions/projects";
 import { notFound } from "next/navigation";
+import { getPublishedProjectBySlug, getPublishedProjectSlugs } from "@/lib/data/projects";
+import { atLeastOne, EMPTY_PARAM_PLACEHOLDER } from "@/lib/data/static-params";
 import ProjectDetailClient from "./client";
 
-export const revalidate = 3600;
-
-interface PageProps {
-  params: Promise<{ id: string }>;
+export async function generateStaticParams() {
+  const slugs = await getPublishedProjectSlugs();
+  return atLeastOne(
+    slugs.map((id) => ({ id })),
+    { id: EMPTY_PARAM_PLACEHOLDER },
+  );
 }
 
-export default async function ProjectDetailPage({ params }: PageProps) {
+export default async function ProjectDetailPage({ params }: PageProps<"/[locale]/projects/[id]">) {
   const { id } = await params;
-  const project = await getProjectBySlug(id);
-
-  if (!project) {
-    notFound();
-  }
-
+  const project = await getPublishedProjectBySlug(id);
+  if (!project) notFound();
   return <ProjectDetailClient project={project} />;
 }

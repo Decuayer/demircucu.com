@@ -1,104 +1,62 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "./auth";
-import { revalidatePath } from "next/cache";
-import { getTranslations } from "next-intl/server";
+import { requireUser } from "@/lib/auth/guards";
+import { invalidate } from "@/lib/cache/tags";
+import { findPublishedPost } from "@/lib/data/interactions";
+import { consumeAll, RATE_LIMITS } from "@/lib/rate-limit";
+import { fail, ok, toActionFailure, type ActionResult } from "@/lib/actions/result";
+import { commentSchema, likeSchema } from "@/lib/validation/interactions";
+import type { z } from "zod";
 
-export async function addComment(postId: string, content: string, pathToRevalidate: string) {
-  const t = await getTranslations("blog");
-
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return { error: t("loginToComment") || "Yorum yapmak için giriş yapmalısınız." };
-  }
-
-  if (!content || content.trim().length === 0) {
-    return { error: t("commentEmpty") || "Yorum boş olamaz." };
-  }
-
+/**
+ * The cache entries to refresh are derived on the server from the post id; the client cannot
+ * choose what gets revalidated (security review S8).
+ */
+export async function addComment(input: z.input<typeof commentSchema>): Promise<ActionResult> {
   try {
-    await prisma.comment.create({
-      data: {
-        content: content.trim(),
-        postId,
-        authorId: user.id,
-      },
-    });
+    const user = await requireUser();
+    const { postId, content } = commentSchema.parse(input);
+    const limit = await consumeAll([
+      [RATE_LIMITS.commentPerUser, user.id],
+      [RATE_LIMITS.commentPerUserDaily, user.id],
+    ]);
+    if (!limit.allowed) return fail("rateLimited");
 
-    revalidatePath(pathToRevalidate);
-    return { success: true };
+    const post = await findPublishedPost(postId);
+    if (!post) return fail("notFound");
+
+    await prisma.comment.create({ data: { content, postId: post.id, authorId: user.id } });
+    invalidate({ entity: "postInteractions", postId: post.id });
+    return ok();
   } catch (error) {
-    console.error("Add comment error:", error);
-    return { error: t("commentError") || "Yorum eklenirken bir hata oluştu." };
+    return toActionFailure(error, "addComment");
   }
 }
 
-export async function toggleLike(postId: string, pathToRevalidate: string) {
-  const t = await getTranslations("blog");
-
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return { error: t("loginToLike") || "Beğenmek için giriş yapmalısınız." };
-  }
-
+export async function toggleLike(
+  input: z.input<typeof likeSchema>,
+): Promise<ActionResult<{ liked: boolean }>> {
   try {
-    const existingLike = await prisma.like.findFirst({
-      where: {
-        postId,
-        userId: user.id,
-      },
-    });
+    const user = await requireUser();
+    const { postId } = likeSchema.parse(input);
+    const limit = await consumeAll([[RATE_LIMITS.likePerUser, user.id]]);
+    if (!limit.allowed) return fail("rateLimited");
 
-    if (existingLike) {
-      // Unlike
-      await prisma.like.delete({
-        where: { id: existingLike.id },
-      });
+    const post = await findPublishedPost(postId);
+    if (!post) return fail("notFound");
+
+    const where = { postId_userId: { postId: post.id, userId: user.id } };
+    const existing = await prisma.like.findUnique({ where, select: { id: true } });
+    if (existing) {
+      await prisma.like.delete({ where });
     } else {
-      // Like
-      await prisma.like.create({
-        data: {
-          postId,
-          userId: user.id,
-        },
-      });
+      // A concurrent duplicate hits the unique constraint and maps to `conflict`.
+      await prisma.like.create({ data: { postId: post.id, userId: user.id } });
     }
-
-    revalidatePath(pathToRevalidate);
-    return { success: true };
+    invalidate({ entity: "postInteractions", postId: post.id });
+    return ok({ liked: !existing });
   } catch (error) {
-    console.error("Toggle like error:", error);
-    return { error: t("likeError") || "Beğeni işlemi başarısız oldu." };
+    return toActionFailure(error, "toggleLike");
   }
-}
-
-export async function getPostInteractions(postId: string) {
-  const [comments, likesCount] = await Promise.all([
-    prisma.comment.findMany({
-      where: { postId },
-      include: {
-        author: {
-          select: { name: true, id: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.like.count({
-      where: { postId },
-    }),
-  ]);
-
-  let userLiked = false;
-  const user = await getCurrentUser();
-  if (user) {
-    const like = await prisma.like.findFirst({
-      where: { postId, userId: user.id },
-    });
-    if (like) userLiked = true;
-  }
-
-  return { comments, likesCount, userLiked };
 }

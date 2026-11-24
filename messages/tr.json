@@ -32,7 +32,8 @@
     "updatePassword": "Şifreyi Güncelle",
     "save": "Kaydet",
     "name": "Ad Soyad",
-    "email": "E-posta"
+    "email": "E-posta",
+    "switchLanguage": "Switch to English"
   },
   "home": {
     "heroTitle": "Merhaba, Ben",
@@ -84,7 +85,9 @@
     "commentEmpty": "Yorum boş olamaz.",
     "commentError": "Yorum eklenirken bir hata oluştu.",
     "loginToLike": "Beğenmek için giriş yapmalısınız.",
-    "likeError": "Beğeni işlemi başarısız oldu."
+    "likeError": "Beğeni işlemi başarısız oldu.",
+    "submitting": "Gönderiliyor...",
+    "anonymousUser": "Kullanıcı"
   },
   "contact": {
     "title": "İletişim",
@@ -117,7 +120,30 @@
     "invalidCredentials": "E-posta veya şifre hatalı.",
     "unauthorized": "Yetkisiz işlem.",
     "profileUpdateError": "Profil güncellenemedi.",
-    "passwordUpdateError": "Şifre güncellenemedi."
+    "passwordUpdateError": "Şifre güncellenemedi.",
+    "loginSubtitle": "demircucu.com hesabınıza giriş yapın",
+    "registerSubtitle": "Yorum yapmak ve yazıları beğenmek için hesap oluşturun",
+    "passwordRequirements": "En az {min} karakter; küçük harf, büyük harf ve rakam içermeli.",
+    "checkEmailTitle": "E-postanızı doğrulayın",
+    "checkEmailBody": "Size bir doğrulama bağlantısı gönderdik. Hesabınızı etkinleştirmek için bağlantıya tıklayın.",
+    "checkEmailHint": "E-posta gelmediyse spam klasörünü kontrol edin veya yeniden gönderin.",
+    "resendConfirmation": "Doğrulama e-postasını yeniden gönder",
+    "confirmationResent": "Hesap doğrulanmamışsa yeni bir bağlantı gönderildi.",
+    "confirmedTitle": "E-posta doğrulandı",
+    "confirmedBody": "Hesabınız etkinleştirildi.",
+    "continue": "Devam et",
+    "forgotTitle": "Şifremi unuttum",
+    "forgotBody": "E-posta adresinizi girin, şifre sıfırlama bağlantısı gönderelim.",
+    "sendResetLink": "Sıfırlama bağlantısı gönder",
+    "resetEmailSent": "Bu adrese kayıtlı bir hesap varsa sıfırlama bağlantısı gönderildi.",
+    "backToLogin": "Girişe dön",
+    "resetTitle": "Yeni şifre belirleyin",
+    "resetBody": "Hesabınız için yeni bir şifre girin.",
+    "newPassword": "Yeni şifre",
+    "savePassword": "Şifreyi kaydet",
+    "resetLinkExpired": "Sıfırlama bağlantısının süresi dolmuş veya geçersiz.",
+    "requestNewLink": "Yeni bağlantı iste",
+    "linkInvalid": "Bağlantı geçersiz veya süresi dolmuş. Lütfen tekrar deneyin."
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -267,7 +293,17 @@
     "blogCreationFailed": "Yazı oluşturulamadı.",
     "blogUpdateFailed": "Yazı güncellenemedi.",
     "blogDeleteFailed": "Yazı silinemedi.",
-    "contactDeleteFailed": "Mesaj silinemedi."
+    "contactDeleteFailed": "Mesaj silinemedi.",
+    "media": "Medya",
+    "comments": "Yorumlar",
+    "noComments": "Henüz yorum yok.",
+    "hiddenBadge": "Gizli",
+    "hideComment": "Gizle",
+    "showComment": "Göster",
+    "commentHidden": "Yorum gizlendi.",
+    "commentShown": "Yorum yeniden gösteriliyor.",
+    "commentDeleted": "Yorum silindi.",
+    "commentDeleteConfirm": "Bu yorum kalıcı olarak silinsin mi?"
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -280,5 +316,35 @@
     "fileNotFound": "Dosya bulunamadı.",
     "deleteError": "Dosya silinirken bir hata oluştu.",
     "saveError": "Dosya veritabanına kaydedilemedi."
+  },
+  "meta": {
+    "defaultTitle": "Demircucu | Bilgisayar Mühendisi",
+    "defaultDescription": "Kişisel portfolyo ve blog sitesi. Projeler, deneyimler ve yazılım dünyasından yazılar."
+  },
+  "errors": {
+    "unauthenticated": "Bu işlem için giriş yapmalısınız.",
+    "forbidden": "Bu işlem için yetkiniz yok.",
+    "invalidInput": "Lütfen formdaki alanları kontrol edin.",
+    "notFound": "Kayıt bulunamadı.",
+    "conflict": "Bu değer zaten kullanılıyor.",
+    "rateLimited": "Çok fazla deneme yapıldı. Lütfen biraz sonra tekrar deneyin.",
+    "invalidCredentials": "E-posta veya şifre hatalı.",
+    "emailNotConfirmed": "E-posta adresiniz henüz doğrulanmadı. Gelen kutunuzu kontrol edin.",
+    "weakPassword": "Bu şifre yeterince güçlü değil veya sızdırılmış şifreler listesinde.",
+    "unsupportedType": "Bu dosya türü desteklenmiyor.",
+    "tooLarge": "Dosya boyutu sınırı aşıyor.",
+    "serverError": "Bir hata oluştu. Lütfen tekrar deneyin."
+  },
+  "validation": {
+    "required": "Bu alan zorunludur.",
+    "invalidEmail": "Geçerli bir e-posta adresi girin.",
+    "passwordTooShort": "Şifre en az {min} karakter olmalıdır.",
+    "passwordTooLong": "Şifre çok uzun.",
+    "passwordTooWeak": "Şifre küçük harf, büyük harf ve rakam içermelidir.",
+    "passwordMismatch": "Şifreler eşleşmiyor.",
+    "messageTooShort": "Mesaj en az 10 karakter olmalıdır.",
+    "invalidUrl": "Geçerli bir http(s) adresi girin.",
+    "invalidSlug": "Yalnızca harf, rakam ve tire kullanın.",
+    "endBeforeStart": "Bitiş tarihi başlangıçtan önce olamaz."
   }
 }

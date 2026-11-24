@@ -1,34 +1,26 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getTranslations } from "next-intl/server";
+import { clientIp, consumeAll, RATE_LIMITS } from "@/lib/rate-limit";
+import { fail, ok, toActionFailure, type ActionResult } from "@/lib/actions/result";
+import { contactSchema } from "@/lib/validation/interactions";
 
-export async function submitContactMessage(data: {
-  name: string;
-  email: string;
-  subject?: string;
-  message: string;
-}) {
-  const t = await getTranslations("contact");
-  const { name, email, subject, message } = data;
-
-  if (!name || !email || !message) {
-    return { error: t("requiredFields") };
-  }
-
+export async function submitContactMessage(input: unknown): Promise<ActionResult> {
   try {
-    await prisma.contactMessage.create({
-      data: {
-        name,
-        email,
-        subject,
-        message,
-      },
-    });
+    const { website, ...data } = contactSchema.parse(input);
+    // Honeypot filled: pretend success so the bot learns nothing, store nothing.
+    if (website) return ok();
 
-    return { success: true };
+    const ip = await clientIp();
+    const limit = await consumeAll([
+      [RATE_LIMITS.contactPerIp, ip],
+      [RATE_LIMITS.contactPerIpDaily, ip],
+    ]);
+    if (!limit.allowed) return fail("rateLimited");
+
+    await prisma.contactMessage.create({ data });
+    return ok();
   } catch (error) {
-    console.error("Contact submission error:", error);
-    return { error: t("submissionError") };
+    return toActionFailure(error, "submitContactMessage");
   }
 }

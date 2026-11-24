@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import type { SiteSettings } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -30,6 +31,7 @@ interface ContactClientProps {
 export default function ContactClient({ settings }: ContactClientProps) {
   const t = useTranslations("contact");
   const [loading, setLoading] = useState(false);
+  const errorMessage = useActionErrorMessage();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,13 +42,14 @@ export default function ContactClient({ settings }: ContactClientProps) {
     const email = formData.get("email") as string;
     const subject = formData.get("subject") as string;
     const message = formData.get("message") as string;
+    const website = formData.get("website") as string;
 
-    const res = await submitContactMessage({ name, email, subject, message });
+    const res = await submitContactMessage({ name, email, subject, message, website });
 
     setLoading(false);
 
     if (res.error) {
-      toast.error(res.error);
+      toast.error(errorMessage(res.error));
     } else {
       toast.success(t("success") || "Mesajınız başarıyla gönderildi!");
       (e.target as HTMLFormElement).reset();
@@ -124,6 +127,20 @@ export default function ContactClient({ settings }: ContactClientProps) {
             <Card className="border-border/50 bg-card/50">
               <CardContent className="p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Honeypot: invisible to people and screen readers, filled by naive bots. */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute -left-[9999px] h-0 w-0 overflow-hidden"
+                  >
+                    <label htmlFor="contact-website">Website</label>
+                    <input
+                      id="contact-website"
+                      name="website"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
+                  </div>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="name">{t("name")}</Label>

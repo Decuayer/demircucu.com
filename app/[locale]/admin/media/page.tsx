@@ -1,18 +1,10 @@
-import { getCurrentUser } from "@/app/actions/auth";
-import { getMediaFiles } from "@/app/actions/media";
-import { redirect } from "next/navigation";
+import { adminListMediaFiles } from "@/lib/data/admin";
 import AdminMediaClient from "./client";
 
-export default async function AdminMediaPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);
-
-  const initialFiles = await getMediaFiles();
-
+export default async function AdminMediaPage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <AdminMediaClient initialFiles={initialFiles} />
+      <AdminMediaClient initialFiles={await adminListMediaFiles()} />
     </div>
   );
 }

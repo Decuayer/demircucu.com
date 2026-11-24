@@ -1,0 +1,15 @@
+<!-- Supabase "Reset password" template. RedirectTo is the app's /<locale>/auth/callback?next=... URL. -->
+<h2>Şifre sıfırlama / Reset your password</h2>
+<p>
+  Yeni bir şifre belirlemek için bağlantıya tıklayın.<br />
+  Click the link to choose a new password.
+</p>
+<p>
+  <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery"
+    >Şifremi sıfırla / Reset password</a
+  >
+</p>
+<p>
+  Bu isteği siz yapmadıysanız bu e-postayı yok sayabilirsiniz. / If you did not request this, ignore
+  this e-mail.
+</p>

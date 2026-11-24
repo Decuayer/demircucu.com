@@ -1,12 +1,6 @@
-import { getCurrentUser } from "@/app/actions/auth";
-import { redirect } from "next/navigation";
 import BlogFormClient from "../form-client";
 
-export default async function NewBlogPostPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") redirect(`/${locale}/auth/login`);
-
+export default function NewBlogPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <BlogFormClient />

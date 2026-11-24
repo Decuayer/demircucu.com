@@ -27,21 +27,23 @@ import { useParams } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { addComment, toggleLike } from "@/app/actions/blog_interaction";
-import type { BlogPost, Comment, Profile, Tag } from "@prisma/client";
+import type { BlogPost, Tag } from "@prisma/client";
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 
-interface CommentWithAuthor extends Comment {
-  author: {
-    id: string;
-    name: string | null;
-  };
+interface PublicComment {
+  id: string;
+  content: string;
+  createdAt: Date;
+  author: { id: string; name: string | null };
 }
 
 interface BlogDetailClientProps {
   post: BlogPost & { tags: Tag[] };
-  initialComments: CommentWithAuthor[];
+  initialComments: PublicComment[];
   initialLikesCount: number;
   initialUserLiked: boolean;
-  currentUser: Profile | null;
+  /** Only whether someone is signed in matters here. */
+  currentUser: { id: string } | null;
 }
 
 export default function BlogDetailClient({
@@ -57,6 +59,7 @@ export default function BlogDetailClient({
   const [liked, setLiked] = useState(initialUserLiked);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [isPending, startTransition] = useTransition();
+  const errorMessage = useActionErrorMessage();
 
   const content = getTranslated(post, "content", locale);
 
@@ -70,13 +73,13 @@ export default function BlogDetailClient({
     setLiked(!liked);
     setLikesCount(liked ? likesCount - 1 : likesCount + 1);
 
-    const res = await toggleLike(post.id, `/blog/${post.slug}`);
+    const res = await toggleLike({ postId: post.id });
 
     // Revert if error
     if (res?.error) {
       setLiked(liked);
       setLikesCount(likesCount);
-      toast.error(res.error);
+      toast.error(errorMessage(res.error));
     }
   };
 
@@ -86,9 +89,9 @@ export default function BlogDetailClient({
     const content = formData.get("content") as string;
 
     startTransition(async () => {
-      const res = await addComment(post.id, content, `/blog/${post.slug}`);
+      const res = await addComment({ postId: post.id, content });
       if (res?.error) {
-        toast.error(res.error);
+        toast.error(errorMessage(res.error));
       } else {
         toast.success(t("commentSuccess") || "Yorumunuz eklendi.");
         (e.target as HTMLFormElement).reset();
@@ -227,6 +230,7 @@ export default function BlogDetailClient({
                       placeholder={t("writeComment") || "Yorumunuzu buraya yazın..."}
                       className="resize-none border-border/50 bg-accent/30"
                       rows={3}
+                      maxLength={2000}
                       required
                     />
                     <Button
@@ -234,7 +238,7 @@ export default function BlogDetailClient({
                       disabled={isPending}
                       className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700"
                     >
-                      {isPending ? "Gönderiliyor..." : t("submitComment") || "Yorum Gönder"}
+                      {isPending ? t("submitting") : t("submitComment")}
                     </Button>
                   </form>
                 )}
@@ -255,7 +259,9 @@ export default function BlogDetailClient({
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium">{comment.author.name || "Kullanıcı"}</p>
+                        <p className="text-sm font-medium">
+                          {comment.author.name || t("anonymousUser")}
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(comment.createdAt).toLocaleDateString()}
                         </p>

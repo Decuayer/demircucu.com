@@ -10,10 +10,12 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { updateProfile, updatePassword } from "@/app/actions/auth";
 import { User, Lock, Settings } from "lucide-react";
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 
 export default function ProfileClient({ user }: { user: Profile }) {
   const t = useTranslations("nav");
   const [isPending, startTransition] = useTransition();
+  const errorMessage = useActionErrorMessage();
 
   const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,7 +24,7 @@ export default function ProfileClient({ user }: { user: Profile }) {
 
     startTransition(async () => {
       const res = await updateProfile({ name });
-      if (res.error) toast.error(res.error);
+      if (res.error) toast.error(errorMessage(res.error));
       else toast.success(t("profileUpdated") || "Profiliniz başarıyla güncellendi.");
     });
   };
@@ -39,8 +41,8 @@ export default function ProfileClient({ user }: { user: Profile }) {
     }
 
     startTransition(async () => {
-      const res = await updatePassword(password);
-      if (res.error) toast.error(res.error);
+      const res = await updatePassword({ password, confirmPassword: confirm });
+      if (res.error) toast.error(errorMessage(res.error));
       else {
         toast.success(t("passwordUpdated") || "Şifreniz güncellendi.");
         (e.target as HTMLFormElement).reset();

@@ -1,51 +1,20 @@
-import { getCurrentUser } from "@/app/actions/auth";
-import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { requireUserPage } from "@/lib/auth/guards";
+import { getUserActivity } from "@/lib/data/profile";
+import { PageSpinner } from "@/components/layout/page-spinner";
 import ProfileLikesClient from "./client";
 
-export default async function ProfileLikesPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+async function LikesContent({ params }: Pick<PageProps<"/[locale]/profile/likes">, "params">) {
   const { locale } = await params;
-  const user = await getCurrentUser();
-
-  if (!user) {
-    redirect(`/${locale}/auth/login`);
-  }
-
-  // Fetch liked posts
-  const likes = await prisma.like.findMany({
-    where: { userId: user.id },
-    include: {
-      post: {
-        select: {
-          id: true,
-          titleTr: true,
-          titleEn: true,
-          slug: true,
-          createdAt: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  // Fetch past comments
-  const comments = await prisma.comment.findMany({
-    where: { authorId: user.id },
-    include: {
-      post: {
-        select: {
-          titleTr: true,
-          titleEn: true,
-          slug: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
+  const user = await requireUserPage(locale);
+  const { likes, comments } = await getUserActivity(user.id);
   return <ProfileLikesClient likes={likes} comments={comments} />;
+}
+
+export default function ProfileLikesPage({ params }: PageProps<"/[locale]/profile/likes">) {
+  return (
+    <Suspense fallback={<PageSpinner />}>
+      <LikesContent params={params} />
+    </Suspense>
+  );
 }

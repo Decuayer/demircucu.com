@@ -1,7 +1,7 @@
 "use client";
 
 import type { SiteSettings } from "@prisma/client";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Mail } from "lucide-react";
 import {
@@ -15,7 +15,6 @@ import {
 } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
 import { getTranslated } from "@/lib/i18n-utils";
-import { useParams } from "next/navigation";
 
 const footerLinks = [
   { href: "/", key: "home" },
@@ -25,10 +24,15 @@ const footerLinks = [
   { href: "/contact", key: "contact" },
 ] as const;
 
-export default function Footer({ settings }: { settings?: SiteSettings | null }) {
+interface FooterProps {
+  settings?: SiteSettings | null;
+  /** Passed from a cached server value; never `new Date()` during render (static shell). */
+  year: number;
+}
+
+export default function Footer({ settings, year }: FooterProps) {
   const t = useTranslations("nav");
-  const params = useParams();
-  const locale = params.locale as string;
+  const locale = useLocale();
 
   const socialLinks = [];
   if (settings?.socialGithub)
@@ -115,7 +119,7 @@ export default function Footer({ settings }: { settings?: SiteSettings | null })
 
         <div className="flex flex-col items-center justify-between gap-4 text-xs text-muted-foreground md:flex-row">
           <p>
-            © {new Date().getFullYear()} demircucu.com. {t("copyright") || "Tüm hakları saklıdır."}
+            © {year} demircucu.com. {t("copyright") || "Tüm hakları saklıdır."}
           </p>
         </div>
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ interface AdminProjectsClientProps {
 
 export default function AdminProjectsClient({ initialProjects }: AdminProjectsClientProps) {
   const t = useTranslations("admin");
+  const errorMessage = useActionErrorMessage();
   const params = useParams();
   const locale = params.locale as string;
 
@@ -42,7 +44,7 @@ export default function AdminProjectsClient({ initialProjects }: AdminProjectsCl
     if (!deleteId) return;
     startTransition(async () => {
       const res = await deleteProject(deleteId);
-      if (res.error) toast.error(res.error);
+      if (res.error) toast.error(errorMessage(res.error));
       else {
         toast.success("Proje silindi.");
         setProjects((prev) => prev.filter((p) => p.id !== deleteId));

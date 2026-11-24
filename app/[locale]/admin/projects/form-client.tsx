@@ -1,5 +1,6 @@
 "use client";
 
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ interface ProjectFormClientProps {
 
 export default function ProjectFormClient({ initialData, isEdit }: ProjectFormClientProps) {
   const t = useTranslations("admin");
+  const errorMessage = useActionErrorMessage();
   const router = useRouter();
   const params = useParams();
   const locale = params.locale;
@@ -91,7 +93,7 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
       }
 
       if (res.error) {
-        toast.error(res.error);
+        toast.error(errorMessage(res.error));
       } else {
         toast.success(isEdit ? "Proje güncellendi." : "Proje başarıyla eklendi.");
         router.push(`/${locale}/admin/projects`);

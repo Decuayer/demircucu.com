@@ -1,15 +1,12 @@
-import { getFeaturedProjects } from "@/app/actions/projects";
-import { getFeaturedBlogPosts } from "@/app/actions/blog";
+import { getFeaturedProjects } from "@/lib/data/projects";
+import { getFeaturedPosts } from "@/lib/data/posts";
 import { getSiteSettings } from "@/lib/data/settings";
 import HomeClient from "./client";
-
-// Revalidate the page every 1 hour, or it can be dynamic depending on needs
-export const revalidate = 3600;
 
 export default async function HomePage() {
   const [featuredProjects, latestPosts, settings] = await Promise.all([
     getFeaturedProjects(),
-    getFeaturedBlogPosts(3),
+    getFeaturedPosts(3),
     getSiteSettings(),
   ]);
 

@@ -1,23 +1,12 @@
 "use client";
 
-import type { Profile } from "@prisma/client";
-import { useTranslations } from "next-intl";
-import { Link, usePathname } from "@/i18n/navigation";
-import { useRouter } from "@/i18n/navigation";
-import { useState } from "react";
-import { Menu, Globe, User, LogOut, Settings, Heart, LayoutDashboard } from "lucide-react";
+import { Suspense, useState, type ReactNode } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { Globe, Menu } from "lucide-react";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { useLocale } from "next-intl";
 
 const navLinks = [
   { href: "/", key: "home" },
@@ -28,32 +17,98 @@ const navLinks = [
   { href: "/contact", key: "contact" },
 ] as const;
 
-import { signOut } from "@/app/actions/auth";
+type Variant = "desktop" | "mobile";
 
-interface HeaderClientProps {
-  user: Profile | null;
+const linkStyles: Record<Variant, { base: string; active: string; idle: string }> = {
+  desktop: {
+    base: "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground",
+    active: "bg-accent text-foreground",
+    idle: "text-muted-foreground",
+  },
+  mobile: {
+    base: "rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+    active: "bg-accent text-foreground",
+    idle: "text-muted-foreground hover:bg-accent hover:text-foreground",
+  },
+};
+
+function NavItems({
+  variant,
+  activePath,
+  onNavigate,
+}: {
+  variant: Variant;
+  activePath: string | null;
+  onNavigate?: () => void;
+}) {
+  const t = useTranslations("nav");
+  const styles = linkStyles[variant];
+  return navLinks.map((link) => (
+    <Link
+      key={link.key}
+      href={link.href}
+      onClick={onNavigate}
+      aria-current={activePath === link.href ? "page" : undefined}
+      className={cn(styles.base, activePath === link.href ? styles.active : styles.idle)}
+    >
+      {t(link.key)}
+    </Link>
+  ));
 }
 
-export default function HeaderClient({ user }: HeaderClientProps) {
+/** Reads the URL, so it lives in its own Suspense boundary (routes with runtime params). */
+function ActiveNavItems(props: { variant: Variant; onNavigate?: () => void }) {
+  return <NavItems {...props} activePath={usePathname()} />;
+}
+
+function Nav(props: { variant: Variant; onNavigate?: () => void }) {
+  return (
+    <Suspense fallback={<NavItems {...props} activePath={null} />}>
+      <ActiveNavItems {...props} />
+    </Suspense>
+  );
+}
+
+function LocaleSwitchButton({ onSwitch }: { onSwitch?: () => void }) {
   const t = useTranslations("nav");
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={onSwitch}
+      disabled={!onSwitch}
+      className="text-muted-foreground hover:text-foreground"
+    >
+      <Globe className="h-4 w-4" />
+      <span className="sr-only">{t("switchLanguage")}</span>
+    </Button>
+  );
+}
+
+function ActiveLocaleSwitch() {
   const pathname = usePathname();
   const locale = useLocale();
   const router = useRouter();
+  return (
+    <LocaleSwitchButton
+      onSwitch={() => router.replace(pathname, { locale: locale === "tr" ? "en" : "tr" })}
+    />
+  );
+}
+
+interface HeaderClientProps {
+  /** Session-dependent controls, streamed in after the static shell. */
+  desktopAuth: ReactNode;
+  mobileAuth: ReactNode;
+}
+
+export default function HeaderClient({ desktopAuth, mobileAuth }: HeaderClientProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  const switchLocale = () => {
-    const newLocale = locale === "tr" ? "en" : "tr";
-    router.replace(pathname, { locale: newLocale });
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
+  const close = () => setMobileOpen(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
           <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
             demircucu
@@ -61,99 +116,17 @@ export default function HeaderClient({ user }: HeaderClientProps) {
           <span className="text-sm font-normal text-muted-foreground">.com</span>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.key}
-              href={link.href}
-              className={cn(
-                "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground",
-                pathname === link.href ? "bg-accent text-foreground" : "text-muted-foreground",
-              )}
-            >
-              {t(link.key)}
-            </Link>
-          ))}
+          <Nav variant="desktop" />
         </nav>
 
-        {/* Right Side: Locale + Auth */}
         <div className="flex items-center gap-2">
-          {/* Language Switcher */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={switchLocale}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <Globe className="h-4 w-4" />
-            <span className="sr-only">
-              {locale === "tr" ? "Switch to English" : "Türkçe'ye geç"}
-            </span>
-          </Button>
+          <Suspense fallback={<LocaleSwitchButton />}>
+            <ActiveLocaleSwitch />
+          </Suspense>
 
-          {/* Auth Button or User Dropdown */}
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={<Button variant="ghost" className="relative ml-2 h-8 w-8 rounded-full" />}
-              >
-                <Avatar className="h-8 w-8 border border-border/50">
-                  <AvatarFallback className="bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-violet-400">
-                    {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="text-sm font-medium">{user.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{user.email}</p>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                {user.role === "ADMIN" && (
-                  <DropdownMenuItem
-                    render={<Link href="/admin" className="flex cursor-pointer items-center" />}
-                  >
-                    <LayoutDashboard className="mr-2 h-4 w-4 text-violet-400" />
-                    <span>{t("admin") || "Admin Panel"}</span>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem
-                  render={<Link href="/profile" className="flex cursor-pointer items-center" />}
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>{t("profile") || "Profilim"}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  render={
-                    <Link href="/profile/likes" className="flex cursor-pointer items-center" />
-                  }
-                >
-                  <Heart className="mr-2 h-4 w-4 text-red-400" />
-                  <span>{t("likes") || "Beğenilerim"}</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-400">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>{t("logout") || "Çıkış Yap"}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Link href="/auth/login">
-              <Button
-                variant="default"
-                size="sm"
-                className="hidden border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700 md:inline-flex"
-              >
-                {t("login")}
-              </Button>
-            </Link>
-          )}
+          {desktopAuth}
 
-          {/* Mobile Menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden" />}>
               <Menu className="h-5 w-5" />
@@ -166,39 +139,11 @@ export default function HeaderClient({ user }: HeaderClientProps) {
                   </span>
                 </div>
                 <nav className="flex flex-1 flex-col gap-1 p-4">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.key}
-                      href={link.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={cn(
-                        "rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
-                        pathname === link.href
-                          ? "bg-accent text-foreground"
-                          : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                      )}
-                    >
-                      {t(link.key)}
-                    </Link>
-                  ))}
+                  <Nav variant="mobile" onNavigate={close} />
                 </nav>
-                <div className="border-t border-border p-4">
-                  {user ? (
-                    <Button
-                      onClick={handleSignOut}
-                      variant="outline"
-                      className="w-full border-red-400/20 text-red-400 hover:bg-red-400/10"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Çıkış Yap
-                    </Button>
-                  ) : (
-                    <Link href="/auth/login" onClick={() => setMobileOpen(false)}>
-                      <Button className="w-full border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
-                        {t("login")}
-                      </Button>
-                    </Link>
-                  )}
+                {/* Any click in the auth area (login link, sign out) closes the menu. */}
+                <div className="border-t border-border p-4" onClickCapture={close}>
+                  {mobileAuth}
                 </div>
               </div>
             </SheetContent>

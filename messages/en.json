@@ -32,7 +32,8 @@
     "updatePassword": "Update Password",
     "save": "Save",
     "name": "Full Name",
-    "email": "E-mail"
+    "email": "E-mail",
+    "switchLanguage": "Türkçe'ye geç"
   },
   "home": {
     "heroTitle": "Hello, I am",
@@ -84,7 +85,9 @@
     "commentEmpty": "Comment cannot be empty.",
     "commentError": "An error occurred while adding the comment.",
     "loginToLike": "You must be logged in to like a post.",
-    "likeError": "Failed to like the post."
+    "likeError": "Failed to like the post.",
+    "submitting": "Sending...",
+    "anonymousUser": "User"
   },
   "contact": {
     "title": "Contact",
@@ -117,7 +120,30 @@
     "invalidCredentials": "Invalid email or password.",
     "unauthorized": "Unauthorized action.",
     "profileUpdateError": "Failed to update profile.",
-    "passwordUpdateError": "Failed to update password."
+    "passwordUpdateError": "Failed to update password.",
+    "loginSubtitle": "Sign in to your demircucu.com account",
+    "registerSubtitle": "Create an account to comment on and like posts",
+    "passwordRequirements": "At least {min} characters, with lower-case and upper-case letters and a digit.",
+    "checkEmailTitle": "Verify your e-mail",
+    "checkEmailBody": "We sent you a verification link. Click it to activate your account.",
+    "checkEmailHint": "No e-mail? Check your spam folder or send it again.",
+    "resendConfirmation": "Resend verification e-mail",
+    "confirmationResent": "If the account is not verified yet, a new link has been sent.",
+    "confirmedTitle": "E-mail verified",
+    "confirmedBody": "Your account is now active.",
+    "continue": "Continue",
+    "forgotTitle": "Forgot password",
+    "forgotBody": "Enter your e-mail address and we will send you a reset link.",
+    "sendResetLink": "Send reset link",
+    "resetEmailSent": "If an account exists for this address, a reset link has been sent.",
+    "backToLogin": "Back to sign in",
+    "resetTitle": "Set a new password",
+    "resetBody": "Enter a new password for your account.",
+    "newPassword": "New password",
+    "savePassword": "Save password",
+    "resetLinkExpired": "The reset link has expired or is invalid.",
+    "requestNewLink": "Request a new link",
+    "linkInvalid": "The link is invalid or has expired. Please try again."
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -267,7 +293,17 @@
     "blogCreationFailed": "Blog post creation failed.",
     "blogUpdateFailed": "Blog post update failed.",
     "blogDeleteFailed": "Blog post delete failed.",
-    "contactDeleteFailed": "Contact message delete failed."
+    "contactDeleteFailed": "Contact message delete failed.",
+    "media": "Media",
+    "comments": "Comments",
+    "noComments": "No comments yet.",
+    "hiddenBadge": "Hidden",
+    "hideComment": "Hide",
+    "showComment": "Show",
+    "commentHidden": "Comment hidden.",
+    "commentShown": "Comment visible again.",
+    "commentDeleted": "Comment deleted.",
+    "commentDeleteConfirm": "Delete this comment permanently?"
   },
   "common": {
     "loading": "Loading...",
@@ -280,5 +316,35 @@
     "fileNotFound": "File not found.",
     "deleteError": "An error occurred while deleting the file.",
     "saveError": "Failed to save the file to the database."
+  },
+  "meta": {
+    "defaultTitle": "Demircucu | Computer Engineer",
+    "defaultDescription": "Personal portfolio and blog. Projects, experience and articles from the software world."
+  },
+  "errors": {
+    "unauthenticated": "Please sign in to continue.",
+    "forbidden": "You are not allowed to do this.",
+    "invalidInput": "Please check the highlighted fields.",
+    "notFound": "Not found.",
+    "conflict": "This value is already in use.",
+    "rateLimited": "Too many attempts. Please try again later.",
+    "invalidCredentials": "Incorrect e-mail or password.",
+    "emailNotConfirmed": "Your e-mail address is not verified yet. Please check your inbox.",
+    "weakPassword": "This password is too weak or appears in a list of leaked passwords.",
+    "unsupportedType": "This file type is not supported.",
+    "tooLarge": "The file exceeds the size limit.",
+    "serverError": "Something went wrong. Please try again."
+  },
+  "validation": {
+    "required": "This field is required.",
+    "invalidEmail": "Enter a valid e-mail address.",
+    "passwordTooShort": "Password must be at least {min} characters.",
+    "passwordTooLong": "Password is too long.",
+    "passwordTooWeak": "Password must contain lower-case and upper-case letters and a digit.",
+    "passwordMismatch": "Passwords do not match.",
+    "messageTooShort": "Message must be at least 10 characters.",
+    "invalidUrl": "Enter a valid http(s) URL.",
+    "invalidSlug": "Use only letters, digits and dashes.",
+    "endBeforeStart": "End date cannot be before the start date."
   }
 }

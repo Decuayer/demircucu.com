@@ -1,9 +1,7 @@
-import { getBlogPosts } from "@/app/actions/blog";
+import { getPublishedPosts } from "@/lib/data/posts";
 import BlogClient from "./client";
 
-export const revalidate = 3600;
-
 export default async function BlogPage() {
-  const posts = await getBlogPosts();
+  const posts = await getPublishedPosts();
   return <BlogClient posts={posts} />;
 }
