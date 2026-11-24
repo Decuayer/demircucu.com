@@ -1,21 +1,22 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 4 kapandı; Faz 5 onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-24 (Faz 5 PR'ı açık; production migration ve GitHub App kurulumu bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
 ## 1. Durum özeti
 
-| Faz / iş                         | Durum                                                           | Branch / PR                       |
-| -------------------------------- | --------------------------------------------------------------- | --------------------------------- |
-| Faz 0: Keşif                     | Tamamlandı, onaylandı                                           | (PR #1 açıklamasında)             |
-| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                    | `chore/phase-1-test-infra`, PR #1 |
-| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı          | `fix/db-connection-pool`, PR #2   |
-| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı  | `feat/phase-2-security-auth`      |
-| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor      | —                                 |
-| Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod | `feat/phase-3-*`                  |
-| Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da        | `feat/phase-4-tags`, PR #8        |
-| Faz 5–10                         | Başlamadı                                                       | —                                 |
+| Faz / iş                         | Durum                                                             | Branch / PR                       |
+| -------------------------------- | ----------------------------------------------------------------- | --------------------------------- |
+| Faz 0: Keşif                     | Tamamlandı, onaylandı                                             | (PR #1 açıklamasında)             |
+| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                      | `chore/phase-1-test-infra`, PR #1 |
+| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı            | `fix/db-connection-pool`, PR #2   |
+| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı    | `feat/phase-2-security-auth`      |
+| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor        | —                                 |
+| Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod   | `feat/phase-3-*`                  |
+| Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da          | `feat/phase-4-tags`, PR #8        |
+| Faz 5: GitHub entegrasyonu       | **PR açık**; prod migration + App kurulumu + ilk senkron bekliyor | `feat/phase-5-github`             |
+| Faz 6–10                         | Başlamadı                                                         | —                                 |
 
 ## 2. Tamamlanan işler
 
@@ -114,6 +115,30 @@ kuyruk yok), hatalar admin "Etiketler" sayfasında düzeltilir; önerilen ağaç
 - **Testler:** unit 283, integration 180, supabase 16, E2E 41. `admin-media` E2E bir kez zaman aşımına
   düştü (paralel yük), tekrarlarda geçti.
 
+### Faz 5 (`feat/phase-5-github`)
+
+Kararlar (kullanıcı, 2026-11-24): tetikleyici GitHub App webhook + admin butonu + günlük cron
+(Vercel Hobby); kapsam: fork/arşiv hariç (admin'den açılabilir), ilk içe aktarma taslak, sonradan
+açılan repo açıklama + README varsa otomatik yayında; Mermaid tarayıcıda lazy; limit görsel 10 MB,
+PDF 25 MB (aşan mirror edilmez, GitHub linki); README orijinal dilde, TR sayfada TR override özet
+yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşleme dry-run'ını kullanıcı çalıştıracak.
+
+- **Migration:** `20261126090000_phase5_github` (`UnmappedTopic` silinir, boş değilse durur;
+  `ProjectDocument.mediaFileId` nullable + `htmlUrl`; `Project.readmeVersion`;
+  `GithubSyncSettings` tek satır, `autoPublishAfter` = migration anı; RLS açık).
+- **Senkron:** `lib/github/*` (auth: App / PAT / anonim; ETag, sayfalama, backoff; `sync.ts`
+  idempotent; 240 sn bütçe, PARTIAL ile devam). Ayrıntı ve kurulum: `docs/github-sync.md`.
+- **README / mirror / PDF:** sanitize sonrası güvenli dönüşümler; görseller ve PDF'ler
+  `media/github/{repo}/{sha256}.{ext}`; SVG PNG'ye çevrilir. pdf.js dosyaları `public/pdfjs`
+  (build öncesi kopyalanır, gitignore). CSP'ye yalnızca badge host'ları eklendi.
+- **UI:** proje detay (README sekmesi, TOC, dokümanlar, galeri, dil çubuğu), doküman sayfası,
+  liste filtreleri (`?skill`, `?lang`, `?q`, `?sort`), admin senkron paneli, medya kaynak/repo
+  filtresi ve kullanılmayan GitHub medyası temizliği. GitHub projeleri silinemez (yayından kaldırılır).
+- **Testler:** unit 403, integration 187 (senkron: idempotans, override/manuel etiket koruma,
+  rename + 301, kaybolan repo, otomatik yayın, hata kaydı), E2E 43 (README + Mermaid + PDF CSP
+  altında, admin paneli).
+- **Bucket:** limit 25 MB'a çıkıyor (`ensure-storage-bucket.ts --apply`, staging ve prod).
+
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
 | Sapma                                                                   | Gerekçe                                                                            |
@@ -133,6 +158,10 @@ kuyruk yok), hatalar admin "Etiketler" sayfasında düzeltilir; önerilen ağaç
 | `SkillCategory` yok; kategoriler `parentId` kök düğümleri               | Tek ağaç; etiket sayısı az                                                         |
 | `UnmappedTopic` kuyruğu yerine otomatik etiket                          | Kullanıcı kararı (Faz 4); düzeltme admin araçlarıyla                               |
 | Admin ağaçta sürükle-bırak yok                                          | Üst etiket seçimi + yukarı/aşağı; yeni bağımlılık gerekmez                         |
+| PAT yerine GitHub App (PAT yedek)                                       | Yeni repo anında gelir; kullanıcı kararı                                           |
+| `revalidateTag("skills")` yerine `tags`                                 | Faz 4'te etiket cache tag'i `tags` olarak adlandırıldı                             |
+| SVG mirror'da PNG'ye çevriliyor                                         | Public bucket'tan SVG servis etmek script riski taşır                              |
+| README'deki tek başına `user-attachments` URL'i link olarak kalıyor     | GitHub bunu video gömmesi olarak gösterir; video oynatıcı yok                      |
 
 ## 4. Ortamlar
 
@@ -244,11 +273,15 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 - **Yeni API anahtar formatı** (`sb_publishable_` / `sb_secret_`) production'da: ileride ayrı küçük
   bir iş; şimdi değil.
 
+### Faz 5 devreye alma sırası
+
+1. Prod yedeği + `20261126090000_phase5_github` (onaylı, merge'den önce) ve `ensure-storage-bucket --apply`.
+2. GitHub App + Vercel env (`docs/github-sync.md` → Setup), merge, deploy.
+3. `link-existing-projects.ts` dry-run → çakışma kararları → `--apply`; sonra admin "Şimdi senkronize et".
+
 ### Sonraki planlar
 
-- **Faz 5:** `UnmappedTopic` silinsin mi kararı bu fazda. Başında senkron tetikleme seçenekleri (admin butonu, cron, GitHub App/webhook) kısaca
-  sunulacak; kullanıcı yeni repo için mümkün olduğunca hızlı güncelleme istiyor. Sync,
-  `TagResolver.ensureAll` + `selectRepoLanguages` kullanacak. **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
+- **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
 
 ### Bilinen riskler
