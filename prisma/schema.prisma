@@ -76,12 +76,6 @@ model Tag {
   blogPostTags   BlogPostTag[]
   unmappedTopics UnmappedTopic[]
 
-  // Legacy implicit many-to-many relations (`_ProjectToTag` ...). Copied to the explicit join
-  // tables by the expand migration; dropped by the contract migration. Not used by the app.
-  legacyExperiences Experience[] @relation("ExperienceToTag")
-  legacyProjects    Project[]    @relation("ProjectToTag")
-  legacyBlogPosts   BlogPost[]   @relation("BlogPostToTag")
-
   @@index([parentId])
 }
 
@@ -187,12 +181,6 @@ model Experience {
 
   logoMedia MediaFile?      @relation("ExperienceLogo", fields: [logoPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
   tags      ExperienceTag[]
-
-  /// Legacy, dropped by the contract migration. Not used by the app.
-  logo       String?
-  /// Legacy, dropped by the contract migration. Not used by the app.
-  images     String[]
-  legacyTags Tag[]    @relation("ExperienceToTag")
 }
 
 enum ProjectSource {
@@ -264,12 +252,6 @@ model Project {
   tags        ProjectTag[]
   documents   ProjectDocument[]
   slugHistory ProjectSlugHistory[]
-
-  /// Legacy, dropped by the contract migration. Not used by the app.
-  logo       String?
-  /// Legacy, dropped by the contract migration. Not used by the app.
-  images     String[]
-  legacyTags Tag[]    @relation("ProjectToTag")
 }
 
 /// PDFs found in a repository (README links and the tree), mirrored to the media library.
@@ -366,10 +348,6 @@ model BlogPost {
   likes      Like[]
   coverMedia MediaFile?    @relation("BlogPostCover", fields: [coverPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
   tags       BlogPostTag[]
-
-  /// Legacy, dropped by the contract migration. Not used by the app.
-  coverImage String?
-  legacyTags Tag[]   @relation("BlogPostToTag")
 }
 
 model Comment {
@@ -444,11 +422,6 @@ model MediaFile {
   blogPostCovers     BlogPost[]        @relation("BlogPostCover")
   settingsAboutPhoto SiteSettings[]    @relation("SettingsAboutPhoto")
   settingsFavicon    SiteSettings[]    @relation("SettingsFavicon")
-
-  /// Legacy, dropped by the contract migration. Not written by the app.
-  url    String? @unique
-  /// Legacy, dropped by the contract migration. Replaced by MediaUsage and the relations above.
-  usedIn String?
 
   @@index([source, repoFullName])
 }
@@ -530,11 +503,6 @@ model SiteSettings {
 
   aboutPhotoMedia MediaFile? @relation("SettingsAboutPhoto", fields: [aboutPhotoPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
   faviconMedia    MediaFile? @relation("SettingsFavicon", fields: [faviconPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
-
-  /// Legacy, dropped by the contract migration. Not used by the app.
-  aboutPhoto String?
-  /// Legacy, dropped by the contract migration. Not used by the app.
-  faviconUrl String?
 }
 
 /// Fixed-window rate limit counters (lib/rate-limit). `key` is `<bucket>:<sha256(identifier)>`;

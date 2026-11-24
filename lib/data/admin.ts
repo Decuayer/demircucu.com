@@ -18,7 +18,6 @@ export async function adminGetProject(id: string) {
   await requireAdmin();
   const row = await prisma.project.findUnique({
     where: { id },
-    omit: { logo: true, images: true },
     include: { tags: allTagsInclude },
   });
   return row && { ...row, tags: flattenTags(row.tags, { includeHidden: true }) };
@@ -33,7 +32,6 @@ export async function adminGetExperience(id: string) {
   await requireAdmin();
   const row = await prisma.experience.findUnique({
     where: { id },
-    omit: { logo: true, images: true },
     include: { tags: allTagsInclude },
   });
   return row && { ...row, tags: flattenTags(row.tags, { includeHidden: true }) };
@@ -48,7 +46,6 @@ export async function adminGetPost(id: string) {
   await requireAdmin();
   const row = await prisma.blogPost.findUnique({
     where: { id },
-    omit: { coverImage: true },
     include: { tags: allTagsInclude },
   });
   return row && { ...row, tags: flattenTags(row.tags, { includeHidden: true }) };
@@ -117,8 +114,5 @@ export async function adminListComments() {
 
 export async function adminGetSiteSettings() {
   await requireAdmin();
-  return prisma.siteSettings.findUnique({
-    where: { id: "main" },
-    omit: { aboutPhoto: true, faviconUrl: true },
-  });
+  return prisma.siteSettings.findUnique({ where: { id: "main" } });
 }

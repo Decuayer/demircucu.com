@@ -77,13 +77,12 @@ test("uploaded logo is stored as a path, rendered publicly and protected from de
     await page.locator("form button[type=submit]").click();
     await expect(page).toHaveURL(/\/tr\/admin\/projects$/);
 
-    const [row] = await sql<{ logoPath: string | null; logo: string | null }>(
-      `SELECT "logoPath", logo FROM public."Project" WHERE id = $1`,
+    const [row] = await sql<{ logoPath: string | null }>(
+      `SELECT "logoPath" FROM public."Project" WHERE id = $1`,
       [project!.id],
     );
     uploadedPath = row?.logoPath ?? undefined;
     expect(uploadedPath).toMatch(/^projects\/[0-9a-f-]{36}\.png$/);
-    expect(row?.logo).toBeNull();
 
     await expect
       .poll(
