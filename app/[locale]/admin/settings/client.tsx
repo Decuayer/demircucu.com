@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
-import type { SiteSettings } from "@prisma/client";
+import type { AdminSiteSettings } from "@/lib/types/content";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -194,7 +194,7 @@ type SkillState = { nameTr: string; nameEn: string; level: number };
 type HobbyState = { nameTr: string; nameEn: string; descTr: string; descEn: string; icon: string };
 
 interface AdminSettingsClientProps {
-  initialSettings: SiteSettings | null;
+  initialSettings: AdminSiteSettings | null;
 }
 
 export default function AdminSettingsClient({ initialSettings }: AdminSettingsClientProps) {
@@ -210,7 +210,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
 
   const [aboutBioTr, setAboutBioTr] = useState(initialSettings?.aboutBioTr || "");
   const [aboutBioEn, setAboutBioEn] = useState(initialSettings?.aboutBioEn || "");
-  const [aboutPhoto, setAboutPhoto] = useState(initialSettings?.aboutPhoto || "");
+  const [aboutPhoto, setAboutPhoto] = useState(initialSettings?.aboutPhotoPath || "");
   const [aboutLocationTr, setAboutLocationTr] = useState(initialSettings?.aboutLocationTr || "");
   const [aboutLocationEn, setAboutLocationEn] = useState(initialSettings?.aboutLocationEn || "");
   const [aboutExperienceTr, setAboutExperienceTr] = useState(
@@ -263,7 +263,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
   const [siteDescriptionEn, setSiteDescriptionEn] = useState(
     initialSettings?.siteDescriptionEn || "",
   );
-  const [faviconUrl, setFaviconUrl] = useState(initialSettings?.faviconUrl || "");
+  const [faviconUrl, setFaviconUrl] = useState(initialSettings?.faviconPath || "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,7 +276,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         heroSubEn,
         aboutBioTr,
         aboutBioEn,
-        aboutPhoto,
+        aboutPhotoPath: aboutPhoto,
         aboutLocationTr,
         aboutLocationEn,
         aboutExperienceTr,
@@ -305,7 +305,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         siteTitleEn,
         siteDescriptionTr,
         siteDescriptionEn,
-        faviconUrl,
+        faviconPath: faviconUrl,
       };
 
       const res = await updateSiteSettings(payload);
@@ -530,12 +530,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label>{t("profilePhoto")}</Label>
-                    <ImageUpload
-                      value={aboutPhoto}
-                      onChange={setAboutPhoto}
-                      folder="settings"
-                      usedIn="settings:profile"
-                    />
+                    <ImageUpload value={aboutPhoto} onChange={setAboutPhoto} folder="settings" />
                   </div>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
@@ -972,12 +967,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               </div>
               <div className="space-y-2">
                 <Label>{t("siteIcon")} (Site İkonu)</Label>
-                <ImageUpload
-                  value={faviconUrl}
-                  onChange={setFaviconUrl}
-                  folder="settings"
-                  usedIn="settings:favicon"
-                />
+                <ImageUpload value={faviconUrl} onChange={setFaviconUrl} folder="settings" />
                 <p className="mt-1 text-[10px] text-muted-foreground">{t("siteIconPlaceholder")}</p>
               </div>
             </CardContent>

@@ -14,7 +14,9 @@ describe("prisma seed", () => {
     expect(await prisma.project.count({ where: { published: true } })).toBe(1);
     expect(await prisma.project.count({ where: { published: false } })).toBe(1);
     expect(await prisma.blogPost.count()).toBe(2);
-    expect(await prisma.tag.count()).toBe(4);
+    expect(await prisma.tag.count()).toBe(6);
+    expect(await prisma.projectTag.count()).toBe(3);
+    expect(await prisma.tagAlias.count()).toBe(2);
   });
 
   it("is idempotent", async () => {

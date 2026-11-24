@@ -303,7 +303,10 @@
     "commentHidden": "Yorum gizlendi.",
     "commentShown": "Yorum yeniden gösteriliyor.",
     "commentDeleted": "Yorum silindi.",
-    "commentDeleteConfirm": "Bu yorum kalıcı olarak silinsin mi?"
+    "commentDeleteConfirm": "Bu yorum kalıcı olarak silinsin mi?",
+    "publicUrl": "Genel URL",
+    "urlCopied": "URL kopyalandı.",
+    "usageCount": "{count, plural, =0 {Kullanılmıyor} other {# yerde kullanılıyor}}"
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -333,6 +336,7 @@
     "weakPassword": "Bu şifre yeterince güçlü değil veya sızdırılmış şifreler listesinde.",
     "unsupportedType": "Bu dosya türü desteklenmiyor.",
     "tooLarge": "Dosya boyutu sınırı aşıyor.",
+    "mediaInUse": "Bu dosya içeriklerde kullanılıyor; önce kullanıldığı yerlerden kaldırın.",
     "serverError": "Bir hata oluştu. Lütfen tekrar deneyin."
   },
   "validation": {
@@ -345,6 +349,26 @@
     "messageTooShort": "Mesaj en az 10 karakter olmalıdır.",
     "invalidUrl": "Geçerli bir http(s) adresi girin.",
     "invalidSlug": "Yalnızca harf, rakam ve tire kullanın.",
-    "endBeforeStart": "Bitiş tarihi başlangıçtan önce olamaz."
+    "endBeforeStart": "Bitiş tarihi başlangıçtan önce olamaz.",
+    "invalidMediaPath": "Geçersiz medya dosyası."
+  },
+  "uploader": {
+    "uploading": "Yükleniyor...",
+    "notAnImage": "Lütfen geçerli bir görsel seçin.",
+    "imageUploaded": "Görsel yüklendi.",
+    "fileUploaded": "Dosya yüklendi.",
+    "imageDropHint": "Görsel yüklemek için tıklayın veya sürükleyin",
+    "imageTypes": "PNG, JPG, GIF, WEBP, AVIF (en fazla 4 MB)",
+    "fileDropHint": "Dosya seçmek için tıklayın",
+    "fileTypes": "PNG, JPG, GIF, WEBP, AVIF, ICO, PDF (en fazla 4 MB)",
+    "previewAlt": "Yüklenen görselin önizlemesi",
+    "remove": "Kaldır",
+    "uploadTab": "Dosya yükle",
+    "linkTab": "Link ekle",
+    "linkName": "Dosya adı",
+    "linkNamePlaceholder": "Örn: Proje sunumu (PDF)",
+    "linkUrl": "Dosya linki (URL)",
+    "add": "Ekle",
+    "attached": "Ekli dosyalar"
   }
 }

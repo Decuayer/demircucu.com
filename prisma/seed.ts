@@ -2,7 +2,7 @@
  * Development / test seed data. Idempotent: safe to run repeatedly.
  * Run with `npm run db:seed` (guarded: local databases only).
  */
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, type TagKind } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
@@ -10,12 +10,46 @@ import { Pool } from "pg";
 export const SEED_ADMIN_ID = "00000000-0000-4000-8000-000000000001";
 export const SEED_USER_ID = "00000000-0000-4000-8000-000000000002";
 
+// Parents first: `parent` refers to a slug defined earlier in the list.
 const TAGS = [
-  { slug: "python", nameTr: "Python", nameEn: "Python" },
-  { slug: "typescript", nameTr: "TypeScript", nameEn: "TypeScript" },
-  { slug: "nextjs", nameTr: "Next.js", nameEn: "Next.js" },
-  { slug: "machine-learning", nameTr: "Makine Öğrenmesi", nameEn: "Machine Learning" },
-] as const;
+  { slug: "web", name: "Web", nameTr: "Web Geliştirme", nameEn: "Web Development", kind: "DOMAIN" },
+  {
+    slug: "ai",
+    name: "AI",
+    nameTr: "Yapay Zeka",
+    nameEn: "Artificial Intelligence",
+    kind: "DOMAIN",
+  },
+  { slug: "python", name: "Python", kind: "LANGUAGE" },
+  { slug: "typescript", name: "TypeScript", kind: "LANGUAGE", parent: "web" },
+  {
+    slug: "nextjs",
+    name: "Next.js",
+    kind: "FRAMEWORK",
+    parent: "web",
+    aliases: ["next-js", "next.js"],
+  },
+  {
+    slug: "machine-learning",
+    name: "Machine Learning",
+    nameTr: "Makine Öğrenmesi",
+    nameEn: "Machine Learning",
+    kind: "CONCEPT",
+    parent: "ai",
+  },
+] as const satisfies readonly {
+  slug: string;
+  name: string;
+  nameTr?: string;
+  nameEn?: string;
+  kind: TagKind;
+  parent?: string;
+  aliases?: readonly string[];
+}[];
+
+const tagLinks = (...slugs: string[]) => ({
+  create: slugs.map((slug) => ({ source: "MANUAL" as const, tag: { connect: { slug } } })),
+});
 
 export async function seed(prisma: PrismaClient): Promise<void> {
   await prisma.profile.upsert({
@@ -30,7 +64,19 @@ export async function seed(prisma: PrismaClient): Promise<void> {
   });
 
   for (const tag of TAGS) {
-    await prisma.tag.upsert({ where: { slug: tag.slug }, update: {}, create: tag });
+    const { parent, aliases, ...data } = tag as (typeof TAGS)[number] & {
+      parent?: string;
+      aliases?: readonly string[];
+    };
+    await prisma.tag.upsert({
+      where: { slug: tag.slug },
+      update: {},
+      create: {
+        ...data,
+        ...(parent ? { parent: { connect: { slug: parent } } } : {}),
+        ...(aliases ? { aliases: { create: aliases.map((alias) => ({ alias })) } } : {}),
+      },
+    });
   }
 
   await prisma.siteSettings.upsert({
@@ -63,7 +109,7 @@ export async function seed(prisma: PrismaClient): Promise<void> {
       githubUrl: "https://github.com/example/sample-project",
       featured: true,
       published: true,
-      tags: { connect: [{ slug: "typescript" }, { slug: "nextjs" }] },
+      tags: tagLinks("typescript", "nextjs"),
     },
   });
 
@@ -77,7 +123,7 @@ export async function seed(prisma: PrismaClient): Promise<void> {
       summaryTr: "Yayımlanmamış proje.",
       summaryEn: "Unpublished project.",
       published: false,
-      tags: { connect: [{ slug: "python" }] },
+      tags: tagLinks("python"),
     },
   });
 
@@ -95,7 +141,7 @@ export async function seed(prisma: PrismaClient): Promise<void> {
         startDate: new Date("2025-06-16"),
         endDate: new Date("2025-07-11"),
         published: true,
-        tags: { connect: [{ slug: "python" }] },
+        tags: tagLinks("python"),
       },
     });
   }
@@ -113,7 +159,7 @@ export async function seed(prisma: PrismaClient): Promise<void> {
       contentEn: "<p>Hello world.</p>",
       published: true,
       authorId: SEED_ADMIN_ID,
-      tags: { connect: [{ slug: "machine-learning" }] },
+      tags: tagLinks("machine-learning"),
     },
   });
 

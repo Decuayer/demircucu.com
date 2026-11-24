@@ -9,10 +9,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Briefcase, ArrowRight, Calendar } from "lucide-react";
 import { getTranslated } from "@/lib/i18n-utils";
 
-import { type Experience } from "@prisma/client";
+import type { PublicExperience } from "@/lib/types/content";
+import { tagLabel } from "@/lib/tags/view";
 
 interface ExperienceClientProps {
-  experiences: (Experience & { tags: { id: string; nameTr: string; nameEn: string }[] })[];
+  experiences: PublicExperience[];
 }
 
 export default function ExperienceClient({ experiences }: ExperienceClientProps) {
@@ -105,7 +106,7 @@ export default function ExperienceClient({ experiences }: ExperienceClientProps)
                               variant="secondary"
                               className="bg-accent/50 text-xs"
                             >
-                              {getTranslated(tag, "name", locale)}
+                              {tagLabel(tag, locale)}
                             </Badge>
                           ))}
                         </div>

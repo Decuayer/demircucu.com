@@ -24,16 +24,144 @@ model Profile {
   likes    Like[]
 }
 
+enum TagKind {
+  LANGUAGE
+  FRAMEWORK
+  LIBRARY
+  DATABASE
+  TOOL
+  PLATFORM
+  CLOUD
+  CONCEPT
+  DOMAIN
+  TOPIC
+}
+
+/// How a tag got attached to a piece of content. Sync only adds or removes GITHUB / LANGUAGE rows;
+/// MANUAL rows belong to the admin.
+enum TagSource {
+  GITHUB
+  MANUAL
+  LANGUAGE
+}
+
+/// Canonical skill / tag. Categories are root nodes of the same tree (`parentId` null); cycles
+/// are rejected by the `tag_parent_no_cycle` trigger.
 model Tag {
-  id        String   @id @default(cuid())
-  nameTr    String   @unique
-  nameEn    String   @unique
-  slug      String   @unique
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  /// Canonical display name with correct casing ("C++", "Next.js").
+  name          String
+  /// Only for concepts that need translating ("Makine Öğrenmesi" / "Machine Learning").
+  nameTr        String?
+  nameEn        String?
+  kind          TagKind  @default(TOPIC)
+  parentId      String?
+  isSkill       Boolean  @default(true)
+  /// simple-icons slug.
+  icon          String?
+  descriptionTr String?  @db.Text
+  descriptionEn String?  @db.Text
+  order         Int      @default(0)
+  hidden        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+
+  parent   Tag?       @relation("TagTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children Tag[]      @relation("TagTree")
+  aliases  TagAlias[]
+
+  projectTags    ProjectTag[]
+  experienceTags ExperienceTag[]
+  blogPostTags   BlogPostTag[]
+  unmappedTopics UnmappedTopic[]
+
+  // Legacy implicit many-to-many relations (`_ProjectToTag` ...). Copied to the explicit join
+  // tables by the expand migration; dropped by the contract migration. Not used by the app.
+  legacyExperiences Experience[] @relation("ExperienceToTag")
+  legacyProjects    Project[]    @relation("ProjectToTag")
+  legacyBlogPosts   BlogPost[]   @relation("BlogPostToTag")
+
+  @@index([parentId])
+}
+
+/// Alternative spellings that resolve to a tag (`cplusplus`, `c++` -> `cpp`). The primary key
+/// makes an alias unique across all tags; the `tag_alias_not_slug` trigger keeps an alias from
+/// shadowing another tag's slug.
+model TagAlias {
+  alias     String   @id
+  tagId     String
   createdAt DateTime @default(now())
 
-  experiences Experience[]
-  projects    Project[]
-  blogPosts   BlogPost[]
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@index([tagId])
+}
+
+model ProjectTag {
+  projectId String
+  tagId     String
+  source    TagSource @default(MANUAL)
+  /// GitHub-derived tags cannot be removed by hand, only hidden.
+  hidden    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Restrict)
+
+  @@id([projectId, tagId])
+  @@index([tagId])
+}
+
+model ExperienceTag {
+  experienceId String
+  tagId        String
+  source       TagSource @default(MANUAL)
+  hidden       Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+
+  experience Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  tag        Tag        @relation(fields: [tagId], references: [id], onDelete: Restrict)
+
+  @@id([experienceId, tagId])
+  @@index([tagId])
+}
+
+model BlogPostTag {
+  blogPostId String
+  tagId      String
+  source     TagSource @default(MANUAL)
+  hidden     Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+
+  blogPost BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Restrict)
+
+  @@id([blogPostId, tagId])
+  @@index([tagId])
+}
+
+enum UnmappedTopicStatus {
+  PENDING
+  MAPPED
+  IGNORED
+}
+
+/// GitHub topics that match no tag slug or alias; reviewed in the admin panel.
+model UnmappedTopic {
+  /// Canonicalised topic.
+  topic       String              @id
+  status      UnmappedTopicStatus @default(PENDING)
+  tagId       String?
+  /// Repository full names the topic was last seen on.
+  seenIn      String[]            @default([])
+  firstSeenAt DateTime            @default(now())
+  lastSeenAt  DateTime            @default(now())
+  resolvedAt  DateTime?
+
+  tag Tag? @relation(fields: [tagId], references: [id], onDelete: SetNull)
+
+  @@index([status])
 }
 
 model Experience {
@@ -47,60 +175,201 @@ model Experience {
   detailsEn     String?   @db.Text
   startDate     DateTime
   endDate       DateTime?
-  tags          Tag[]
-  logo          String?
-  images        String[]
-  files         Json? // Array of { name: string, url: string, type: string }
+  /// Storage path of the logo in the `media` bucket.
+  logoPath      String?
+  /// Array of { name, path } (own media) or { name, url } (external link); see lib/media/attachments.
+  files         Json?
   githubUrl     String?
   order         Int       @default(0)
   published     Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  logoMedia MediaFile?      @relation("ExperienceLogo", fields: [logoPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
+  tags      ExperienceTag[]
+
+  /// Legacy, dropped by the contract migration. Not used by the app.
+  logo       String?
+  /// Legacy, dropped by the contract migration. Not used by the app.
+  images     String[]
+  legacyTags Tag[]    @relation("ExperienceToTag")
 }
 
+enum ProjectSource {
+  MANUAL
+  GITHUB
+}
+
+enum SyncStatus {
+  OK
+  ERROR
+  PENDING
+}
+
+/// Title, summary and description are overrides: when empty the GitHub value is shown, and the
+/// sync never writes them.
 model Project {
-  id            String   @id @default(cuid())
-  titleTr       String
-  titleEn       String
-  slug          String   @unique
-  summaryTr     String
-  summaryEn     String
-  descriptionTr String?  @db.Text
-  descriptionEn String?  @db.Text
-  tags          Tag[]
-  files         Json? // Array of { name: string, url: string, type: string }
-  logo          String?
-  images        String[]
+  id            String        @id @default(cuid())
+  source        ProjectSource @default(MANUAL)
+  titleTr       String?
+  titleEn       String?
+  slug          String        @unique
+  summaryTr     String?
+  summaryEn     String?
+  descriptionTr String?       @db.Text
+  descriptionEn String?       @db.Text
+  /// Array of { name, path } (own media) or { name, url } (external link); see lib/media/attachments.
+  files         Json?
+  /// Storage path of the logo / cover in the `media` bucket.
+  logoPath      String?
   githubUrl     String?
   liveUrl       String?
-  featured      Boolean  @default(false)
-  published     Boolean  @default(true)
-  order         Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  featured      Boolean       @default(false)
+  published     Boolean       @default(true)
+  order         Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // GitHub (filled by the sync, never by the admin forms)
+  /// GitHub repository ids already exceed 1e9; BigInt avoids the int32 ceiling.
+  githubRepoId      BigInt?     @unique
+  githubFullName    String?
+  defaultBranch     String?
+  githubDescription String?
+  homepage          String?
+  primaryLanguage   String?
+  /// { [language]: bytes } as returned by the languages endpoint.
+  languages         Json?
+  license           String?
+  /// Raw topics as on GitHub (before canonicalisation), for auditing the mapping.
+  topics            String[]    @default([])
+  stars             Int         @default(0)
+  forks             Int         @default(0)
+  isArchived        Boolean     @default(false)
+  isFork            Boolean     @default(false)
+  pushedAt          DateTime?
+  repoCreatedAt     DateTime?
+  readmeMarkdown    String?     @db.Text
+  /// Sanitised README HTML with rewritten URLs; rendered as is.
+  readmeHtml        String?     @db.Text
+  readmeSha         String?
+  readmeEtag        String?
+  languagesEtag     String?
+  treeSha           String?
+  lastSyncedAt      DateTime?
+  syncStatus        SyncStatus?
+  syncError         String?
+
+  logoMedia   MediaFile?           @relation("ProjectLogo", fields: [logoPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
+  tags        ProjectTag[]
+  documents   ProjectDocument[]
+  slugHistory ProjectSlugHistory[]
+
+  /// Legacy, dropped by the contract migration. Not used by the app.
+  logo       String?
+  /// Legacy, dropped by the contract migration. Not used by the app.
+  images     String[]
+  legacyTags Tag[]    @relation("ProjectToTag")
+}
+
+/// PDFs found in a repository (README links and the tree), mirrored to the media library.
+model ProjectDocument {
+  id          String   @id @default(cuid())
+  projectId   String
+  title       String
+  /// Path inside the repository.
+  repoPath    String
+  mediaFileId String
+  mimeType    String
+  size        Int
+  /// Git blob sha; unchanged sha means no re-download.
+  sha         String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  mediaFile MediaFile @relation(fields: [mediaFileId], references: [id], onDelete: Restrict)
+
+  @@unique([projectId, repoPath])
+  @@index([mediaFileId])
+}
+
+/// Previous slugs of a project (renamed repository, slug normalisation); served as 301 redirects.
+model ProjectSlugHistory {
+  slug      String   @id
+  projectId String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+enum SyncTrigger {
+  MANUAL
+  CRON
+  WEBHOOK
+}
+
+enum SyncRunStatus {
+  RUNNING
+  OK
+  PARTIAL
+  ERROR
+}
+
+/// One GitHub sync run (all repositories or one), shown as the sync log in the admin panel.
+model GithubSyncRun {
+  id         String        @id @default(cuid())
+  trigger    SyncTrigger
+  /// Repository full name for a single-repo run; null for a full run.
+  scope      String?
+  status     SyncRunStatus @default(RUNNING)
+  /// Counters: repos seen / created / updated / unchanged / failed, media mirrored, requests used.
+  stats      Json?
+  error      String?
+  startedAt  DateTime      @default(now())
+  finishedAt DateTime?
+
+  @@index([startedAt])
+}
+
+/// ETags for conditional GitHub requests that do not belong to one project (repository list).
+model GithubEtag {
+  key       String   @id
+  etag      String
+  updatedAt DateTime @updatedAt
 }
 
 model BlogPost {
-  id         String   @id @default(cuid())
-  titleTr    String
-  titleEn    String
-  slug       String   @unique
-  excerptTr  String
-  excerptEn  String
-  contentTr  String   @db.Text
-  contentEn  String   @db.Text
-  coverImage String?
-  tags       Tag[]
-  files      Json? // Array of { name: string, url: string, type: string }
-  published  Boolean  @default(false)
-  featured   Boolean  @default(false)
-  viewCount  Int      @default(0)
-  authorId   String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  titleTr   String
+  titleEn   String
+  slug      String   @unique
+  excerptTr String
+  excerptEn String
+  contentTr String   @db.Text
+  contentEn String   @db.Text
+  /// Storage path of the cover image in the `media` bucket.
+  coverPath String?
+  /// Array of { name, path } (own media) or { name, url } (external link); see lib/media/attachments.
+  files     Json?
+  published Boolean  @default(false)
+  featured  Boolean  @default(false)
+  viewCount Int      @default(0)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  comments Comment[]
-  likes    Like[]
+  comments   Comment[]
+  likes      Like[]
+  coverMedia MediaFile?    @relation("BlogPostCover", fields: [coverPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
+  tags       BlogPostTag[]
+
+  /// Legacy, dropped by the contract migration. Not used by the app.
+  coverImage String?
+  legacyTags Tag[]   @relation("BlogPostToTag")
 }
 
 model Comment {
@@ -141,16 +410,72 @@ model ContactMessage {
   createdAt DateTime @default(now())
 }
 
+enum MediaSource {
+  UPLOAD
+  GITHUB
+}
+
+/// A file in the `media` bucket. Content stores the storage `path`; the public URL is derived at
+/// render time (lib/media/url.ts), so rows stay valid across environments and hosts.
 model MediaFile {
-  id        String   @id @default(cuid())
-  name      String
-  url       String   @unique
-  type      String
-  size      Int
-  bucket    String   @default("media")
-  path      String
-  usedIn    String?
-  createdAt DateTime @default(now())
+  id           String      @id @default(cuid())
+  name         String
+  type         String
+  size         Int
+  bucket       String      @default("media")
+  path         String      @unique
+  source       MediaSource @default(UPLOAD)
+  /// Where a mirrored file was downloaded from.
+  originUrl    String?
+  repoFullName String?
+  /// sha256 of the stored bytes; one row per distinct content.
+  contentHash  String?     @unique
+  width        Int?
+  height       Int?
+  blurDataUrl  String?     @db.Text
+  altTr        String?
+  altEn        String?
+  createdAt    DateTime    @default(now())
+
+  usages             MediaUsage[]
+  documents          ProjectDocument[]
+  projectLogos       Project[]         @relation("ProjectLogo")
+  experienceLogos    Experience[]      @relation("ExperienceLogo")
+  blogPostCovers     BlogPost[]        @relation("BlogPostCover")
+  settingsAboutPhoto SiteSettings[]    @relation("SettingsAboutPhoto")
+  settingsFavicon    SiteSettings[]    @relation("SettingsFavicon")
+
+  /// Legacy, dropped by the contract migration. Not written by the app.
+  url    String? @unique
+  /// Legacy, dropped by the contract migration. Replaced by MediaUsage and the relations above.
+  usedIn String?
+
+  @@index([source, repoFullName])
+}
+
+enum MediaEntityType {
+  PROJECT
+  EXPERIENCE
+  BLOG_POST
+  SITE_SETTINGS
+}
+
+/// References to media that cannot be a column foreign key: attachment lists, images inside
+/// rich text and README HTML. Rewritten in the same transaction as the owning row; Restrict keeps
+/// a referenced file from being deleted.
+model MediaUsage {
+  id          String          @id @default(cuid())
+  mediaFileId String
+  entityType  MediaEntityType
+  entityId    String
+  /// "files", "content", "readme", "aboutBio" ...
+  field       String
+  createdAt   DateTime        @default(now())
+
+  mediaFile MediaFile @relation(fields: [mediaFileId], references: [id], onDelete: Restrict)
+
+  @@unique([mediaFileId, entityType, entityId, field])
+  @@index([entityType, entityId])
 }
 
 model SiteSettings {
@@ -163,7 +488,8 @@ model SiteSettings {
   // About
   aboutBioTr          String?  @db.Text
   aboutBioEn          String?  @db.Text
-  aboutPhoto          String?
+  /// Storage path in the `media` bucket.
+  aboutPhotoPath      String?
   aboutLocationTr     String?
   aboutLocationEn     String?
   aboutExperienceTr   String?
@@ -197,9 +523,18 @@ model SiteSettings {
   siteTitleEn         String?
   siteDescriptionTr   String?  @db.Text
   siteDescriptionEn   String?  @db.Text
-  faviconUrl          String?
+  /// Storage path in the `media` bucket.
+  faviconPath         String?
   // Meta
   updatedAt           DateTime @updatedAt
+
+  aboutPhotoMedia MediaFile? @relation("SettingsAboutPhoto", fields: [aboutPhotoPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
+  faviconMedia    MediaFile? @relation("SettingsFavicon", fields: [faviconPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
+
+  /// Legacy, dropped by the contract migration. Not used by the app.
+  aboutPhoto String?
+  /// Legacy, dropped by the contract migration. Not used by the app.
+  faviconUrl String?
 }
 
 /// Fixed-window rate limit counters (lib/rate-limit). `key` is `<bucket>:<sha256(identifier)>`;
@@ -210,4 +545,105 @@ model RateLimitBucket {
   windowStart DateTime @default(now())
 
   @@index([windowStart])
+}
+
+// --- Analytics (task 8.1, approach a: self-hosted, cookieless) --------------------------------
+// Raw events (PageView, OutboundClick) are kept for 90 days; DailyStat is kept forever.
+// No raw IP address is stored. Bot traffic is not stored as events; it is counted in DailyStat
+// under dimension "bot".
+
+enum AnalyticsEntityType {
+  HOME
+  PROJECT
+  BLOG
+  EXPERIENCE
+  SKILL
+  PAGE
+}
+
+enum DeviceType {
+  DESKTOP
+  MOBILE
+  TABLET
+  OTHER
+}
+
+model PageView {
+  id           String              @id @default(cuid())
+  createdAt    DateTime            @default(now())
+  path         String
+  locale       String
+  entityType   AnalyticsEntityType
+  entityId     String?
+  referrerHost String?
+  utmSource    String?
+  utmMedium    String?
+  utmCampaign  String?
+  /// ISO 3166-1 alpha-2 from the hosting platform's geo header.
+  country      String?
+  deviceType   DeviceType          @default(OTHER)
+  browser      String?
+  os           String?
+  /// sha256(daily salt + IP + user agent); the salt is deleted after its day, so hashes from
+  /// different days cannot be linked.
+  visitorHash  String
+  sessionId    String?
+  /// Engagement, updated by a beacon when the page is left.
+  durationMs   Int?
+  /// 0-100.
+  scrollDepth  Int?
+
+  outboundClicks OutboundClick[]
+
+  @@index([createdAt])
+  @@index([entityType, entityId, createdAt])
+  @@index([path, createdAt])
+  @@index([visitorHash, path, createdAt])
+}
+
+enum OutboundTarget {
+  GITHUB
+  LIVE
+  DOCUMENT
+  OTHER
+}
+
+model OutboundClick {
+  id          String              @id @default(cuid())
+  createdAt   DateTime            @default(now())
+  pageViewId  String?
+  entityType  AnalyticsEntityType
+  entityId    String?
+  target      OutboundTarget
+  targetHost  String
+  visitorHash String
+
+  pageView PageView? @relation(fields: [pageViewId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([entityType, entityId, createdAt])
+}
+
+/// Daily aggregates. `entityKey` is the entity id, or the path for PAGE, or "" for site totals.
+/// `dimension` is "total" (value "") or one of referrer, country, device, browser, os, locale,
+/// outbound, bot. Unique visitors are per day; longer ranges sum the daily values (approximate).
+model DailyStat {
+  date       DateTime            @db.Date
+  entityType AnalyticsEntityType
+  entityKey  String              @default("")
+  dimension  String              @default("total")
+  value      String              @default("")
+  views      Int                 @default(0)
+  visitors   Int                 @default(0)
+
+  @@id([date, entityType, entityKey, dimension, value])
+  @@index([entityType, entityKey, dimension, date])
+  @@index([dimension, date])
+}
+
+/// One random salt per UTC day for visitor hashes; rows older than the current day are deleted.
+model AnalyticsSalt {
+  date      DateTime @id @db.Date
+  salt      String
+  createdAt DateTime @default(now())
 }

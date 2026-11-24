@@ -10,9 +10,10 @@ import { Newspaper, Eye, Clock, ArrowRight, TrendingUp } from "lucide-react";
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
-import { type BlogPost, type Tag } from "@prisma/client";
+import type { PublicPost } from "@/lib/types/content";
+import { tagLabel } from "@/lib/tags/view";
 
-type BlogPostWithTags = BlogPost & { tags: Tag[] };
+type BlogPostWithTags = PublicPost;
 
 function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
   const params = useParams();
@@ -50,7 +51,7 @@ function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <Badge key={tag.id} variant="secondary" className="bg-accent/50 text-xs">
-                  {getTranslated(tag, "name", locale)}
+                  {tagLabel(tag, locale)}
                 </Badge>
               ))}
             </div>

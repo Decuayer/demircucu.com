@@ -1,6 +1,6 @@
 "use client";
 
-import type { SiteSettings } from "@prisma/client";
+import type { PublicSiteSettings } from "@/lib/types/content";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Mail } from "lucide-react";
@@ -25,7 +25,7 @@ const footerLinks = [
 ] as const;
 
 interface FooterProps {
-  settings?: SiteSettings | null;
+  settings?: PublicSiteSettings | null;
   /** Passed from a cached server value; never `new Date()` during render (static shell). */
   year: number;
 }

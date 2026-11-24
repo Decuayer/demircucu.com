@@ -13,47 +13,19 @@ import {
   type BlogPostInput,
   type ExperienceInput,
   type ProjectInput,
-  type TagInput,
 } from "@/lib/validation/content";
+import { attachmentPaths, type Attachment } from "@/lib/media/attachments";
+import { mediaPathsInHtml } from "@/lib/media/url";
+import { clearMediaUsage, syncMediaUsage } from "@/lib/media/usage";
+import { replaceManualTags, resolveTagIds } from "@/lib/tags/content-tags";
 import { z } from "zod";
 
-/**
- * Resolves the tag selector's free-text tags to existing tags (by slug, then by either name) and
- * creates only the ones that are really new. The selector derives slugs from names
- * ("Next.js" -> "next-js"), which used to miss the existing "nextjs" tag and then fail on the
- * unique name. Replaced by the canonical tag system in Phase 4.
- */
-async function connectTags(tags: TagInput[] | undefined, replace: boolean) {
-  if (!tags) return undefined;
-  const existing = await prisma.tag.findMany({
-    where: {
-      OR: [
-        { slug: { in: tags.map((t) => t.slug) } },
-        { nameTr: { in: tags.map((t) => t.nameTr) } },
-        { nameEn: { in: tags.map((t) => t.nameEn) } },
-      ],
-    },
-    select: { id: true, slug: true, nameTr: true, nameEn: true },
-  });
-  const connect: { id: string }[] = [];
-  const create: TagInput[] = [];
-  for (const tag of tags) {
-    const match = existing.find(
-      (e) => e.slug === tag.slug || e.nameTr === tag.nameTr || e.nameEn === tag.nameEn,
-    );
-    if (match) connect.push({ id: match.id });
-    else if (!create.some((c) => c.slug === tag.slug)) create.push(tag);
-  }
-  return {
-    ...(replace ? { set: [] } : {}),
-    connect,
-    create: create.map(({ slug, nameTr, nameEn }) => ({ slug, nameTr, nameEn })),
-  };
-}
-
-function filesJson(files: { name: string; url: string; type?: string }[] | undefined) {
+function filesJson(files: Attachment[] | undefined) {
   return files ? (files as Prisma.InputJsonValue) : undefined;
 }
+
+const htmlPaths = (...html: (string | null | undefined)[]) =>
+  html.flatMap((h) => mediaPathsInHtml(h));
 
 // --- PROJECTS -------------------------------------------------------------------------------
 
@@ -61,9 +33,18 @@ export async function createProject(input: ProjectInput): Promise<ActionResult<{
   try {
     await requireAdmin();
     const { tagsList, filesList, ...data } = projectSchema.parse(input);
-    const project = await prisma.project.create({
-      data: { ...data, files: filesJson(filesList), tags: await connectTags(tagsList, false) },
-      select: { id: true, slug: true },
+    const files: Attachment[] | undefined = filesList;
+    const project = await prisma.$transaction(async (tx) => {
+      const created = await tx.project.create({
+        data: { ...data, files: filesJson(files) },
+        select: { id: true, slug: true },
+      });
+      await replaceManualTags(tx, "project", created.id, await resolveTagIds(tx, tagsList ?? []));
+      await syncMediaUsage(tx, "PROJECT", created.id, {
+        required: { files: attachmentPaths(files) },
+        optional: { description: htmlPaths(data.descriptionTr, data.descriptionEn) },
+      });
+      return created;
     });
     invalidate({ entity: "project", slug: project.slug });
     return ok({ id: project.id });
@@ -77,14 +58,23 @@ export async function updateProject(idInput: string, input: ProjectInput): Promi
     await requireAdmin();
     const id = idSchema.parse(idInput);
     const { tagsList, filesList, ...data } = projectSchema.parse(input);
-    const previous = await prisma.project.findUniqueOrThrow({
-      where: { id },
-      select: { slug: true },
-    });
-    const project = await prisma.project.update({
-      where: { id },
-      data: { ...data, files: filesJson(filesList), tags: await connectTags(tagsList, true) },
-      select: { slug: true },
+    const files: Attachment[] | undefined = filesList;
+    const { previous, project } = await prisma.$transaction(async (tx) => {
+      const previous = await tx.project.findUniqueOrThrow({
+        where: { id },
+        select: { slug: true },
+      });
+      const project = await tx.project.update({
+        where: { id },
+        data: { ...data, files: filesJson(files) },
+        select: { slug: true },
+      });
+      if (tagsList) await replaceManualTags(tx, "project", id, await resolveTagIds(tx, tagsList));
+      await syncMediaUsage(tx, "PROJECT", id, {
+        required: { files: attachmentPaths(files) },
+        optional: { description: htmlPaths(data.descriptionTr, data.descriptionEn) },
+      });
+      return { previous, project };
     });
     invalidate({ entity: "project", slug: project.slug, previousSlug: previous.slug });
     return ok();
@@ -97,7 +87,10 @@ export async function deleteProject(idInput: string): Promise<ActionResult> {
   try {
     await requireAdmin();
     const id = idSchema.parse(idInput);
-    const project = await prisma.project.delete({ where: { id }, select: { slug: true } });
+    const project = await prisma.$transaction(async (tx) => {
+      await clearMediaUsage(tx, "PROJECT", id);
+      return tx.project.delete({ where: { id }, select: { slug: true } });
+    });
     invalidate({ entity: "project", slug: project.slug });
     return ok();
   } catch (error) {
@@ -113,14 +106,23 @@ export async function createExperience(
   try {
     await requireAdmin();
     const { tagsList, filesList, endDate, ...data } = experienceSchema.parse(input);
-    const experience = await prisma.experience.create({
-      data: {
-        ...data,
-        endDate: endDate ?? null,
-        files: filesJson(filesList),
-        tags: await connectTags(tagsList, false),
-      },
-      select: { id: true },
+    const files: Attachment[] | undefined = filesList;
+    const experience = await prisma.$transaction(async (tx) => {
+      const created = await tx.experience.create({
+        data: { ...data, endDate: endDate ?? null, files: filesJson(files) },
+        select: { id: true },
+      });
+      await replaceManualTags(
+        tx,
+        "experience",
+        created.id,
+        await resolveTagIds(tx, tagsList ?? []),
+      );
+      await syncMediaUsage(tx, "EXPERIENCE", created.id, {
+        required: { files: attachmentPaths(files) },
+        optional: { details: htmlPaths(data.detailsTr, data.detailsEn) },
+      });
+      return created;
     });
     invalidate({ entity: "experience", id: experience.id });
     return ok({ id: experience.id });
@@ -137,15 +139,23 @@ export async function updateExperience(
     await requireAdmin();
     const id = idSchema.parse(idInput);
     const { tagsList, filesList, endDate, ...data } = experienceSchema.parse(input);
-    await prisma.experience.update({
-      where: { id },
-      data: {
-        ...data,
-        // The form omits endDate for ongoing positions; clear it instead of keeping the old one.
-        endDate: endDate ?? null,
-        files: filesJson(filesList),
-        tags: await connectTags(tagsList, true),
-      },
+    const files: Attachment[] | undefined = filesList;
+    await prisma.$transaction(async (tx) => {
+      await tx.experience.update({
+        where: { id },
+        data: {
+          ...data,
+          // The form omits endDate for ongoing positions; clear it instead of keeping the old one.
+          endDate: endDate ?? null,
+          files: filesJson(files),
+        },
+      });
+      if (tagsList)
+        await replaceManualTags(tx, "experience", id, await resolveTagIds(tx, tagsList));
+      await syncMediaUsage(tx, "EXPERIENCE", id, {
+        required: { files: attachmentPaths(files) },
+        optional: { details: htmlPaths(data.detailsTr, data.detailsEn) },
+      });
     });
     invalidate({ entity: "experience", id });
     return ok();
@@ -158,7 +168,10 @@ export async function deleteExperience(idInput: string): Promise<ActionResult> {
   try {
     await requireAdmin();
     const id = idSchema.parse(idInput);
-    await prisma.experience.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+      await clearMediaUsage(tx, "EXPERIENCE", id);
+      await tx.experience.delete({ where: { id } });
+    });
     invalidate({ entity: "experience", id });
     return ok();
   } catch (error) {
@@ -172,14 +185,18 @@ export async function createBlogPost(input: BlogPostInput): Promise<ActionResult
   try {
     const admin = await requireAdmin();
     const { tagsList, filesList, ...data } = blogPostSchema.parse(input);
-    const post = await prisma.blogPost.create({
-      data: {
-        ...data,
-        files: filesJson(filesList),
-        tags: await connectTags(tagsList, false),
-        authorId: admin.id,
-      },
-      select: { id: true, slug: true },
+    const files: Attachment[] | undefined = filesList;
+    const post = await prisma.$transaction(async (tx) => {
+      const created = await tx.blogPost.create({
+        data: { ...data, files: filesJson(files), authorId: admin.id },
+        select: { id: true, slug: true },
+      });
+      await replaceManualTags(tx, "blogPost", created.id, await resolveTagIds(tx, tagsList ?? []));
+      await syncMediaUsage(tx, "BLOG_POST", created.id, {
+        required: { files: attachmentPaths(files) },
+        optional: { content: htmlPaths(data.contentTr, data.contentEn) },
+      });
+      return created;
     });
     invalidate({ entity: "post", slug: post.slug });
     return ok({ id: post.id });
@@ -193,14 +210,23 @@ export async function updateBlogPost(idInput: string, input: BlogPostInput): Pro
     await requireAdmin();
     const id = idSchema.parse(idInput);
     const { tagsList, filesList, ...data } = blogPostSchema.parse(input);
-    const previous = await prisma.blogPost.findUniqueOrThrow({
-      where: { id },
-      select: { slug: true },
-    });
-    const post = await prisma.blogPost.update({
-      where: { id },
-      data: { ...data, files: filesJson(filesList), tags: await connectTags(tagsList, true) },
-      select: { slug: true },
+    const files: Attachment[] | undefined = filesList;
+    const { previous, post } = await prisma.$transaction(async (tx) => {
+      const previous = await tx.blogPost.findUniqueOrThrow({
+        where: { id },
+        select: { slug: true },
+      });
+      const post = await tx.blogPost.update({
+        where: { id },
+        data: { ...data, files: filesJson(files) },
+        select: { slug: true },
+      });
+      if (tagsList) await replaceManualTags(tx, "blogPost", id, await resolveTagIds(tx, tagsList));
+      await syncMediaUsage(tx, "BLOG_POST", id, {
+        required: { files: attachmentPaths(files) },
+        optional: { content: htmlPaths(data.contentTr, data.contentEn) },
+      });
+      return { previous, post };
     });
     invalidate(
       { entity: "post", slug: post.slug, previousSlug: previous.slug },
@@ -216,7 +242,10 @@ export async function deleteBlogPost(idInput: string): Promise<ActionResult> {
   try {
     await requireAdmin();
     const id = idSchema.parse(idInput);
-    const post = await prisma.blogPost.delete({ where: { id }, select: { slug: true } });
+    const post = await prisma.$transaction(async (tx) => {
+      await clearMediaUsage(tx, "BLOG_POST", id);
+      return tx.blogPost.delete({ where: { id }, select: { slug: true } });
+    });
     invalidate({ entity: "post", slug: post.slug }, { entity: "postInteractions", postId: id });
     return ok();
   } catch (error) {

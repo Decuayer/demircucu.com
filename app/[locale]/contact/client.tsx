@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
-import type { SiteSettings } from "@prisma/client";
+import type { PublicSiteSettings } from "@/lib/types/content";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { submitContactMessage } from "@/app/actions/contact";
 
 interface ContactClientProps {
-  settings: SiteSettings | null;
+  settings: PublicSiteSettings | null;
 }
 
 export default function ContactClient({ settings }: ContactClientProps) {

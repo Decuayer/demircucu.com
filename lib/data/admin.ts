@@ -1,6 +1,8 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import type { MediaSource } from "@prisma/client";
 import { requireAdmin } from "@/lib/auth/guards";
+import { allTagsInclude, flattenTags } from "@/lib/tags/view";
 
 /**
  * Admin reads. Every function checks the role itself so a caller can never forget it; none of
@@ -14,7 +16,12 @@ export async function adminListProjects() {
 
 export async function adminGetProject(id: string) {
   await requireAdmin();
-  return prisma.project.findUnique({ where: { id }, include: { tags: true } });
+  const row = await prisma.project.findUnique({
+    where: { id },
+    omit: { logo: true, images: true },
+    include: { tags: allTagsInclude },
+  });
+  return row && { ...row, tags: flattenTags(row.tags, { includeHidden: true }) };
 }
 
 export async function adminListExperiences() {
@@ -24,7 +31,12 @@ export async function adminListExperiences() {
 
 export async function adminGetExperience(id: string) {
   await requireAdmin();
-  return prisma.experience.findUnique({ where: { id }, include: { tags: true } });
+  const row = await prisma.experience.findUnique({
+    where: { id },
+    omit: { logo: true, images: true },
+    include: { tags: allTagsInclude },
+  });
+  return row && { ...row, tags: flattenTags(row.tags, { includeHidden: true }) };
 }
 
 export async function adminListPosts() {
@@ -34,7 +46,12 @@ export async function adminListPosts() {
 
 export async function adminGetPost(id: string) {
   await requireAdmin();
-  return prisma.blogPost.findUnique({ where: { id }, include: { tags: true } });
+  const row = await prisma.blogPost.findUnique({
+    where: { id },
+    omit: { coverImage: true },
+    include: { tags: allTagsInclude },
+  });
+  return row && { ...row, tags: flattenTags(row.tags, { includeHidden: true }) };
 }
 
 export async function adminListContactMessages() {
@@ -42,12 +59,48 @@ export async function adminListContactMessages() {
   return prisma.contactMessage.findMany({ orderBy: { createdAt: "desc" } });
 }
 
-export async function adminListMediaFiles(typePrefix?: string) {
+export interface AdminMediaItem {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  path: string;
+  source: MediaSource;
+  createdAt: Date;
+  /** Content rows that reference the file (foreign keys and MediaUsage). */
+  usageCount: number;
+}
+
+export async function adminListMediaFiles(typePrefix?: string): Promise<AdminMediaItem[]> {
   await requireAdmin();
-  return prisma.mediaFile.findMany({
+  const files = await prisma.mediaFile.findMany({
     where: typePrefix ? { type: { startsWith: typePrefix } } : {},
     orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      type: true,
+      size: true,
+      path: true,
+      source: true,
+      createdAt: true,
+      _count: {
+        select: {
+          usages: true,
+          documents: true,
+          projectLogos: true,
+          experienceLogos: true,
+          blogPostCovers: true,
+          settingsAboutPhoto: true,
+          settingsFavicon: true,
+        },
+      },
+    },
   });
+  return files.map(({ _count, ...file }) => ({
+    ...file,
+    usageCount: Object.values(_count).reduce((sum, n) => sum + n, 0),
+  }));
 }
 
 export async function adminListComments() {
@@ -64,5 +117,8 @@ export async function adminListComments() {
 
 export async function adminGetSiteSettings() {
   await requireAdmin();
-  return prisma.siteSettings.findUnique({ where: { id: "main" } });
+  return prisma.siteSettings.findUnique({
+    where: { id: "main" },
+    omit: { aboutPhoto: true, faviconUrl: true },
+  });
 }

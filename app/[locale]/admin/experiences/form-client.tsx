@@ -13,17 +13,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { TagSelector } from "@/components/ui/tag-selector";
 import { FileUploader } from "@/components/ui/file-uploader";
-import {
-  toFileAttachments,
-  type FileAttachment,
-  type ExperienceWithTags,
-} from "@/lib/types/content";
+import type { AdminExperience } from "@/lib/types/content";
+import { toAttachments, type Attachment } from "@/lib/media/attachments";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { createExperience, updateExperience } from "@/app/actions/admin";
 import { useTranslations } from "next-intl";
 
 interface ExperienceFormClientProps {
-  initialData?: ExperienceWithTags | null;
+  initialData?: AdminExperience | null;
   isEdit?: boolean;
 }
 
@@ -39,7 +36,7 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
   const [company, setCompany] = useState(initialData?.company || "");
   const [positionTr, setPositionTr] = useState(initialData?.positionTr || "");
   const [positionEn, setPositionEn] = useState(initialData?.positionEn || "");
-  const [logo, setLogo] = useState(initialData?.logo || "");
+  const [logo, setLogo] = useState(initialData?.logoPath || "");
   const [descriptionTr, setDescriptionTr] = useState(initialData?.descriptionTr || "");
   const [descriptionEn, setDescriptionEn] = useState(initialData?.descriptionEn || "");
   const [detailsTr, setDetailsTr] = useState(initialData?.detailsTr || "");
@@ -54,13 +51,12 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
 
   // Tags (Mapping relations to simplified objects for the server action)
   const [tags, setTags] = useState<string[]>(() => {
-    const initialTags =
-      initialData?.tags?.map((t) => t.nameTr || t.nameEn || "").filter(Boolean) || [];
+    const initialTags = initialData?.tags?.map((t) => t.name).filter(Boolean) || [];
     return Array.from(new Set(initialTags));
   });
 
   // Files
-  const [files, setFiles] = useState<FileAttachment[]>(() => toFileAttachments(initialData?.files));
+  const [files, setFiles] = useState<Attachment[]>(() => toAttachments(initialData?.files));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +70,7 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
       company,
       positionTr,
       positionEn,
-      logo,
+      logoPath: logo,
       descriptionTr,
       descriptionEn,
       detailsTr,
@@ -168,12 +164,7 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
                 <Label>
                   {t("companyLogo")} ({t("optional")})
                 </Label>
-                <ImageUpload
-                  value={logo}
-                  onChange={setLogo}
-                  folder="experiences"
-                  usedIn={isEdit ? `experience:${initialData?.id}` : undefined}
-                />
+                <ImageUpload value={logo} onChange={setLogo} folder="experiences" />
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -232,12 +223,7 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
               <CardTitle>{t("addedFiles")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <FileUploader
-                files={files}
-                onChange={setFiles}
-                folder="experiences"
-                usedIn={isEdit ? `experience:${initialData?.id}` : undefined}
-              />
+              <FileUploader files={files} onChange={setFiles} folder="experiences" />
             </CardContent>
           </Card>
         </div>

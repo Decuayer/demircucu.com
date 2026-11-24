@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isMediaPath } from "@/lib/media/url";
 
 /** Strips ASCII control characters (except tab/newline) that have no place in form input. */
 
@@ -39,6 +40,18 @@ export const optionalUrl = z
       .max(2048)
       .nullable(),
   )
+  .optional();
+
+/** Storage path inside the media bucket (see lib/media/url.ts). */
+export const mediaPath = z.string().trim().refine(isMediaPath, { error: "invalidMediaPath" });
+
+/** Optional storage path; empty becomes null. Existence is enforced by the foreign key. */
+export const optionalMediaPath = z
+  .string()
+  .trim()
+  .nullish()
+  .transform((value) => (value ? value : null))
+  .pipe(mediaPath.nullable())
   .optional();
 
 /** Legacy slugs contain upper-case letters (normalised in Phase 4); accept them for edits. */

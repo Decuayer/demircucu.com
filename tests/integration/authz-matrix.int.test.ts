@@ -146,7 +146,6 @@ const ADMIN_ACTIONS: ActionCase[] = [
       await prisma.mediaFile.create({
         data: {
           name: "x.png",
-          url: "https://example.test/x.png",
           type: "image/png",
           size: 1,
           path: "general/x.png",
@@ -161,7 +160,6 @@ const ADMIN_ACTIONS: ActionCase[] = [
     run: () =>
       mediaData.saveMediaFile({
         name: "x.png",
-        url: "https://example.test/y.png",
         type: "image/png",
         size: 1,
         bucket: "media",
@@ -305,11 +303,15 @@ describe("tag resolution", () => {
       ],
     });
     expect(result).toEqual({ success: true });
-    const tags = await prisma.project.findUniqueOrThrow({
-      where: { id: project.id },
-      select: { tags: { select: { slug: true }, orderBy: { slug: "asc" } } },
+    const rows = await prisma.projectTag.findMany({
+      where: { projectId: project.id },
+      select: { source: true, tag: { select: { slug: true } } },
+      orderBy: { tag: { slug: "asc" } },
     });
-    expect(tags.tags.map((t) => t.slug)).toEqual(["nextjs", "rust"]);
-    expect(await prisma.tag.count()).toBe(5);
+    expect(rows).toEqual([
+      { source: "MANUAL", tag: { slug: "nextjs" } },
+      { source: "MANUAL", tag: { slug: "rust" } },
+    ]);
+    expect(await prisma.tag.count()).toBe(7);
   });
 });

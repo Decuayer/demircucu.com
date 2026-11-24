@@ -10,10 +10,11 @@ import { GithubIcon } from "@/components/icons";
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 
-import { type Project, type Tag } from "@prisma/client";
+import type { PublicProject } from "@/lib/types/content";
+import { tagLabel } from "@/lib/tags/view";
 
 interface ProjectsClientProps {
-  projects: (Project & { tags: Tag[] })[];
+  projects: PublicProject[];
 }
 
 export default function ProjectsClient({ projects }: ProjectsClientProps) {
@@ -99,7 +100,7 @@ export default function ProjectsClient({ projects }: ProjectsClientProps) {
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
                       <Badge key={tag.id} variant="secondary" className="bg-accent/50 text-xs">
-                        {getTranslated(tag, "name", locale)}
+                        {tagLabel(tag, locale)}
                       </Badge>
                     ))}
                   </div>

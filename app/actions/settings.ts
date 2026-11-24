@@ -6,6 +6,8 @@ import { requireAdmin } from "@/lib/auth/guards";
 import { invalidate } from "@/lib/cache/tags";
 import { ok, toActionFailure, type ActionResult } from "@/lib/actions/result";
 import { siteSettingsSchema, type SiteSettingsInput } from "@/lib/validation/content";
+import { mediaPathsInHtml } from "@/lib/media/url";
+import { syncMediaUsage } from "@/lib/media/usage";
 
 /** Admin only. Unknown keys are rejected (`.strict()`), so no other column can be written. */
 export async function updateSiteSettings(input: SiteSettingsInput): Promise<ActionResult> {
@@ -17,10 +19,18 @@ export async function updateSiteSettings(input: SiteSettingsInput): Promise<Acti
       ...(skills ? { skills: skills as Prisma.InputJsonValue } : {}),
       ...(hobbies ? { hobbies: hobbies as Prisma.InputJsonValue } : {}),
     };
-    await prisma.siteSettings.upsert({
-      where: { id: "main" },
-      update: data,
-      create: { id: "main", ...data },
+    await prisma.$transaction(async (tx) => {
+      const saved = await tx.siteSettings.upsert({
+        where: { id: "main" },
+        update: data,
+        create: { id: "main", ...data },
+        select: { aboutBioTr: true, aboutBioEn: true },
+      });
+      await syncMediaUsage(tx, "SITE_SETTINGS", "main", {
+        optional: {
+          aboutBio: [...mediaPathsInHtml(saved.aboutBioTr), ...mediaPathsInHtml(saved.aboutBioEn)],
+        },
+      });
     });
     invalidate({ entity: "settings" });
     return ok();

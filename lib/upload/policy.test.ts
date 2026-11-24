@@ -57,11 +57,11 @@ describe("uploadFieldsSchema", () => {
     expect(uploadFieldsSchema.parse({ name: "a.png" }).folder).toBe("general");
   });
 
-  it("validates usedIn references", () => {
-    expect(uploadFieldsSchema.safeParse({ name: "a", usedIn: "project:clx123" }).success).toBe(
-      true,
-    );
-    expect(uploadFieldsSchema.safeParse({ name: "a", usedIn: "x:<script>" }).success).toBe(false);
+  it("drops client-supplied fields it does not know (usage is tracked by the database)", () => {
+    expect(uploadFieldsSchema.parse({ name: "a", usedIn: "project:clx123" })).toEqual({
+      name: "a",
+      folder: "general",
+    });
   });
 });
 

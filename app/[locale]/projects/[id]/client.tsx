@@ -9,13 +9,14 @@ import { ArrowLeft, ExternalLink, Code2, FileIcon } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
 import { Link } from "@/i18n/navigation";
 import { getTranslated } from "@/lib/i18n-utils";
-import { toFileAttachments } from "@/lib/types/content";
+import { attachmentHref, toAttachments } from "@/lib/media/attachments";
 import { useParams } from "next/navigation";
 
-import { type Project, type Tag } from "@prisma/client";
+import type { PublicProject } from "@/lib/types/content";
+import { tagLabel } from "@/lib/tags/view";
 
 interface ProjectDetailClientProps {
-  project: Project & { tags: Tag[] };
+  project: PublicProject;
 }
 
 export default function ProjectDetailClient({ project }: ProjectDetailClientProps) {
@@ -38,11 +39,11 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
           <div className="mb-8">
             <div className="mb-4 flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20">
-                {project.logo ? (
+                {project.logoUrl ? (
                   // TODO(phase-6): migrate to next/image once remotePatterns cover all logo hosts.
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={project.logo}
+                    src={project.logoUrl}
                     alt={getTranslated(project, "title", locale)}
                     className="h-10 w-10 rounded object-contain"
                   />
@@ -88,7 +89,7 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
               <div className="flex flex-wrap gap-2">
                 {project.tags.map((tag) => (
                   <Badge key={tag.id} variant="secondary" className="bg-accent/50">
-                    {getTranslated(tag, "name", locale)}
+                    {tagLabel(tag, locale)}
                   </Badge>
                 ))}
               </div>
@@ -117,8 +118,13 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
                 Ekli Dosyalar
               </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {toFileAttachments(project.files).map((file, i) => (
-                  <a key={i} href={file.url} target="_blank" rel="noopener noreferrer">
+                {toAttachments(project.files).map((file, i) => (
+                  <a
+                    key={i}
+                    href={attachmentHref(file) ?? undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
                       <CardContent className="flex items-center justify-between p-4">
                         <div className="flex items-center gap-3 overflow-hidden">

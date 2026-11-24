@@ -103,7 +103,7 @@ import {
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
-import type { SiteSettings } from "@prisma/client";
+import type { PublicSiteSettings } from "@/lib/types/content";
 import type { HobbySetting, SkillSetting } from "@/lib/types/content";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -192,7 +192,7 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 interface AboutClientProps {
-  settings: SiteSettings | null;
+  settings: PublicSiteSettings | null;
 }
 
 export default function AboutClient({ settings }: AboutClientProps) {
@@ -273,10 +273,10 @@ export default function AboutClient({ settings }: AboutClientProps) {
             <div className="mb-10 flex justify-center md:float-left md:mr-10 md:mb-8 md:block">
               <div className="relative">
                 <div className="flex h-64 w-64 items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20 shadow-2xl md:h-72 md:w-72">
-                  {settings?.aboutPhoto ? (
+                  {settings?.aboutPhotoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={settings.aboutPhoto}
+                      src={settings.aboutPhotoUrl}
                       alt="Profile"
                       className="h-full w-full object-cover"
                     />

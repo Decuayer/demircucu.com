@@ -303,7 +303,10 @@
     "commentHidden": "Comment hidden.",
     "commentShown": "Comment visible again.",
     "commentDeleted": "Comment deleted.",
-    "commentDeleteConfirm": "Delete this comment permanently?"
+    "commentDeleteConfirm": "Delete this comment permanently?",
+    "publicUrl": "Public URL",
+    "urlCopied": "URL copied.",
+    "usageCount": "{count, plural, =0 {Not used} one {Used in # place} other {Used in # places}}"
   },
   "common": {
     "loading": "Loading...",
@@ -333,6 +336,7 @@
     "weakPassword": "This password is too weak or appears in a list of leaked passwords.",
     "unsupportedType": "This file type is not supported.",
     "tooLarge": "The file exceeds the size limit.",
+    "mediaInUse": "This file is used by content; remove it from there first.",
     "serverError": "Something went wrong. Please try again."
   },
   "validation": {
@@ -345,6 +349,26 @@
     "messageTooShort": "Message must be at least 10 characters.",
     "invalidUrl": "Enter a valid http(s) URL.",
     "invalidSlug": "Use only letters, digits and dashes.",
-    "endBeforeStart": "End date cannot be before the start date."
+    "endBeforeStart": "End date cannot be before the start date.",
+    "invalidMediaPath": "Invalid media file."
+  },
+  "uploader": {
+    "uploading": "Uploading...",
+    "notAnImage": "Please choose a valid image.",
+    "imageUploaded": "Image uploaded.",
+    "fileUploaded": "File uploaded.",
+    "imageDropHint": "Click or drag an image here to upload",
+    "imageTypes": "PNG, JPG, GIF, WEBP, AVIF (up to 4 MB)",
+    "fileDropHint": "Click to choose a file",
+    "fileTypes": "PNG, JPG, GIF, WEBP, AVIF, ICO, PDF (up to 4 MB)",
+    "previewAlt": "Preview of the uploaded image",
+    "remove": "Remove",
+    "uploadTab": "Upload file",
+    "linkTab": "Add link",
+    "linkName": "File name",
+    "linkNamePlaceholder": "e.g. Project presentation (PDF)",
+    "linkUrl": "File link (URL)",
+    "add": "Add",
+    "attached": "Attached files"
   }
 }

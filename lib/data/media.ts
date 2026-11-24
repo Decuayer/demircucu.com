@@ -4,13 +4,14 @@ import { requireAdmin } from "@/lib/auth/guards";
 
 export async function saveMediaFile(data: {
   name: string;
-  url: string;
   type: string;
   size: number;
   bucket: string;
   path: string;
-  usedIn?: string;
 }) {
   await requireAdmin();
-  return prisma.mediaFile.create({ data });
+  return prisma.mediaFile.create({
+    data: { ...data, source: "UPLOAD" },
+    select: { id: true, name: true, type: true, size: true, path: true, createdAt: true },
+  });
 }
