@@ -1,6 +1,6 @@
 import { getFeaturedProjects } from "@/app/actions/projects";
 import { getFeaturedBlogPosts } from "@/app/actions/blog";
-import { getSiteSettings } from "@/app/actions/settings";
+import { getSiteSettings } from "@/lib/data/settings";
 import HomeClient from "./client";
 
 // Revalidate the page every 1 hour, or it can be dynamic depending on needs
