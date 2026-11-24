@@ -8,7 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
-import { getSiteSettings } from "@/app/actions/settings";
+import { getSiteSettings } from "@/lib/data/settings";
 
 const geistSans = Geist({
   variable: "--font-sans",

@@ -1,4 +1,4 @@
-import { getSiteSettings } from "@/app/actions/settings";
+import { getSiteSettings } from "@/lib/data/settings";
 import ContactClient from "./client";
 
 export default async function ContactPage() {

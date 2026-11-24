@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/app/actions/auth";
-import { getSiteSettings } from "@/app/actions/settings";
+import { getSiteSettings } from "@/lib/data/settings";
 import { redirect } from "next/navigation";
 import AdminSettingsClient from "./client";
 
