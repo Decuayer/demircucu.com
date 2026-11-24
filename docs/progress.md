@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 3 genişletme PR'ı açık; production migration onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-24 (Faz 3 genişletme production'a uygulandı; PR #5 merge bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -13,7 +13,7 @@ dosyada veya ortamda olduklarını belirtir.
 | Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı         | `fix/db-connection-pool`, PR #2   |
 | Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı | `feat/phase-2-security-auth`      |
 | Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor     | —                                 |
-| Faz 3: Veri modeli (genişletme)  | Kod ve staging tamam; production migration onay bekliyor       | `feat/phase-3-data-model`         |
+| Faz 3: Veri modeli (genişletme)  | Production'a uygulandı (onaylı), PR #5 merge bekliyor          | `feat/phase-3-data-model`         |
 | Faz 3: Daraltma migration'ı      | Deploy doğrulandıktan sonra ayrı PR                            | —                                 |
 | Faz 4–10                         | Başlamadı                                                      | —                                 |
 
@@ -133,8 +133,13 @@ Kurallar:
 | `20261124004754_comment_moderation_and_rate_limit` | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
 | `20261124004800_rls_lockdown`                      | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
 | `20261124004900_auth_profile_sync`                 | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
+| `20261124120000_phase3_expand`                     | `migrate deploy` (onaylı), lockdown ok, drift yok        | 2026-11-24 |
 
-- **Son yedek:** `~/backups/demircucu/backup-2026-11-24-pre-migrate.dump` (migration'dan hemen önce,
+- **Faz 3 yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-phase3.dump` (genişletmeden hemen
+  önce, 436 KB, mode 600, pg_dump 17 yerel Supabase konteynerinden; public 15, auth 27, storage 10
+  tablo verisi). Backfill sonucu: join tabloları 0/11/1, `aboutPhotoPath` ve `faviconPath` dolu,
+  Vestel logosu dönüştürülmedi (beklenen), 1 ek dosyaya path ve 1 `MediaUsage`, trigger'lar 3.
+- **Önceki yedek:** `~/backups/demircucu/backup-2026-11-24-pre-migrate.dump` (migration'dan hemen önce,
   426 KB, mode 600; `pg_restore --list`: public 14, auth 27, storage 10 tablo verisi). Önceki
   `backup-2026-11-24-pre-phase2.dump` güncel değildi (sonradan 1 blog yazısı eklenmiş). Storage
   dosyaları yedekte yok.
@@ -170,8 +175,7 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Kullanıcının bekleyen manuel adımları
 
-- Faz 3 production genişletme migration'ı için onay; uygulama sırasında admin panelde düzenleme
-  yapılmaması (içerik dondurma), sonra PR merge.
+- PR #5 merge; deploy bitene kadar admin panelde düzenleme yapılmaması.
 - Daraltma sonrası: Vestel logosunu medya kütüphanesine yükleyip deneyimde seçmek.
 
 ### Kararlar (2026-11-24)
