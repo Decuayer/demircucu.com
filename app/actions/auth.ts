@@ -85,6 +85,7 @@ export async function signIn(input: unknown): Promise<ActionResult> {
     const ip = await clientIp();
     const limit = await consumeAll([
       [RATE_LIMITS.loginPerIp, ip],
+      [RATE_LIMITS.loginPerAccountIp, `${data.email}|${ip}`],
       [RATE_LIMITS.loginPerAccount, data.email],
     ]);
     if (!limit.allowed) {

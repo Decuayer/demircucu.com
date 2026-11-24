@@ -15,7 +15,10 @@ const DAY = 24 * HOUR;
 
 export const RATE_LIMITS = {
   loginPerIp: { name: "login-ip", limit: 20, windowSeconds: 15 * MINUTE },
-  loginPerAccount: { name: "login-account", limit: 5, windowSeconds: 15 * MINUTE },
+  // Per account and IP: stops guessing from one source without letting others lock the account.
+  loginPerAccountIp: { name: "login-account-ip", limit: 5, windowSeconds: 15 * MINUTE },
+  // Per account across all IPs: a high ceiling against distributed guessing only.
+  loginPerAccount: { name: "login-account", limit: 50, windowSeconds: 15 * MINUTE },
   registerPerIp: { name: "register-ip", limit: 3, windowSeconds: HOUR },
   passwordResetPerIp: { name: "reset-ip", limit: 5, windowSeconds: HOUR },
   passwordResetPerAccount: { name: "reset-account", limit: 3, windowSeconds: HOUR },

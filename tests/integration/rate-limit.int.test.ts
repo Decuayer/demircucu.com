@@ -4,10 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { seed, SEED_USER_ID } from "@/prisma/seed";
 import { resetDatabase } from "../helpers/db";
 import { RATE_LIMITS } from "@/lib/rate-limit/policies";
+import { vi } from "vitest";
+
+const signInWithPassword = vi.fn(async () => ({
+  error: { name: "AuthApiError", status: 400, code: "invalid_credentials", message: "x" },
+}));
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: vi.fn(async () => ({ auth: { signInWithPassword } })),
+}));
 
 const { consume, bucketKey } = await import("@/lib/rate-limit");
 const contact = await import("@/app/actions/contact");
 const interactions = await import("@/app/actions/blog_interaction");
+const authActions = await import("@/app/actions/auth");
 
 const policy = { name: "test", limit: 3, windowSeconds: 60 };
 
@@ -86,4 +95,22 @@ describe("rate limiter (Postgres)", () => {
       error: "rateLimited",
     });
   });
+
+  it("login limits per account and IP, so other sources cannot lock an account out", async () => {
+    const credentials = { email: "admin@example.test", password: "Wrong-password-1" };
+    headerValues.ip = "198.51.100.66";
+    const attacker = [];
+    for (let i = 0; i <= RATE_LIMITS.loginPerAccountIp.limit; i++) {
+      attacker.push(await authActions.signIn(credentials));
+    }
+    expect(attacker.at(-2)).toEqual({ error: "invalidCredentials" });
+    expect(attacker.at(-1)).toEqual({ error: "rateLimited" });
+
+    // The owner, from another address, still reaches Supabase.
+    headerValues.ip = "203.0.113.5";
+    signInWithPassword.mockResolvedValueOnce({ error: null } as never);
+    expect(await authActions.signIn({ ...credentials, password: "Right-password-1" })).toEqual({
+      success: true,
+    });
+  }, 30_000);
 });
