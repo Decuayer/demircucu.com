@@ -1,22 +1,22 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 5 PR'ı açık; production migration ve GitHub App kurulumu bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-25 (Faz 5 kapandı; Faz 6 onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
 ## 1. Durum özeti
 
-| Faz / iş                         | Durum                                                             | Branch / PR                       |
-| -------------------------------- | ----------------------------------------------------------------- | --------------------------------- |
-| Faz 0: Keşif                     | Tamamlandı, onaylandı                                             | (PR #1 açıklamasında)             |
-| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                      | `chore/phase-1-test-infra`, PR #1 |
-| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı            | `fix/db-connection-pool`, PR #2   |
-| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı    | `feat/phase-2-security-auth`      |
-| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor        | —                                 |
-| Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod   | `feat/phase-3-*`                  |
-| Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da          | `feat/phase-4-tags`, PR #8        |
-| Faz 5: GitHub entegrasyonu       | **PR açık**; prod migration + App kurulumu + ilk senkron bekliyor | `feat/phase-5-github`             |
-| Faz 6–10                         | Başlamadı                                                         | —                                 |
+| Faz / iş                         | Durum                                                               | Branch / PR                                           |
+| -------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------- |
+| Faz 0: Keşif                     | Tamamlandı, onaylandı                                               | (PR #1 açıklamasında)                                 |
+| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                        | `chore/phase-1-test-infra`, PR #1                     |
+| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı              | `fix/db-connection-pool`, PR #2                       |
+| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı      | `feat/phase-2-security-auth`                          |
+| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor          | —                                                     |
+| Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod     | `feat/phase-3-*`                                      |
+| Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da            | `feat/phase-4-tags`, PR #8                            |
+| Faz 5: GitHub entegrasyonu       | **Kapandı**: PR #10 merge, prod'da senkron çalışıyor; düzeltme PR'ı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates` |
+| Faz 6–10                         | Başlamadı                                                           | —                                                     |
 
 ## 2. Tamamlanan işler
 
@@ -115,13 +115,13 @@ kuyruk yok), hatalar admin "Etiketler" sayfasında düzeltilir; önerilen ağaç
 - **Testler:** unit 283, integration 180, supabase 16, E2E 41. `admin-media` E2E bir kez zaman aşımına
   düştü (paralel yük), tekrarlarda geçti.
 
-### Faz 5 (`feat/phase-5-github`)
+### Faz 5 (PR #10 ve kapanış PR'ı `fix/phase-5-pdf-legacy-dates`)
 
 Kararlar (kullanıcı, 2026-11-24): tetikleyici GitHub App webhook + admin butonu + günlük cron
 (Vercel Hobby); kapsam: fork/arşiv hariç (admin'den açılabilir), ilk içe aktarma taslak, sonradan
 açılan repo açıklama + README varsa otomatik yayında; Mermaid tarayıcıda lazy; limit görsel 10 MB,
 PDF 25 MB (aşan mirror edilmez, GitHub linki); README orijinal dilde, TR sayfada TR override özet
-yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşleme dry-run'ını kullanıcı çalıştıracak.
+yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çalıştırdı.
 
 - **Migration:** `20261126090000_phase5_github` (`UnmappedTopic` silinir, boş değilse durur;
   `ProjectDocument.mediaFileId` nullable + `htmlUrl`; `Project.readmeVersion`;
@@ -143,6 +143,25 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşleme dry-run'ını kulla
 - **CI düzeltmeleri:** README testlerinde Shiki ilk kurulumu `beforeAll`'da (5 sn sınırı aşılıyordu);
   `lib/projects` testleri eklendi (kapsama ratchet'in 0,01 altına düşmüştü); Supabase job'ında
   geçici port aralığı 60000-65000 (543xx portlarıyla çakışma).
+- **Devreye alma (2026-11-24, kullanıcı):** `link-existing-projects --apply` 14 proje (çakışma yok;
+  Game Catalog ve NetMonitor isimle, `githubUrl` repo adresiyle düzeldi), GitHub App kuruldu (All
+  repositories), PR #10 merge, ilk senkron, projeler yayımlandı, webhook testi çalıştı.
+  `feng497-smart-corridor` `autoPublishAfter`'dan 23 sn önce açıldığı için taslak geldi, kullanıcı
+  yayımladı; `personal-portfolio` yayından kaldırıldı. 27 projenin 18'i yayında.
+- **Kapanış düzeltmeleri:**
+  - Doküman sayfası ve proje sayfasında Dokümanlar sekmesi bazı tarayıcılarda "This page
+    couldn't load": pdf.js 6'nın modern derlemesi `Map#getOrInsertComputed` gibi çok yeni
+    built-in'leri polyfill'siz çağırıyor. Turbopack `resolveAlias` ile `pdfjs-dist` → legacy
+    derleme, worker da legacy (`copy-pdfjs-assets.mjs`).
+  - Hydration hatası (#418): sunucu (UTC) ve tarayıcı (yerel saat dilimi / varsayılan dil) farklı
+    tarih basıyordu (Tatum: 22:34 UTC push). `lib/format-date.ts` (sayfa dili, `Europe/Istanbul`);
+    proje, deneyim ve blog tarihleri.
+  - E2E: yeni built-in'leri silinmiş tarayıcıda PDF, İstanbul saat dilimi + UTC sunucu (`TZ=UTC`),
+    seed'lerde UUID ve projeyi en son yayımlama (paralel prefetch yarışı). İki regresyon testi
+    düzeltme olmadan başarısız oldu, düzeltmeyle geçti.
+- **Testler (kapanış):** unit 417, integration 187, E2E 45; 3x tekrarlı yük çalıştırmalarında 270
+  testten yalnızca `admin-media` deneyim logosu testi bir kez 15 sn sınırını aştı (Faz 4'ten beri
+  bilinen yük kaynaklı zaman aşımı).
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
@@ -283,15 +302,10 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 - **Yeni API anahtar formatı** (`sb_publishable_` / `sb_secret_`) production'da: ileride ayrı küçük
   bir iş; şimdi değil.
 
-### Faz 5 devreye alma sırası
-
-1. ~~Prod yedeği + migration + bucket 25 MB~~ (yapıldı, 2026-11-24). Eşleme dry-run: 14 eşleşme, çakışma yok, 12 repo taslak gelecek.
-2. GitHub App + Vercel env (`docs/github-sync.md` → Setup), merge, deploy.
-3. `link-existing-projects.ts` dry-run → çakışma kararları → `--apply`; sonra admin "Şimdi senkronize et".
-
 ### Sonraki planlar
 
-- **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
+- **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için); README görselleri
+  için `next/image` / blur placeholder kullanımı (`MediaFile.blurDataUrl` hazır).
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
 
 ### Bilinen riskler
@@ -303,5 +317,9 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
   `.env.staging.local`'da.
 - `use cache` kayıtları deploy'lar arasında taşınmıyor; build DB okuyor (env ve pooler doğru olmalı;
   session pooler artık hata veriyor).
-- `game-catalog` projesinin `githubUrl` alanında prompt metni var; proje kaydedilirken URL
-  doğrulamasına takılır (içerik kararı kullanıcıda).
+- `admin-media` deneyim logosu E2E'si ağır paralel yükte 15 sn beklemeyi aşabiliyor (CI'da 2 worker +
+  2 retry ile sorun yok).
+- Webhook ve cron yalnızca Production'da; Preview/staging'de senkron admin butonuyla.
+- Büyük harfli slug'lar (`Spotify-Stream`, `NetMonitor`, `Task-Management-System`) olduğu gibi
+  kaldı; istenirse admin'den değiştirilir (eski slug için yönlendirme yalnızca repo yeniden
+  adlandırmada otomatik).
