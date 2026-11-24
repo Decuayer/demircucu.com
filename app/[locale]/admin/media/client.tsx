@@ -18,6 +18,7 @@ import {
   Copy,
   ExternalLink,
   Loader2,
+  Eraser,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/errors";
@@ -25,6 +26,7 @@ import type { AdminMediaItem } from "@/lib/data/admin";
 import { mediaUrl } from "@/lib/media/url";
 import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
 import { deleteMediaFile } from "@/app/actions/media";
+import { deleteUnusedGithubMedia } from "@/app/actions/github";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -47,6 +49,14 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
   const [files, setFiles] = useState<AdminMediaItem[]>(initialFiles);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"all" | "image" | "document">("all");
+  const [filterSource, setFilterSource] = useState<"all" | "UPLOAD" | "GITHUB">("all");
+  const [filterRepo, setFilterRepo] = useState("");
+  const [cleanupOpen, setCleanupOpen] = useState(false);
+  const repos = [
+    ...new Set(files.map((f) => f.repoFullName).filter((r): r is string => Boolean(r))),
+  ].sort();
+  // Garbage collection candidates: mirrored GitHub files nothing refers to any more.
+  const unusedGithub = files.filter((f) => f.source === "GITHUB" && f.usageCount === 0);
 
   const [selectedFile, setSelectedFile] = useState<AdminMediaItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -59,6 +69,8 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
   const filteredFiles = files.filter((file) => {
     const matchesSearch = file.name.toLowerCase().includes(searchTerm.toLowerCase());
     if (!matchesSearch) return false;
+    if (filterSource !== "all" && file.source !== filterSource) return false;
+    if (filterRepo && file.repoFullName !== filterRepo) return false;
 
     if (filterType === "image") return file.type.startsWith("image/");
     if (filterType === "document") return !file.type.startsWith("image/");
@@ -88,7 +100,19 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setFiles((prev) => [{ ...data.file, usageCount: 0 }, ...prev]);
+        setFiles((prev) => [
+          {
+            ...data.file,
+            source: "UPLOAD",
+            repoFullName: null,
+            originUrl: null,
+            width: null,
+            height: null,
+            usageCount: 0,
+            usedIn: [],
+          },
+          ...prev,
+        ]);
         toast.success(t("fileUploaded"));
       } else {
         throw new Error(data.error ? errorMessage(data.error) : t("uploadFailed"));
@@ -119,6 +143,18 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       setDeleteId(null);
     });
   };
+
+  const handleCleanup = () =>
+    startTransition(async () => {
+      const ids = unusedGithub.map((f) => f.id);
+      const res = await deleteUnusedGithubMedia(ids);
+      if (res.error) toast.error(errorMessage(res.error));
+      else {
+        toast.success(t("cleanupDone", { count: res.deleted }));
+        setFiles((prev) => prev.filter((f) => !ids.includes(f.id)));
+      }
+      setCleanupOpen(false);
+    });
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -180,7 +216,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-border/50 pb-4">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border/50 pb-4">
         <Button
           variant={filterType === "all" ? "default" : "ghost"}
           size="sm"
@@ -211,6 +247,43 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
         >
           {t("documents")}
         </Button>
+        <span className="mx-2 h-5 w-px bg-border" />
+        <select
+          value={filterSource}
+          onChange={(e) => setFilterSource(e.target.value as typeof filterSource)}
+          aria-label={t("mediaSource")}
+          className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+        >
+          <option value="all">{t("allSources")}</option>
+          <option value="UPLOAD">{t("sourceUpload")}</option>
+          <option value="GITHUB">{t("sourceGithub")}</option>
+        </select>
+        {repos.length > 0 && (
+          <select
+            value={filterRepo}
+            onChange={(e) => setFilterRepo(e.target.value)}
+            aria-label={t("mediaRepo")}
+            className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+          >
+            <option value="">{t("allRepos")}</option>
+            {repos.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        )}
+        {unusedGithub.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto"
+            onClick={() => setCleanupOpen(true)}
+          >
+            <Eraser className="mr-2 h-3.5 w-3.5" />
+            {t("cleanupUnused", { count: unusedGithub.length })}
+          </Button>
+        )}
       </div>
 
       {/* Grid */}
@@ -303,8 +376,32 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       {formatSize(selectedFile.size)}
+                      {selectedFile.width && selectedFile.height
+                        ? ` · ${selectedFile.width}×${selectedFile.height}`
+                        : ""}
                     </span>
+                    <Badge variant="secondary" className="text-xs">
+                      {selectedFile.source === "GITHUB" ? t("sourceGithub") : t("sourceUpload")}
+                    </Badge>
                   </div>
+                  {selectedFile.repoFullName && (
+                    <p className="mt-2 text-xs break-all text-muted-foreground">
+                      {selectedFile.repoFullName}
+                      {selectedFile.originUrl && (
+                        <>
+                          {" · "}
+                          <a
+                            href={selectedFile.originUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline"
+                          >
+                            {t("origin")}
+                          </a>
+                        </>
+                      )}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -345,6 +442,15 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                   <p className="inline-block rounded-md border border-border/50 bg-accent/30 px-3 py-1.5 text-sm">
                     {t("usageCount", { count: selectedFile.usageCount })}
                   </p>
+                  {selectedFile.usedIn.length > 0 && (
+                    <ul className="space-y-0.5 text-xs text-muted-foreground">
+                      {selectedFile.usedIn.map((u, i) => (
+                        <li key={i}>
+                          {t(`usage.${u.kind.replace(":", "_")}`)} · {u.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
 
                 <div className="mt-4 border-t border-border/50 pt-4">
@@ -364,6 +470,35 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Garbage collection of unused GitHub mirrors */}
+      <AlertDialog open={cleanupOpen} onOpenChange={setCleanupOpen}>
+        <AlertDialogContent className="border-border/50 bg-background">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("cleanupTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("cleanupConfirmation", { count: unusedGithub.length })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <ul className="max-h-48 overflow-y-auto text-xs text-muted-foreground">
+            {unusedGithub.map((f) => (
+              <li key={f.id} className="truncate">
+                {f.repoFullName} · {f.name} ({formatSize(f.size)})
+              </li>
+            ))}
+          </ul>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCleanup}
+              className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+              disabled={isPending}
+            >
+              {isPending ? t("deleting") : t("delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>

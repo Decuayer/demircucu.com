@@ -74,3 +74,19 @@ export async function deleteFileFromStorage(
     return { success: false, error: "storageUnavailable" };
   }
 }
+
+/**
+ * Stores bytes at a fixed, content-addressed path (GitHub mirror: `github/<repo>/<sha256>.<ext>`).
+ * Overwriting is harmless because the same path always holds the same content, and it lets a
+ * sync that failed between upload and database write finish on the next run.
+ */
+export async function putObject(
+  path: string,
+  bytes: Uint8Array,
+  contentType: string,
+): Promise<void> {
+  const { error } = await getSupabaseAdmin()
+    .storage.from(BUCKET_NAME)
+    .upload(path, bytes, { contentType, cacheControl: IMMUTABLE_CACHE_SECONDS, upsert: true });
+  if (error) throw new Error(`storage upload failed: ${error.message}`);
+}

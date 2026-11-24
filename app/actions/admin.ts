@@ -4,11 +4,12 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth/guards";
 import { invalidate } from "@/lib/cache/tags";
-import { ok, toActionFailure, type ActionResult } from "@/lib/actions/result";
+import { fail, ok, toActionFailure, type ActionResult } from "@/lib/actions/result";
 import { id as idSchema } from "@/lib/validation/common";
 import {
   blogPostSchema,
   experienceSchema,
+  manualProjectSchema,
   projectSchema,
   type BlogPostInput,
   type ExperienceInput,
@@ -32,7 +33,7 @@ const htmlPaths = (...html: (string | null | undefined)[]) =>
 export async function createProject(input: ProjectInput): Promise<ActionResult<{ id: string }>> {
   try {
     await requireAdmin();
-    const { tagIds, hiddenTagIds, filesList, ...data } = projectSchema.parse(input);
+    const { tagIds, hiddenTagIds, filesList, ...data } = manualProjectSchema.parse(input);
     const files: Attachment[] | undefined = filesList;
     const project = await prisma.$transaction(async (tx) => {
       const created = await tx.project.create({
@@ -57,7 +58,11 @@ export async function updateProject(idInput: string, input: ProjectInput): Promi
   try {
     await requireAdmin();
     const id = idSchema.parse(idInput);
-    const { tagIds, hiddenTagIds, filesList, ...data } = projectSchema.parse(input);
+    const current = await prisma.project.findUnique({ where: { id }, select: { source: true } });
+    if (!current) return fail("notFound");
+    // GitHub projects fall back to repository data; manual ones need their own texts.
+    const schema = current.source === "GITHUB" ? projectSchema : manualProjectSchema;
+    const { tagIds, hiddenTagIds, filesList, ...data } = schema.parse(input);
     const files: Attachment[] | undefined = filesList;
     const { previous, project } = await prisma.$transaction(async (tx) => {
       const previous = await tx.project.findUniqueOrThrow({
@@ -87,6 +92,10 @@ export async function deleteProject(idInput: string): Promise<ActionResult> {
   try {
     await requireAdmin();
     const id = idSchema.parse(idInput);
+    const current = await prisma.project.findUnique({ where: { id }, select: { source: true } });
+    if (!current) return fail("notFound");
+    // A GitHub project would be imported again by the next sync; unpublish it instead.
+    if (current.source === "GITHUB") return fail("conflict");
     const project = await prisma.$transaction(async (tx) => {
       await clearMediaUsage(tx, "PROJECT", id);
       return tx.project.delete({ where: { id }, select: { slug: true } });

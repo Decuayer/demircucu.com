@@ -51,8 +51,67 @@ const toLinks = (
 
 export async function adminListProjects() {
   await requireAdmin();
-  return prisma.project.findMany({ orderBy: { order: "asc" } });
+  const rows = await prisma.project.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+    select: {
+      id: true,
+      slug: true,
+      titleTr: true,
+      titleEn: true,
+      source: true,
+      published: true,
+      featured: true,
+      order: true,
+      githubFullName: true,
+      githubUrl: true,
+      isArchived: true,
+      stars: true,
+      lastSyncedAt: true,
+      syncStatus: true,
+      syncError: true,
+      _count: { select: { documents: true } },
+    },
+  });
+  return rows.map(({ githubFullName, ...row }) => ({
+    ...row,
+    githubFullName,
+    // Display title: override, else the repository name.
+    displayTitleTr: row.titleTr || row.titleEn || githubFullName?.split("/").pop() || row.slug,
+    displayTitleEn: row.titleEn || row.titleTr || githubFullName?.split("/").pop() || row.slug,
+  }));
 }
+
+export type AdminProjectRow = Awaited<ReturnType<typeof adminListProjects>>[number];
+
+/** Sync settings, recent runs and which credentials are configured (never their values). */
+export async function adminGithubOverview() {
+  await requireAdmin();
+  const [settings, runs] = await Promise.all([
+    prisma.githubSyncSettings.upsert({ where: { id: "main" }, update: {}, create: { id: "main" } }),
+    prisma.githubSyncRun.findMany({ orderBy: { startedAt: "desc" }, take: 10 }),
+  ]);
+  const env = process.env;
+  return {
+    settings: {
+      includeForks: settings.includeForks,
+      includeArchived: settings.includeArchived,
+      autoPublishAfter: settings.autoPublishAfter,
+    },
+    runs: runs.map((run) => ({ ...run, stats: run.stats as Record<string, unknown> | null })),
+    config: {
+      auth:
+        env.GITHUB_APP_ID && env.GITHUB_APP_PRIVATE_KEY
+          ? "app"
+          : env.GITHUB_TOKEN
+            ? "token"
+            : "anonymous",
+      webhook: Boolean(env.GITHUB_WEBHOOK_SECRET),
+      cron: Boolean(env.CRON_SECRET),
+    },
+  };
+}
+
+export type AdminGithubOverview = Awaited<ReturnType<typeof adminGithubOverview>>;
 
 export async function adminGetProject(id: string) {
   await requireAdmin();
@@ -103,10 +162,26 @@ export interface AdminMediaItem {
   size: number;
   path: string;
   source: MediaSource;
+  repoFullName: string | null;
+  originUrl: string | null;
+  width: number | null;
+  height: number | null;
   createdAt: Date;
   /** Content rows that reference the file (foreign keys and MediaUsage). */
   usageCount: number;
+  /** Where it is used: "<entity> <field>" labels with the row's slug or id. */
+  usedIn: { kind: string; label: string }[];
 }
+
+const mediaCountSelect = {
+  usages: true,
+  documents: true,
+  projectLogos: true,
+  experienceLogos: true,
+  blogPostCovers: true,
+  settingsAboutPhoto: true,
+  settingsFavicon: true,
+} as const;
 
 export async function adminListMediaFiles(typePrefix?: string): Promise<AdminMediaItem[]> {
   await requireAdmin();
@@ -120,24 +195,73 @@ export async function adminListMediaFiles(typePrefix?: string): Promise<AdminMed
       size: true,
       path: true,
       source: true,
+      repoFullName: true,
+      originUrl: true,
+      width: true,
+      height: true,
       createdAt: true,
-      _count: {
-        select: {
-          usages: true,
-          documents: true,
-          projectLogos: true,
-          experienceLogos: true,
-          blogPostCovers: true,
-          settingsAboutPhoto: true,
-          settingsFavicon: true,
-        },
-      },
+      _count: { select: mediaCountSelect },
+      usages: { select: { entityType: true, entityId: true, field: true } },
+      documents: { select: { project: { select: { slug: true } } } },
+      projectLogos: { select: { slug: true } },
+      experienceLogos: { select: { company: true } },
+      blogPostCovers: { select: { slug: true } },
     },
   });
-  return files.map(({ _count, ...file }) => ({
-    ...file,
-    usageCount: Object.values(_count).reduce((sum, n) => sum + n, 0),
-  }));
+
+  // Names for MediaUsage rows (entity ids).
+  const projectIds = files.flatMap((f) =>
+    f.usages.filter((u) => u.entityType === "PROJECT").map((u) => u.entityId),
+  );
+  const postIds = files.flatMap((f) =>
+    f.usages.filter((u) => u.entityType === "BLOG_POST").map((u) => u.entityId),
+  );
+  const [projects, posts] = await Promise.all([
+    projectIds.length
+      ? prisma.project.findMany({
+          where: { id: { in: projectIds } },
+          select: { id: true, slug: true },
+        })
+      : [],
+    postIds.length
+      ? prisma.blogPost.findMany({
+          where: { id: { in: postIds } },
+          select: { id: true, slug: true },
+        })
+      : [],
+  ]);
+  const names = new Map([...projects, ...posts].map((r) => [r.id, r.slug]));
+
+  return files.map(
+    ({ _count, usages, documents, projectLogos, experienceLogos, blogPostCovers, ...file }) => ({
+      ...file,
+      usageCount: Object.values(_count).reduce((sum, n) => sum + n, 0),
+      usedIn: [
+        ...usages.map((u) => ({
+          kind: `${u.entityType}:${u.field}`,
+          label: names.get(u.entityId) ?? u.entityId,
+        })),
+        ...documents.map((d) => ({ kind: "PROJECT:document", label: d.project.slug })),
+        ...projectLogos.map((p) => ({ kind: "PROJECT:logo", label: p.slug })),
+        ...experienceLogos.map((e) => ({ kind: "EXPERIENCE:logo", label: e.company })),
+        ...blogPostCovers.map((p) => ({ kind: "BLOG_POST:cover", label: p.slug })),
+        ...(_count.settingsAboutPhoto
+          ? [{ kind: "SITE_SETTINGS:aboutPhoto", label: "settings" }]
+          : []),
+        ...(_count.settingsFavicon ? [{ kind: "SITE_SETTINGS:favicon", label: "settings" }] : []),
+      ],
+    }),
+  );
+}
+
+/** GitHub mirrors no content refers to any more (garbage collection candidates). */
+export async function unusedGithubMediaIds(): Promise<string[]> {
+  await requireAdmin();
+  const files = await prisma.mediaFile.findMany({
+    where: { source: "GITHUB" },
+    select: { id: true, _count: { select: mediaCountSelect } },
+  });
+  return files.filter((f) => Object.values(f._count).every((n) => n === 0)).map((f) => f.id);
 }
 
 export async function adminListComments() {

@@ -12,9 +12,10 @@ export interface MediaRefs {
 }
 
 /**
- * Replaces the MediaUsage rows of one entity with the given references. Call inside the same
- * transaction that writes the entity, so the usage list never disagrees with the content.
- * Column references (logoPath, coverPath ...) are foreign keys and are not duplicated here.
+ * Replaces the MediaUsage rows of the given fields of one entity (fields not named are left
+ * alone: the admin form owns "files" / "description", the GitHub sync owns "readme"). Call inside
+ * the same transaction that writes the entity, so the usage list never disagrees with the
+ * content. Column references (logoPath, coverPath ...) are foreign keys and are not duplicated.
  */
 export async function syncMediaUsage(
   tx: Prisma.TransactionClient,
@@ -48,7 +49,8 @@ export async function syncMediaUsage(
     }
   }
 
-  await tx.mediaUsage.deleteMany({ where: { entityType, entityId } });
+  const fields = [...required, ...optional].map(([field]) => field);
+  await tx.mediaUsage.deleteMany({ where: { entityType, entityId, field: { in: fields } } });
   if (rows.size) await tx.mediaUsage.createMany({ data: [...rows.values()] });
 }
 

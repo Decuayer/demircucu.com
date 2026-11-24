@@ -150,6 +150,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # The local Supabase ports (54321-54329) lie inside Linux's default ephemeral range
+      # (32768-60999), so an outgoing connection of an earlier step can hold one of them and
+      # `supabase start` then fails with "address already in use". Move the ephemeral range
+      # above them before anything opens connections.
+      - name: Keep ephemeral ports away from the Supabase ports
+        run: sudo sysctl -w net.ipv4.ip_local_port_range="60000 65000"
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:

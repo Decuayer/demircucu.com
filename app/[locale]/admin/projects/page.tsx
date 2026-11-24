@@ -1,6 +1,10 @@
-import { adminListProjects } from "@/lib/data/admin";
+import { adminGithubOverview, adminListProjects } from "@/lib/data/admin";
 import AdminProjectsClient from "./client";
 
+/** "Sync now" runs inside this page's server action, after the response (`after`). */
+export const maxDuration = 300;
+
 export default async function AdminProjectsPage() {
-  return <AdminProjectsClient initialProjects={await adminListProjects()} />;
+  const [projects, github] = await Promise.all([adminListProjects(), adminGithubOverview()]);
+  return <AdminProjectsClient initialProjects={projects} github={github} />;
 }

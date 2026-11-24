@@ -24,6 +24,20 @@ export type AllowedMime = keyof typeof UPLOAD_TYPES;
 
 export const MAX_UPLOAD_BYTES = Math.max(...Object.values(UPLOAD_TYPES).map((t) => t.maxBytes));
 
+/**
+ * GitHub mirror limits (approved Phase 5): original size of README images and repository PDFs.
+ * Larger files are not mirrored; the site links to GitHub instead. Mirrors are written by the
+ * server (no request body limit), always as one of the UPLOAD_TYPES MIME types.
+ */
+export const MIRROR_LIMITS = { image: 10 * MB, document: 25 * MB } as const;
+
+/** Storage bucket limit: the largest file either path may store. */
+export const BUCKET_FILE_SIZE_LIMIT = Math.max(
+  MAX_UPLOAD_BYTES,
+  MIRROR_LIMITS.image,
+  MIRROR_LIMITS.document,
+);
+
 export const UPLOAD_FOLDERS = [
   "general",
   "blog",

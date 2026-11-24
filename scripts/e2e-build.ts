@@ -11,6 +11,7 @@ if (!/^postgresql:\/\/[^@]+@(127\.0\.0\.1|localhost):/.test(db)) {
   throw new Error("E2E builds must use the local Supabase database");
 }
 
+execFileSync("node", ["scripts/copy-pdfjs-assets.mjs"], { stdio: "inherit" });
 execFileSync("npx", ["next", "build"], {
   stdio: "inherit",
   env: {

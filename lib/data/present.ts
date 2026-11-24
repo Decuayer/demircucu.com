@@ -13,6 +13,8 @@ export const publicProjectQuery = {
   omit: {
     githubRepoId: true,
     readmeMarkdown: true,
+    readmeHtml: true,
+    readmeVersion: true,
     readmeSha: true,
     readmeEtag: true,
     languagesEtag: true,
@@ -46,6 +48,8 @@ export function presentProject(row: ProjectRow) {
     titleEn: row.titleEn || row.titleTr || fallbackTitle,
     summaryTr: row.summaryTr || row.summaryEn || fallbackSummary,
     summaryEn: row.summaryEn || row.summaryTr || fallbackSummary,
+    // The repository's website when the admin set no live URL.
+    liveUrl: row.liveUrl || row.homepage,
     logoUrl: mediaUrl(row.logoPath),
     tags: flattenTags(row.tags),
   };

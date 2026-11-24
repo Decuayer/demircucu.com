@@ -32,6 +32,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "coverage/**",
+    // Copied from pdfjs-dist by scripts/copy-pdfjs-assets.mjs.
+    "public/pdfjs/**",
     "playwright-report/**",
     "test-results/**",
     "lib/generated/**",

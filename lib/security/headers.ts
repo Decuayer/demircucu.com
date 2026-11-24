@@ -1,3 +1,5 @@
+import { BADGE_IMAGE_ORIGINS } from "../github/readme/urls";
+
 /**
  * Security headers and Content Security Policy (security review S10).
  *
@@ -42,6 +44,8 @@ export function buildContentSecurityPolicy({
       "blob:",
       ...(supabase ? [supabase] : []),
       "https://avatars.githubusercontent.com",
+      // README badges and cards stay on their hosts (dynamic SVGs; never mirrored).
+      ...BADGE_IMAGE_ORIGINS,
       ...(isPreview ? ["https://vercel.live", "https://vercel.com"] : []),
     ],
     "font-src": [

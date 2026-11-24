@@ -74,7 +74,6 @@ model Tag {
   projectTags    ProjectTag[]
   experienceTags ExperienceTag[]
   blogPostTags   BlogPostTag[]
-  unmappedTopics UnmappedTopic[]
 
   @@index([parentId])
 }
@@ -135,29 +134,7 @@ model BlogPostTag {
   @@index([tagId])
 }
 
-enum UnmappedTopicStatus {
-  PENDING
-  MAPPED
-  IGNORED
-}
-
 /// GitHub topics that match no tag slug or alias; reviewed in the admin panel.
-model UnmappedTopic {
-  /// Canonicalised topic.
-  topic       String              @id
-  status      UnmappedTopicStatus @default(PENDING)
-  tagId       String?
-  /// Repository full names the topic was last seen on.
-  seenIn      String[]            @default([])
-  firstSeenAt DateTime            @default(now())
-  lastSeenAt  DateTime            @default(now())
-  resolvedAt  DateTime?
-
-  tag Tag? @relation(fields: [tagId], references: [id], onDelete: SetNull)
-
-  @@index([status])
-}
-
 model Experience {
   id            String    @id @default(cuid())
   company       String
@@ -242,6 +219,8 @@ model Project {
   readmeHtml        String?     @db.Text
   readmeSha         String?
   readmeEtag        String?
+  /// README pipeline version that produced readmeHtml (lib/github/readme/version.ts).
+  readmeVersion     Int?
   languagesEtag     String?
   treeSha           String?
   lastSyncedAt      DateTime?
@@ -261,7 +240,10 @@ model ProjectDocument {
   title       String
   /// Path inside the repository.
   repoPath    String
-  mediaFileId String
+  /// Mirrored copy; null when the file exceeds the mirror limit (shown as a GitHub link).
+  mediaFileId String?
+  /// File page on GitHub (blob URL), used as the fallback link.
+  htmlUrl     String
   mimeType    String
   size        Int
   /// Git blob sha; unchanged sha means no re-download.
@@ -270,8 +252,8 @@ model ProjectDocument {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  mediaFile MediaFile @relation(fields: [mediaFileId], references: [id], onDelete: Restrict)
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  mediaFile MediaFile? @relation(fields: [mediaFileId], references: [id], onDelete: Restrict)
 
   @@unique([projectId, repoPath])
   @@index([mediaFileId])
@@ -302,6 +284,17 @@ enum SyncRunStatus {
 }
 
 /// One GitHub sync run (all repositories or one), shown as the sync log in the admin panel.
+/// Single row (id "main"): GitHub sync policy, edited in the admin panel.
+model GithubSyncSettings {
+  id               String   @id @default("main")
+  includeForks     Boolean  @default(false)
+  includeArchived  Boolean  @default(false)
+  /// Repositories created after this instant are published on import when they have a
+  /// description and a README; older ones (the initial import) arrive as drafts.
+  autoPublishAfter DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
 model GithubSyncRun {
   id         String        @id @default(cuid())
   trigger    SyncTrigger
@@ -406,7 +399,7 @@ model MediaFile {
   /// Where a mirrored file was downloaded from.
   originUrl    String?
   repoFullName String?
-  /// sha256 of the stored bytes; one row per distinct content.
+  /// sha256 of the original bytes (the downloaded file for mirrors); one row per distinct content.
   contentHash  String?     @unique
   width        Int?
   height       Int?

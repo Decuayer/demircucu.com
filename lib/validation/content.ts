@@ -41,12 +41,17 @@ const relations = {
   filesList: z.array(fileAttachmentSchema).max(20).optional(),
 };
 
+/**
+ * Project form. Titles and summaries are overrides for GitHub projects (empty = use the
+ * repository name / description), so they are optional here; manual projects require them
+ * (manualProjectSchema).
+ */
 export const projectSchema = z.object({
-  titleTr: requiredText(200),
-  titleEn: requiredText(200),
+  titleTr: optionalText(200),
+  titleEn: optionalText(200),
   slug,
-  summaryTr: requiredText(500),
-  summaryEn: requiredText(500),
+  summaryTr: optionalText(500),
+  summaryEn: optionalText(500),
   descriptionTr: optionalRichText(RICH_TEXT_MAX),
   descriptionEn: optionalRichText(RICH_TEXT_MAX),
   logoPath: optionalMediaPath,
@@ -56,6 +61,12 @@ export const projectSchema = z.object({
   published: z.boolean().default(true),
   featured: z.boolean().default(false),
   ...relations,
+});
+
+export const manualProjectSchema = projectSchema.superRefine((value, ctx) => {
+  for (const key of ["titleTr", "titleEn", "summaryTr", "summaryEn"] as const) {
+    if (!value[key]) ctx.addIssue({ code: "custom", path: [key], message: "required" });
+  }
 });
 
 export const experienceSchema = z

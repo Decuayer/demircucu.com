@@ -9,3 +9,5 @@ lib/generated
 playwright-report
 test-results
 docs/claude-code-task.md
+public/pdfjs
+lib/github/readme/__fixtures__

@@ -129,3 +129,256 @@
     @apply font-sans;
   }
 }
+
+/* ---------------------------------------------------------------------------------------------
+ * README (GitHub-flavoured markdown rendered by lib/github/readme/render.ts). Close to GitHub's
+ * own look, on the site's colour tokens; light and dark follow the site theme (.dark).
+ * ------------------------------------------------------------------------------------------- */
+.markdown-body {
+  --md-border: var(--border);
+  --md-muted: var(--muted-foreground);
+  --md-code-bg: color-mix(in oklch, var(--muted) 70%, transparent);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  overflow-wrap: break-word;
+}
+.markdown-body > *:first-child {
+  margin-top: 0;
+}
+.markdown-body
+  :is(p, ul, ol, blockquote, table, pre, details, .markdown-alert, .table-wrapper, .code-block) {
+  margin-block: 0 1rem;
+}
+.markdown-body :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+  margin-block: 1.5rem 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  scroll-margin-top: 6rem;
+}
+.markdown-body h1 {
+  font-size: 2em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--md-border);
+}
+.markdown-body h2 {
+  font-size: 1.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--md-border);
+}
+.markdown-body h3 {
+  font-size: 1.25em;
+}
+.markdown-body h4 {
+  font-size: 1em;
+}
+.markdown-body .heading-anchor {
+  margin-left: 0.4rem;
+  color: var(--md-muted);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.markdown-body :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor {
+  opacity: 1;
+}
+.markdown-body a {
+  color: var(--color-cyan-500);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.markdown-body :is(ul, ol) {
+  padding-left: 2em;
+}
+.markdown-body ul {
+  list-style: disc;
+}
+.markdown-body ol {
+  list-style: decimal;
+}
+.markdown-body li + li {
+  margin-top: 0.25em;
+}
+.markdown-body .contains-task-list {
+  list-style: none;
+  padding-left: 1.25em;
+}
+.markdown-body .task-list-item input {
+  margin: 0 0.4em 0.2em -1.4em;
+  vertical-align: middle;
+}
+.markdown-body hr {
+  height: 0.25em;
+  margin: 1.5rem 0;
+  border: 0;
+  background: var(--md-border);
+}
+.markdown-body blockquote {
+  padding: 0 1em;
+  color: var(--md-muted);
+  border-left: 0.25em solid var(--md-border);
+}
+.markdown-body img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+.markdown-body img[align="right"] {
+  float: right;
+  margin-left: 1rem;
+}
+.markdown-body img[align="left"] {
+  float: left;
+  margin-right: 1rem;
+}
+.markdown-body p[align="center"],
+.markdown-body div[align="center"] {
+  text-align: center;
+}
+.markdown-body .readme-badge {
+  display: inline;
+  vertical-align: middle;
+}
+.markdown-body .table-wrapper {
+  overflow-x: auto;
+}
+.markdown-body table {
+  border-collapse: collapse;
+  width: max-content;
+  max-width: 100%;
+}
+.markdown-body :is(th, td) {
+  padding: 6px 13px;
+  border: 1px solid var(--md-border);
+}
+.markdown-body th {
+  font-weight: 600;
+}
+.markdown-body tr:nth-child(2n) {
+  background: var(--md-code-bg);
+}
+.markdown-body :not(pre) > code {
+  padding: 0.2em 0.4em;
+  font-size: 85%;
+  border-radius: 6px;
+  background: var(--md-code-bg);
+}
+.markdown-body pre {
+  overflow-x: auto;
+  padding: 1rem;
+  font-size: 85%;
+  line-height: 1.45;
+  border-radius: 6px;
+  background: var(--md-code-bg);
+}
+.markdown-body pre.shiki {
+  background: var(--shiki-light-bg);
+}
+.dark .markdown-body pre.shiki {
+  background: var(--shiki-dark-bg);
+}
+.markdown-body .shiki span {
+  color: var(--shiki-light);
+}
+.dark .markdown-body .shiki span {
+  color: var(--shiki-dark);
+}
+.markdown-body .code-block {
+  position: relative;
+}
+.markdown-body .code-block pre {
+  margin: 0;
+}
+.markdown-body .code-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--md-border);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--md-muted);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.markdown-body .code-block:hover .code-copy,
+.markdown-body .code-copy:focus-visible {
+  opacity: 1;
+}
+.markdown-body details summary {
+  cursor: pointer;
+}
+.markdown-body .footnotes {
+  font-size: 0.85em;
+  color: var(--md-muted);
+  border-top: 1px solid var(--md-border);
+  padding-top: 1rem;
+}
+/* Theme-specific images (<picture> / #gh-*-mode-only). */
+.dark .markdown-body .gh-light-only,
+:root:not(.dark) .markdown-body .gh-dark-only {
+  display: none;
+}
+/* Alerts: > [!NOTE] ... */
+.markdown-body .markdown-alert {
+  padding: 0.5rem 1rem;
+  border-left: 0.25em solid var(--alert-color);
+}
+.markdown-body .markdown-alert > :last-child {
+  margin-bottom: 0;
+}
+.markdown-body .markdown-alert-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--alert-color);
+}
+.markdown-body .markdown-alert-title svg {
+  fill: currentColor;
+}
+.markdown-body .markdown-alert-note {
+  --alert-color: #0969da;
+}
+.markdown-body .markdown-alert-tip {
+  --alert-color: #1a7f37;
+}
+.markdown-body .markdown-alert-important {
+  --alert-color: #8250df;
+}
+.markdown-body .markdown-alert-warning {
+  --alert-color: #9a6700;
+}
+.markdown-body .markdown-alert-caution {
+  --alert-color: #cf222e;
+}
+.dark .markdown-body .markdown-alert-note {
+  --alert-color: #4493f8;
+}
+.dark .markdown-body .markdown-alert-tip {
+  --alert-color: #3fb950;
+}
+.dark .markdown-body .markdown-alert-important {
+  --alert-color: #ab7df8;
+}
+.dark .markdown-body .markdown-alert-warning {
+  --alert-color: #d29922;
+}
+.dark .markdown-body .markdown-alert-caution {
+  --alert-color: #f85149;
+}
+/* Mermaid: the source shows until the diagram is drawn (and stays if drawing fails). */
+.markdown-body .mermaid-block[data-rendered="true"] .mermaid-source {
+  display: none;
+}
+.markdown-body .mermaid-diagram {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+.markdown-body .mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
