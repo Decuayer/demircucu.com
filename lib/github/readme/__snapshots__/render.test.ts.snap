@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renderReadme: aegis-dispatch fixture > is stable 1`] = `
+"<h1 id="aegis-dispatch">Aegis Dispatch<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#aegis-dispatch">#</a></h1>
+<p><a href="https://github.com/Decuayer/aegis-dispatch/actions" target="_blank" rel="noopener noreferrer"><img src="https://github.com/Decuayer/aegis-dispatch/actions/workflows/ci.yml/badge.svg" alt="CI" loading="lazy" decoding="async" referrerpolicy="no-referrer" class="readme-badge"></a> <img src="https://img.shields.io/badge/TypeScript-5-blue" alt="TypeScript" loading="lazy" decoding="async" referrerpolicy="no-referrer" class="readme-badge"></p>
+<p>Emergency dispatch simulator 🚨</p>
+<p><img src="https://cdn.test/media/github/x/architecture.png" alt="Architecture" width="800" height="600" loading="lazy" decoding="async"></p>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="octicon"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<p>Requires Node 20.</p>
+</div>
+<div class="markdown-alert markdown-alert-warning"><p class="markdown-alert-title"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" class="octicon"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Warning</p>
+<p>Not for real emergencies.</p>
+</div>
+<h2 id="flow">Flow<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#flow">#</a></h2>
+<div class="mermaid-block" data-mermaid=""><pre class="mermaid-source">flowchart LR
+  Call --> Triage --> Dispatch
+</pre></div>
+<div class="mermaid-block" data-mermaid=""><pre class="mermaid-source">stateDiagram-v2
+  [*] --> Idle
+  Idle --> EnRoute
+</pre></div>
+<h2 id="features">Features<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#features">#</a></h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Feature</th>
+<th align="center">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Triage</td>
+<td align="center">✅</td>
+</tr>
+</tbody>
+</table></div>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> Map view</li>
+<li class="task-list-item"><input type="checkbox" disabled> <del>Voice</del></li>
+</ul>
+<h2 id="documents">Documents<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#documents">#</a></h2>
+<ul>
+<li><a href="https://github.com/Decuayer/aegis-dispatch/blob/main/docs/design-report.pdf" target="_blank" rel="noopener noreferrer">Design report</a></li>
+<li><a href="/projects/a/docs/d2" data-document="">User manual</a></li>
+</ul>
+<h2 id="installation">Installation<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#installation">#</a></h2>
+<pre class="shiki shiki-themes github-light github-dark" style="--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e" tabindex="0"><code class="language-bash"><span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">npm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> install</span></span></code></pre>
+<p>See <a href="#installation">Installation</a> and <a href="https://github.com/Decuayer/aegis-dispatch/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">contributing</a>.</p>"
+`;

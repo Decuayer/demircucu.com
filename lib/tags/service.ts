@@ -161,7 +161,6 @@ export async function mergeTags(tx: Tx, fromId: string, intoId: string): Promise
     );
     await tx.$executeRawUnsafe(`DELETE FROM "${table}" WHERE "tagId" = $1`, fromId);
   }
-  await tx.unmappedTopic.updateMany({ where: { tagId: fromId }, data: { tagId: intoId } });
 
   // If the target sits below the source, lift it to the source's place first so re-parenting
   // the source's children cannot form a cycle.
