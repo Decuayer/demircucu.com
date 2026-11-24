@@ -1,7 +1,7 @@
 /**
  * Replays the migrations on a scratch database with legacy-shaped rows, applies the Phase 3
  * expand migration and checks the backfill (URL -> storage path, tag join tables, attachments,
- * MediaUsage). The shared test database cannot be used: it already has every migration applied.
+ * MediaUsage), then applies the contract migration and checks that nothing new is lost. The shared test database cannot be used: it already has every migration applied.
  */
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -10,6 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resolveTestDatabaseUrl } from "@/tests/setup/test-db";
 
 const EXPAND = "20261124120000_phase3_expand";
+const CONTRACT = "20261125090000_phase3_contract";
 const MIGRATIONS_DIR = path.join(process.cwd(), "prisma/migrations");
 const HOST = "https://abc.supabase.co/storage/v1/object/public/media/";
 
@@ -139,6 +140,54 @@ describe("phase 3 expand migration backfill", () => {
   });
 
   it("enables row level security on every table", async () => {
+    const { rows } = await db.query(`
+      SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'public' AND c.relkind = 'r' AND NOT c.relrowsecurity`);
+    expect(rows).toEqual([]);
+  });
+});
+
+describe("phase 3 contract migration", () => {
+  beforeAll(async () => {
+    await db.query(migrationSql(CONTRACT));
+  });
+
+  it("drops the legacy url from own-media attachments and keeps external links", async () => {
+    const { files } = await one<{ files: unknown }>(`SELECT files FROM "Project" WHERE id = 'p1'`);
+    expect(files).toEqual([
+      { name: "Doc", path: "general/doc.pdf" },
+      { name: "Ext", url: "https://example.com/x.pdf" },
+    ]);
+  });
+
+  it("drops the legacy columns and implicit tag tables", async () => {
+    const { rows } = await db.query(`
+      SELECT table_name || '.' || column_name AS col FROM information_schema.columns
+      WHERE table_schema = 'public' AND (
+        (table_name IN ('Project', 'Experience') AND column_name IN ('logo', 'images'))
+        OR (table_name = 'BlogPost' AND column_name = 'coverImage')
+        OR (table_name = 'MediaFile' AND column_name IN ('url', 'usedIn'))
+        OR (table_name = 'SiteSettings' AND column_name IN ('aboutPhoto', 'faviconUrl')))`);
+    expect(rows).toEqual([]);
+    for (const table of ["_ProjectToTag", "_ExperienceToTag", "_BlogPostToTag"]) {
+      expect(await one(`SELECT to_regclass('public."${table}"') AS t`)).toEqual({ t: null });
+    }
+  });
+
+  it("keeps the converted references, join rows and usage", async () => {
+    expect(await one(`SELECT "logoPath" FROM "Project" WHERE id = 'p1'`)).toEqual({
+      logoPath: "projects/a.png",
+    });
+    expect(
+      await one(`SELECT
+        (SELECT count(*)::int FROM "ProjectTag") p,
+        (SELECT count(*)::int FROM "ExperienceTag") e,
+        (SELECT count(*)::int FROM "BlogPostTag") b,
+        (SELECT count(*)::int FROM "MediaUsage") u`),
+    ).toEqual({ p: 1, e: 1, b: 1, u: 2 });
+  });
+
+  it("still enforces row level security on every table", async () => {
     const { rows } = await db.query(`
       SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
       WHERE n.nspname = 'public' AND c.relkind = 'r' AND NOT c.relrowsecurity`);

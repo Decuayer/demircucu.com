@@ -16,10 +16,7 @@ export async function getSiteSettings() {
   "use cache: remote";
   cacheTag(CacheTags.settings);
   cacheLife("hours");
-  const settings = await prisma.siteSettings.findUnique({
-    where: { id: "main" },
-    omit: { aboutPhoto: true, faviconUrl: true },
-  });
+  const settings = await prisma.siteSettings.findUnique({ where: { id: "main" } });
   return (
     settings && {
       ...settings,

@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 3 genişletme production'a uygulandı; PR #5 merge bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-24 (Faz 3 genişletme production'da; daraltma PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -13,8 +13,8 @@ dosyada veya ortamda olduklarını belirtir.
 | Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı         | `fix/db-connection-pool`, PR #2   |
 | Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı | `feat/phase-2-security-auth`      |
 | Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor     | —                                 |
-| Faz 3: Veri modeli (genişletme)  | Production'a uygulandı (onaylı), PR #5 merge bekliyor          | `feat/phase-3-data-model`         |
-| Faz 3: Daraltma migration'ı      | Deploy doğrulandıktan sonra ayrı PR                            | —                                 |
+| Faz 3: Veri modeli (genişletme)  | Tamamlandı, **merge edildi** (PR #5), production'da doğrulandı | `feat/phase-3-data-model`         |
+| Faz 3: Daraltma migration'ı      | Staging'e uygulandı; önce kod deploy, sonra production         | `feat/phase-3-contract`           |
 | Faz 4–10                         | Başlamadı                                                      | —                                 |
 
 ## 2. Tamamlanan işler
@@ -72,7 +72,7 @@ içinde, `SkillCategory` yerine `parentId`, `images` / `url` / `usedIn` kaldır�
   override fallback'leri, büyük/iç alanlar hariç).
 - **Testler:** unit 212, integration 127 (backfill replay testi dahil), supabase 16, E2E 33
   (yeni: yükleme → path → public görsel → silme engeli).
-- **Production sayımı (salt okunur, 2026-11-24, `scripts/audit-media-refs.ts`):** 8 medya; tüm
+- **Production sayımı (salt okunur, 2026-11-24, `scripts/audit-media-refs.ts`, daraltmada silindi):** 8 medya; tüm
   bucket referanslarının `MediaFile` kaydı var; 1 dış logo (Vestel); 1 ek dosya; HTML'de görsel
   yok; 12 etiket, 12 etiket bağlantısı (0 proje, 11 deneyim, 1 blog).
 - **Staging:** migration uygulandı, `verify-db-lockdown` hepsi ok, drift yok, join tabloları
@@ -175,7 +175,7 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Kullanıcının bekleyen manuel adımları
 
-- PR #5 merge; deploy bitene kadar admin panelde düzenleme yapılmaması.
+- Daraltma PR'ının merge'ü ve deploy; ardından production daraltma migration'ı için onay.
 - Daraltma sonrası: Vestel logosunu medya kütüphanesine yükleyip deneyimde seçmek.
 
 ### Kararlar (2026-11-24)
@@ -197,8 +197,11 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 3 daraltma (ayrı PR, deploy doğrulandıktan sonra):** legacy kolonları ve `_XToTag`
-  tablolarını düşür, `files` içindeki eski `url` anahtarlarını temizle. **Faz 4:** etiket sistemi (geçici `connectTags`
+- **Faz 3 daraltma (`20261125090000_phase3_contract`):** legacy kolonlar ve `_XToTag` tabloları
+  düşer, `files` içindeki eski `url` anahtarları silinir. Sıra: kod deploy (legacy kolonları artık
+  seçmez), sonra migration; tersi admin listelerini bozar. Production ön kontrolü (salt okunur):
+  kaybolacak gerçek değer yalnızca Vestel logosu; 3 proje logosu ve 2 kapak boş string (eski
+  formlar), etiket bağlantılarının hepsi join tablolarında. **Faz 4:** etiket sistemi (geçici `connectTags`
   eşlemesi kalkacak); **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
 
