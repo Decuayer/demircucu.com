@@ -60,6 +60,8 @@ export default defineConfig({
           DATABASE_URL: E2E_DATABASE_URL,
           DIRECT_URL: E2E_DATABASE_URL,
           NEXT_PUBLIC_APP_URL: BASE_URL,
+          // Like Vercel: the server renders in UTC while browsers use their own time zone.
+          TZ: "UTC",
           SUPABASE_SERVICE_ROLE_KEY: localSecretKey() ?? "",
         },
       },
