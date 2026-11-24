@@ -111,7 +111,7 @@ kuyruk yok), hatalar admin "Etiketler" sayfasında düzeltilir; önerilen ağaç
   kendi tek bağlantılı havuzuyla düzeltildi (`cecabc7`).
 - **Kapanış düzeltmesi:** deneyim liste ve detay sayfaları `logoUrl`'i hiç göstermiyordu (detayda sabit
   ikon). İkisi de logoyu gösteriyor; E2E testi eklendi (admin yükler → liste ve detayda görsel).
-- **Testler:** unit 278, integration 180, supabase 16, E2E 41. `admin-media` E2E bir kez zaman aşımına
+- **Testler:** unit 283, integration 180, supabase 16, E2E 41. `admin-media` E2E bir kez zaman aşımına
   düştü (paralel yük), tekrarlarda geçti.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
