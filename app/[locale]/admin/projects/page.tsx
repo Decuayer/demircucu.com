@@ -1,6 +1,7 @@
-import { adminListProjects } from "@/lib/data/admin";
+import { adminGithubOverview, adminListProjects } from "@/lib/data/admin";
 import AdminProjectsClient from "./client";
 
 export default async function AdminProjectsPage() {
-  return <AdminProjectsClient initialProjects={await adminListProjects()} />;
+  const [projects, github] = await Promise.all([adminListProjects(), adminGithubOverview()]);
+  return <AdminProjectsClient initialProjects={projects} github={github} />;
 }

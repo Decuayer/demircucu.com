@@ -32,6 +32,12 @@ export default function ProjectFormClient({
   isEdit,
 }: ProjectFormClientProps) {
   const t = useTranslations("admin");
+  const g = useTranslations("admin.github");
+  // GitHub projects: titles and summaries are optional overrides of the repository data.
+  const isGithub = initialData?.source === "GITHUB";
+  const repoName = initialData?.githubFullName?.split("/").pop() ?? "";
+  const repoDescription = initialData?.githubDescription ?? "";
+  const mark = isGithub ? "" : " *";
   const errorMessage = useActionErrorMessage();
   const router = useRouter();
   const params = useParams();
@@ -65,8 +71,8 @@ export default function ProjectFormClient({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!titleTr || !titleEn || !slug || !summaryTr || !summaryEn) {
-      toast.error("Lütfen zorunlu alanları (TR ve EN) doldurun.");
+    if (!slug || (!isGithub && (!titleTr || !titleEn || !summaryTr || !summaryEn))) {
+      toast.error(t("required_fields"));
       return;
     }
 
@@ -98,7 +104,7 @@ export default function ProjectFormClient({
       if (res.error) {
         toast.error(errorMessage(res.error));
       } else {
-        toast.success(isEdit ? "Proje güncellendi." : "Proje başarıyla eklendi.");
+        toast.success(isEdit ? t("projectUpdated") : t("projectCreated"));
         router.push(`/${locale}/admin/projects`);
       }
     });
@@ -130,24 +136,35 @@ export default function ProjectFormClient({
               <CardTitle>{t("generalInfo")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {isGithub && (
+                <p className="rounded-md border border-cyan-500/20 bg-cyan-500/5 p-3 text-sm text-muted-foreground">
+                  {g("overrideHint", { repo: initialData?.githubFullName ?? "" })}
+                </p>
+              )}
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="titleTr">{t("projectTitle")} (TR) *</Label>
+                  <Label htmlFor="titleTr">
+                    {t("projectTitle")} (TR){mark}
+                  </Label>
                   <Input
                     id="titleTr"
                     value={titleTr}
                     onChange={(e) => setTitleTr(e.target.value)}
-                    required
+                    required={!isGithub}
+                    placeholder={repoName}
                     className="bg-accent/30"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="titleEn">{t("projectTitle")} (EN) *</Label>
+                  <Label htmlFor="titleEn">
+                    {t("projectTitle")} (EN){mark}
+                  </Label>
                   <Input
                     id="titleEn"
                     value={titleEn}
                     onChange={(e) => setTitleEn(e.target.value)}
-                    required
+                    required={!isGithub}
+                    placeholder={repoName}
                     className="bg-accent/30"
                   />
                 </div>
@@ -165,21 +182,27 @@ export default function ProjectFormClient({
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("summary")} (TR) *</Label>
+                  <Label>
+                    {t("summary")} (TR){mark}
+                  </Label>
                   <Textarea
                     value={summaryTr}
                     onChange={(e) => setSummaryTr(e.target.value)}
-                    required
+                    required={!isGithub}
+                    placeholder={repoDescription}
                     className="bg-accent/30"
                     rows={2}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("summary")} (EN) *</Label>
+                  <Label>
+                    {t("summary")} (EN){mark}
+                  </Label>
                   <Textarea
                     value={summaryEn}
                     onChange={(e) => setSummaryEn(e.target.value)}
-                    required
+                    required={!isGithub}
+                    placeholder={repoDescription}
                     className="bg-accent/30"
                     rows={2}
                   />

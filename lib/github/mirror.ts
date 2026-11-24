@@ -18,9 +18,9 @@ import sharp from "sharp";
 import type { PrismaClient } from "@prisma/client";
 import { USER_AGENT, type FetchLike } from "./auth";
 
-const MB = 1024 * 1024;
+import { MIRROR_LIMITS } from "@/lib/upload/policy";
 
-export const MIRROR_LIMITS = { image: 10 * MB, document: 25 * MB } as const;
+export { MIRROR_LIMITS };
 
 /** Longest edge kept for mirrored images; larger ones are scaled down. */
 export const MAX_IMAGE_EDGE = 2400;

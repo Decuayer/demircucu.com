@@ -67,7 +67,61 @@
     "viewGithub": "View on GitHub",
     "liveSite": "Live Site",
     "techStack": "Tech Stack",
-    "allProjects": "All Projects"
+    "allProjects": "All Projects",
+    "archived": "Archived",
+    "otherLanguages": "Other",
+    "attachments": "Attachments",
+    "sections": {
+      "readme": "README",
+      "documents": "Documents ({count})",
+      "gallery": "Gallery ({count})",
+      "details": "Notes"
+    },
+    "readme": {
+      "copy": "Copy",
+      "copied": "Copied",
+      "originalLanguage": "The README is shown in its original language.",
+      "toc": "Contents"
+    },
+    "meta": {
+      "stars": "{count, plural, one {# star} other {# stars}}",
+      "forks": "{count, plural, one {# fork} other {# forks}}",
+      "updated": "Updated {date}",
+      "languages": "Languages"
+    },
+    "pdf": {
+      "previous": "Previous page",
+      "next": "Next page",
+      "pageOf": "{page} / {pages}",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fullscreen": "Full screen",
+      "exitFullscreen": "Exit full screen",
+      "download": "Download",
+      "failed": "The document could not be loaded."
+    },
+    "documents": {
+      "tooLarge": "Too large; opens on GitHub",
+      "openPage": "Open on its own page"
+    },
+    "gallery": {
+      "open": "Enlarge {name}",
+      "title": "Gallery",
+      "previous": "Previous image",
+      "next": "Next image"
+    },
+    "filters": {
+      "search": "Search projects",
+      "language": "Language",
+      "allLanguages": "All languages",
+      "sort": "Sort",
+      "sorts": {
+        "featured": "Featured",
+        "updated": "Recently updated",
+        "stars": "Stars"
+      },
+      "empty": "No project matches these filters."
+    }
   },
   "blog": {
     "title": "Blog",
@@ -308,7 +362,90 @@
     "publicUrl": "Public URL",
     "urlCopied": "URL copied.",
     "usageCount": "{count, plural, =0 {Not used} one {Used in # place} other {Used in # places}}",
-    "skillsMovedToTags": "Skills now come from tags; the percentage list is no longer used (the old data was kept)."
+    "skillsMovedToTags": "Skills now come from tags; the percentage list is no longer used (the old data was kept).",
+    "projectDeleted": "Project deleted.",
+    "projectUpdated": "Project updated.",
+    "projectCreated": "Project created.",
+    "mediaSource": "Source",
+    "allSources": "All sources",
+    "sourceUpload": "Uploaded",
+    "sourceGithub": "GitHub",
+    "mediaRepo": "Repository",
+    "allRepos": "All repositories",
+    "origin": "Original file",
+    "cleanupUnused": "Clean up unused ({count})",
+    "cleanupTitle": "Unused GitHub media",
+    "cleanupConfirmation": "{count} GitHub files that no content uses will be deleted from storage and the library. This cannot be undone.",
+    "cleanupDone": "{count} files deleted.",
+    "usage": {
+      "PROJECT_files": "Project attachment",
+      "PROJECT_description": "Project description",
+      "PROJECT_readme": "Project README",
+      "PROJECT_document": "Project document",
+      "PROJECT_logo": "Project logo",
+      "EXPERIENCE_files": "Experience attachment",
+      "EXPERIENCE_details": "Experience details",
+      "EXPERIENCE_logo": "Experience logo",
+      "BLOG_POST_files": "Post attachment",
+      "BLOG_POST_content": "Post content",
+      "BLOG_POST_cover": "Post cover",
+      "SITE_SETTINGS_aboutBio": "About text",
+      "SITE_SETTINGS_aboutPhoto": "Profile photo",
+      "SITE_SETTINGS_favicon": "Site icon"
+    },
+    "github": {
+      "title": "GitHub sync",
+      "syncAll": "Sync now",
+      "running": "Syncing…",
+      "started": "Sync started.",
+      "alreadyRunning": "A sync is already running.",
+      "settingsSaved": "Settings saved.",
+      "auth": {
+        "app": "GitHub App",
+        "token": "Token",
+        "anonymous": "No credentials (60 requests per hour)"
+      },
+      "webhookOn": "Webhook on",
+      "webhookOff": "No webhook",
+      "cronOn": "Daily cron on",
+      "cronOff": "No cron",
+      "lastRun": "Last run {when}: {status}",
+      "includeForks": "Include forks",
+      "includeArchived": "Include archived repositories",
+      "policy": "These settings only affect new imports. Repositories created after {date} with a description and a README are published automatically; others arrive as drafts.",
+      "runs": "Recent runs",
+      "run": {
+        "started": "Started",
+        "trigger": "Trigger",
+        "scope": "Scope",
+        "status": "Status",
+        "result": "Result",
+        "summary": "{created} new, {updated} updated, {unchanged} unchanged, {failed} failed, {remaining} remaining"
+      },
+      "allRepos": "All repositories",
+      "trigger": {
+        "MANUAL": "Admin",
+        "CRON": "Cron",
+        "WEBHOOK": "Webhook"
+      },
+      "status": {
+        "RUNNING": "running",
+        "OK": "succeeded",
+        "PARTIAL": "partial",
+        "ERROR": "failed"
+      },
+      "sourceGithub": "GitHub",
+      "sourceManual": "Manual",
+      "archived": "Archived",
+      "syncError": "Sync error",
+      "repoUnavailable": "Repository unavailable",
+      "syncedAgo": "synced {when}",
+      "syncOne": "Sync this repository",
+      "reprocess": "Reprocess README",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "overrideHint": "This project is synced from {repo}. Empty title and summary fields show the repository name and description; fields you fill in are never changed by the sync."
+    }
   },
   "common": {
     "loading": "Loading...",

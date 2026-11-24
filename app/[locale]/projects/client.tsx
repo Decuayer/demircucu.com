@@ -5,7 +5,8 @@ import { Link } from "@/i18n/navigation";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Code2, ExternalLink, ArrowRight } from "lucide-react";
+import { Archive, Code2, ExternalLink, ArrowRight, Star } from "lucide-react";
+import { languageColor } from "@/lib/projects/readme";
 import { GithubIcon } from "@/components/icons";
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
@@ -45,7 +46,7 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
 
         {filter}
 
-        {/* Projects Grid */}
+        {/* Projects grid (animations are per card; the filtered list re-renders in place) */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {projects.map((project, i) => (
             <motion.div
@@ -99,6 +100,33 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
                       {getTranslated(project, "summary", locale)}
                     </p>
                   </div>
+
+                  {/* Repository facts */}
+                  {(project.primaryLanguage || project.stars > 0 || project.isArchived) && (
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                      {project.primaryLanguage && (
+                        <span className="inline-flex items-center gap-1.5">
+                          <span
+                            className="h-2.5 w-2.5 rounded-full"
+                            style={{ backgroundColor: languageColor(project.primaryLanguage) }}
+                          />
+                          {project.primaryLanguage}
+                        </span>
+                      )}
+                      {project.stars > 0 && (
+                        <span className="inline-flex items-center gap-1">
+                          <Star className="h-3.5 w-3.5" />
+                          {project.stars}
+                        </span>
+                      )}
+                      {project.isArchived && (
+                        <span className="inline-flex items-center gap-1 text-yellow-500">
+                          <Archive className="h-3.5 w-3.5" />
+                          {t("archived")}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Tags */}
                   <TagChips tags={project.tags} locale={locale} chipClassName="text-xs" />

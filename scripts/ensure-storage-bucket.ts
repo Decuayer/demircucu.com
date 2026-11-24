@@ -1,6 +1,7 @@
 /**
  * Aligns the public `media` bucket with the upload policy as a second layer: Storage itself
- * rejects other MIME types and files above 4 MB.
+ * rejects other MIME types and files above 25 MB (the GitHub PDF mirror limit; admin uploads
+ * stay at 4 MB in the upload route).
  *   (set -a; . ./.env.staging.local; set +a; npx tsx scripts/ensure-storage-bucket.ts)
  *
  * Dry-run by default: reports the bucket settings, the planned change and every existing object
@@ -8,7 +9,12 @@
  * Bucket limits only apply to new uploads; existing objects are never removed or rewritten.
  */
 import { createClient } from "@supabase/supabase-js";
-import { MAX_UPLOAD_BYTES, UPLOAD_TYPES, type AllowedMime } from "../lib/upload/policy";
+import {
+  BUCKET_FILE_SIZE_LIMIT,
+  MIRROR_LIMITS,
+  UPLOAD_TYPES,
+  type AllowedMime,
+} from "../lib/upload/policy";
 
 const BUCKET = "media";
 const PAGE = 1000;
@@ -39,7 +45,13 @@ async function listObjects(storage: StorageApi, prefix = ""): Promise<ObjectInfo
 function violation(object: ObjectInfo): string | null {
   if (!object.mime || !(object.mime in UPLOAD_TYPES)) return `type ${object.mime ?? "unknown"}`;
   const rule = UPLOAD_TYPES[object.mime as AllowedMime];
-  if (object.size > rule.maxBytes) return `size ${object.size} > ${rule.maxBytes}`;
+  // GitHub mirrors (github/<repo>/...) have their own, larger limits.
+  const max = object.path.startsWith("github/")
+    ? rule.kind === "document"
+      ? MIRROR_LIMITS.document
+      : MIRROR_LIMITS.image
+    : rule.maxBytes;
+  if (object.size > max) return `size ${object.size} > ${max}`;
   return null;
 }
 
@@ -54,7 +66,7 @@ async function main(): Promise<void> {
   }).storage;
   const options = {
     public: true,
-    fileSizeLimit: MAX_UPLOAD_BYTES,
+    fileSizeLimit: BUCKET_FILE_SIZE_LIMIT,
     allowedMimeTypes: Object.keys(UPLOAD_TYPES),
   };
   console.log(apply ? "mode: APPLY" : "mode: dry-run (pass --apply to change)");

@@ -67,7 +67,61 @@
     "viewGithub": "GitHub'da Gör",
     "liveSite": "Canlı Site",
     "techStack": "Teknoloji Stack'i",
-    "allProjects": "Tüm Projeler"
+    "allProjects": "Tüm Projeler",
+    "archived": "Arşivlendi",
+    "otherLanguages": "Diğer",
+    "attachments": "Ekli Dosyalar",
+    "sections": {
+      "readme": "README",
+      "documents": "Dokümanlar ({count})",
+      "gallery": "Galeri ({count})",
+      "details": "Ek Açıklama"
+    },
+    "readme": {
+      "copy": "Kopyala",
+      "copied": "Kopyalandı",
+      "originalLanguage": "README orijinal dilinde gösteriliyor.",
+      "toc": "İçindekiler"
+    },
+    "meta": {
+      "stars": "{count} yıldız",
+      "forks": "{count} fork",
+      "updated": "Son güncelleme: {date}",
+      "languages": "Dil dağılımı"
+    },
+    "pdf": {
+      "previous": "Önceki sayfa",
+      "next": "Sonraki sayfa",
+      "pageOf": "{page} / {pages}",
+      "zoomIn": "Yakınlaştır",
+      "zoomOut": "Uzaklaştır",
+      "fullscreen": "Tam ekran",
+      "exitFullscreen": "Tam ekrandan çık",
+      "download": "İndir",
+      "failed": "Doküman yüklenemedi."
+    },
+    "documents": {
+      "tooLarge": "Dosya çok büyük; GitHub'da açılır",
+      "openPage": "Ayrı sayfada aç"
+    },
+    "gallery": {
+      "open": "{name} görselini büyüt",
+      "title": "Galeri",
+      "previous": "Önceki görsel",
+      "next": "Sonraki görsel"
+    },
+    "filters": {
+      "search": "Projelerde ara",
+      "language": "Dil",
+      "allLanguages": "Tüm diller",
+      "sort": "Sıralama",
+      "sorts": {
+        "featured": "Öne çıkanlar",
+        "updated": "Son güncellenen",
+        "stars": "Yıldız"
+      },
+      "empty": "Bu filtrelere uyan proje yok."
+    }
   },
   "blog": {
     "title": "Blog",
@@ -308,7 +362,90 @@
     "publicUrl": "Genel URL",
     "urlCopied": "URL kopyalandı.",
     "usageCount": "{count, plural, =0 {Kullanılmıyor} other {# yerde kullanılıyor}}",
-    "skillsMovedToTags": "Yetenekler artık etiketlerden geliyor; yüzdelik liste kullanılmıyor (eski veri silinmedi)."
+    "skillsMovedToTags": "Yetenekler artık etiketlerden geliyor; yüzdelik liste kullanılmıyor (eski veri silinmedi).",
+    "projectDeleted": "Proje silindi.",
+    "projectUpdated": "Proje güncellendi.",
+    "projectCreated": "Proje eklendi.",
+    "mediaSource": "Kaynak",
+    "allSources": "Tüm kaynaklar",
+    "sourceUpload": "Yüklenen",
+    "sourceGithub": "GitHub",
+    "mediaRepo": "Repo",
+    "allRepos": "Tüm repolar",
+    "origin": "Orijinal dosya",
+    "cleanupUnused": "Kullanılmayanları temizle ({count})",
+    "cleanupTitle": "Kullanılmayan GitHub medyası",
+    "cleanupConfirmation": "Hiçbir içerikte kullanılmayan {count} GitHub dosyası depodan ve kütüphaneden silinecek. Bu işlem geri alınamaz.",
+    "cleanupDone": "{count} dosya silindi.",
+    "usage": {
+      "PROJECT_files": "Proje eki",
+      "PROJECT_description": "Proje açıklaması",
+      "PROJECT_readme": "Proje README'si",
+      "PROJECT_document": "Proje dokümanı",
+      "PROJECT_logo": "Proje logosu",
+      "EXPERIENCE_files": "Deneyim eki",
+      "EXPERIENCE_details": "Deneyim içeriği",
+      "EXPERIENCE_logo": "Deneyim logosu",
+      "BLOG_POST_files": "Yazı eki",
+      "BLOG_POST_content": "Yazı içeriği",
+      "BLOG_POST_cover": "Yazı kapağı",
+      "SITE_SETTINGS_aboutBio": "Hakkımda metni",
+      "SITE_SETTINGS_aboutPhoto": "Profil fotoğrafı",
+      "SITE_SETTINGS_favicon": "Site ikonu"
+    },
+    "github": {
+      "title": "GitHub senkronizasyonu",
+      "syncAll": "Şimdi senkronize et",
+      "running": "Senkronize ediliyor…",
+      "started": "Senkronizasyon başladı.",
+      "alreadyRunning": "Zaten çalışan bir senkronizasyon var.",
+      "settingsSaved": "Ayarlar kaydedildi.",
+      "auth": {
+        "app": "GitHub App",
+        "token": "Token",
+        "anonymous": "Kimlik yok (saatte 60 istek)"
+      },
+      "webhookOn": "Webhook açık",
+      "webhookOff": "Webhook yok",
+      "cronOn": "Günlük cron açık",
+      "cronOff": "Cron yok",
+      "lastRun": "Son çalışma {when}: {status}",
+      "includeForks": "Fork'ları dahil et",
+      "includeArchived": "Arşivlenmiş repoları dahil et",
+      "policy": "Ayar yalnızca yeni içe aktarmayı etkiler. {date} sonrasında açılan, açıklaması ve README'si olan repolar otomatik yayımlanır; diğerleri taslak gelir.",
+      "runs": "Son çalışmalar",
+      "run": {
+        "started": "Başlangıç",
+        "trigger": "Tetikleyici",
+        "scope": "Kapsam",
+        "status": "Durum",
+        "result": "Sonuç",
+        "summary": "{created} yeni, {updated} güncellendi, {unchanged} değişmedi, {failed} hata, {remaining} kalan"
+      },
+      "allRepos": "Tüm repolar",
+      "trigger": {
+        "MANUAL": "Admin",
+        "CRON": "Cron",
+        "WEBHOOK": "Webhook"
+      },
+      "status": {
+        "RUNNING": "çalışıyor",
+        "OK": "başarılı",
+        "PARTIAL": "kısmi",
+        "ERROR": "hata"
+      },
+      "sourceGithub": "GitHub",
+      "sourceManual": "Manuel",
+      "archived": "Arşiv",
+      "syncError": "Senkron hatası",
+      "repoUnavailable": "Repo erişilemez",
+      "syncedAgo": "senkron {when}",
+      "syncOne": "Bu repoyu senkronize et",
+      "reprocess": "README'yi yeniden işle",
+      "moveUp": "Yukarı taşı",
+      "moveDown": "Aşağı taşı",
+      "overrideHint": "Bu proje {repo} reposundan senkronize ediliyor. Boş bırakılan başlık ve özet alanlarında GitHub'daki ad ve açıklama gösterilir; doldurduğunuz alanlar senkronizasyonda değişmez."
+    }
   },
   "common": {
     "loading": "Yükleniyor...",
