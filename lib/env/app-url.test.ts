@@ -5,11 +5,11 @@ describe("getAppUrl", () => {
   it("prefers NEXT_PUBLIC_APP_URL", () => {
     expect(
       getAppUrl({
-        NEXT_PUBLIC_APP_URL: "https://demircucu.com",
+        NEXT_PUBLIC_APP_URL: "https://www.demircucu.com",
         VERCEL_ENV: "preview",
         VERCEL_BRANCH_URL: "app-git-feature.vercel.app",
       }).origin,
-    ).toBe("https://demircucu.com");
+    ).toBe("https://www.demircucu.com");
   });
 
   it("uses the branch URL on preview deployments", () => {
@@ -32,10 +32,10 @@ describe("getAppUrl", () => {
     expect(
       getAppUrl({
         VERCEL_ENV: "production",
-        VERCEL_PROJECT_PRODUCTION_URL: "demircucu.com",
+        VERCEL_PROJECT_PRODUCTION_URL: "www.demircucu.com",
         VERCEL_URL: "app-xyz.vercel.app",
       }).origin,
-    ).toBe("https://demircucu.com");
+    ).toBe("https://www.demircucu.com");
   });
 
   it("ignores a blank NEXT_PUBLIC_APP_URL", () => {
