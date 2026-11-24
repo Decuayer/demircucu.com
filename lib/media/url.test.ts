@@ -13,7 +13,7 @@ describe("mediaUrl", () => {
   it("returns null for an empty path or a missing / invalid base URL", () => {
     expect(mediaUrl(null, BASE)).toBeNull();
     expect(mediaUrl("", BASE)).toBeNull();
-    expect(mediaUrl("projects/a.png", undefined)).toBeNull();
+    expect(mediaUrl("projects/a.png", "")).toBeNull();
     expect(mediaUrl("projects/a.png", "not a url")).toBeNull();
   });
 
@@ -55,7 +55,7 @@ describe("mediaPathFromUrl", () => {
     expect(mediaPathFromUrl(`${BASE}/storage/v1/object/sign/media/a/b.png`, BASE)).toBeNull();
     expect(mediaPathFromUrl(`${PREFIX}%E0%A4%A`, BASE)).toBeNull();
     expect(mediaPathFromUrl("not a url", BASE)).toBeNull();
-    expect(mediaPathFromUrl(`${PREFIX}a/b.png`, undefined)).toBeNull();
+    expect(mediaPathFromUrl(`${PREFIX}a/b.png`, "")).toBeNull();
   });
 });
 
