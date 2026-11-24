@@ -40,7 +40,17 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
           <div className="mb-12">
             <div className="mb-4 flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20">
-                <Building2 className="h-8 w-8 text-violet-400" />
+                {experience.logoUrl ? (
+                  // TODO(phase-6): migrate to next/image together with the project logo.
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={experience.logoUrl}
+                    alt={experience.company}
+                    className="h-10 w-10 rounded object-contain"
+                  />
+                ) : (
+                  <Building2 className="h-8 w-8 text-violet-400" />
+                )}
               </div>
               <div>
                 <h1 className="text-3xl font-bold md:text-4xl">{experience.company}</h1>

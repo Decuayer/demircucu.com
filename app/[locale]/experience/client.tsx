@@ -88,8 +88,17 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
                 <div className={`pl-8 md:w-1/2 md:pl-0 ${i % 2 === 0 ? "md:pl-12" : "md:pr-12"}`}>
                   <Card className="group relative border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card hover:shadow-lg hover:shadow-violet-500/5">
                     <CardContent className="space-y-3 p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
+                      <div className="flex items-center justify-between gap-3">
+                        {exp.logoUrl && (
+                          // TODO(phase-6): migrate to next/image together with the project logo.
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={exp.logoUrl}
+                            alt=""
+                            className="h-10 w-10 shrink-0 rounded-lg border border-border/50 bg-background/50 object-contain p-1"
+                          />
+                        )}
+                        <div className="min-w-0 flex-1">
                           <h3 className="text-lg font-semibold transition-colors group-hover:text-violet-400">
                             <Link
                               href={`/experience/${exp.id}`}
