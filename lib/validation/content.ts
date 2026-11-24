@@ -1,6 +1,15 @@
 import { z } from "zod";
 import { sanitizeHtml, sanitizeOptionalHtml } from "@/lib/sanitize/html";
-import { optionalText, optionalUrl, requiredText, slug, sortOrder, text } from "./common";
+import {
+  mediaPath,
+  optionalMediaPath,
+  optionalText,
+  optionalUrl,
+  requiredText,
+  slug,
+  sortOrder,
+  text,
+} from "./common";
 
 const richText = (max: number) => z.string().max(max).transform(sanitizeHtml);
 const optionalRichText = (max: number) =>
@@ -24,11 +33,11 @@ export const tagInputSchema = z.object({
   nameEn: requiredText(80),
 });
 
-export const fileAttachmentSchema = z.object({
-  name: requiredText(200),
-  url: z.url({ protocol: /^https$/ }).max(2048),
-  type: text(100).optional(),
-});
+/** An uploaded file of the media library (`path`) or an external https link (`url`). */
+export const fileAttachmentSchema = z.union([
+  z.object({ name: requiredText(200), path: mediaPath }).strict(),
+  z.object({ name: requiredText(200), url: z.url({ protocol: /^https$/ }).max(2048) }).strict(),
+]);
 
 const relations = {
   tagsList: z.array(tagInputSchema).max(50).optional(),
@@ -43,7 +52,7 @@ export const projectSchema = z.object({
   summaryEn: requiredText(500),
   descriptionTr: optionalRichText(RICH_TEXT_MAX),
   descriptionEn: optionalRichText(RICH_TEXT_MAX),
-  logo: optionalUrl,
+  logoPath: optionalMediaPath,
   githubUrl: optionalUrl,
   liveUrl: optionalUrl,
   order: sortOrder.default(0),
@@ -63,7 +72,7 @@ export const experienceSchema = z
     detailsEn: optionalRichText(RICH_TEXT_MAX),
     startDate: z.coerce.date(),
     endDate: z.coerce.date().nullish(),
-    logo: optionalUrl,
+    logoPath: optionalMediaPath,
     order: sortOrder.default(0),
     published: z.boolean().default(true),
     ...relations,
@@ -81,7 +90,7 @@ export const blogPostSchema = z.object({
   excerptEn: requiredText(1000),
   contentTr: richText(RICH_TEXT_MAX),
   contentEn: richText(RICH_TEXT_MAX),
-  coverImage: optionalUrl,
+  coverPath: optionalMediaPath,
   published: z.boolean().default(false),
   featured: z.boolean().default(false),
   ...relations,
@@ -113,7 +122,7 @@ export const siteSettingsSchema = z
     heroSubEn: short,
     aboutBioTr: optionalRichText(RICH_TEXT_MAX),
     aboutBioEn: optionalRichText(RICH_TEXT_MAX),
-    aboutPhoto: optionalUrl,
+    aboutPhotoPath: optionalMediaPath,
     aboutLocationTr: short,
     aboutLocationEn: short,
     aboutExperienceTr: short,
@@ -145,7 +154,7 @@ export const siteSettingsSchema = z
     siteTitleEn: short,
     siteDescriptionTr: long,
     siteDescriptionEn: long,
-    faviconUrl: optionalUrl,
+    faviconPath: optionalMediaPath,
   })
   .partial()
   .strict();

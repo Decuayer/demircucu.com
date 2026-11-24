@@ -35,10 +35,6 @@ export const UPLOAD_FOLDERS = [
 
 export const uploadFieldsSchema = z.object({
   folder: z.enum(UPLOAD_FOLDERS).default("general"),
-  usedIn: z
-    .string()
-    .regex(/^(blog|project|experience|settings):[A-Za-z0-9_-]{1,64}$/)
-    .optional(),
   name: z.string().trim().min(1).max(200),
 });
 

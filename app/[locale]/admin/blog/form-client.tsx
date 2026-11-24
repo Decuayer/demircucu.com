@@ -13,13 +13,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { TagSelector } from "@/components/ui/tag-selector";
 import { FileUploader } from "@/components/ui/file-uploader";
-import { toFileAttachments, type FileAttachment, type BlogPostWithTags } from "@/lib/types/content";
+import type { AdminPost } from "@/lib/types/content";
+import { toAttachments, type Attachment } from "@/lib/media/attachments";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { createBlogPost, updateBlogPost } from "@/app/actions/admin";
 import { useTranslations } from "next-intl";
 
 interface BlogFormClientProps {
-  initialData?: BlogPostWithTags | null;
+  initialData?: AdminPost | null;
   isEdit?: boolean;
 }
 
@@ -35,7 +36,7 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
   const [titleTr, setTitleTr] = useState(initialData?.titleTr || "");
   const [titleEn, setTitleEn] = useState(initialData?.titleEn || "");
   const [slug, setSlug] = useState(initialData?.slug || "");
-  const [coverImage, setCoverImage] = useState(initialData?.coverImage || "");
+  const [coverImage, setCoverImage] = useState(initialData?.coverPath || "");
   const [excerptTr, setExcerptTr] = useState(initialData?.excerptTr || "");
   const [excerptEn, setExcerptEn] = useState(initialData?.excerptEn || "");
   const [contentTr, setContentTr] = useState(initialData?.contentTr || "");
@@ -45,13 +46,12 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
 
   // Tags (Mapping relations to simplified objects for the server action)
   const [tags, setTags] = useState<string[]>(() => {
-    const initialTags =
-      initialData?.tags?.map((t) => t.nameTr || t.nameEn || "").filter(Boolean) || [];
+    const initialTags = initialData?.tags?.map((t) => t.name).filter(Boolean) || [];
     return Array.from(new Set(initialTags));
   });
 
   // Files
-  const [files, setFiles] = useState<FileAttachment[]>(() => toFileAttachments(initialData?.files));
+  const [files, setFiles] = useState<Attachment[]>(() => toAttachments(initialData?.files));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +69,7 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
       excerptEn,
       contentTr,
       contentEn,
-      coverImage,
+      coverPath: coverImage,
       published,
       featured,
       tagsList: tags.map((tag) => ({
@@ -181,12 +181,7 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
                 <Label>
                   {t("coverImageBlog")} ({t("optional")})
                 </Label>
-                <ImageUpload
-                  value={coverImage}
-                  onChange={setCoverImage}
-                  folder="blog"
-                  usedIn={isEdit ? `blog:${initialData?.id}` : undefined}
-                />
+                <ImageUpload value={coverImage} onChange={setCoverImage} folder="blog" />
               </div>
             </CardContent>
           </Card>
@@ -224,12 +219,7 @@ export default function BlogFormClient({ initialData, isEdit }: BlogFormClientPr
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <FileUploader
-                files={files}
-                onChange={setFiles}
-                folder="blog"
-                usedIn={isEdit ? `blog:${initialData?.id}` : undefined}
-              />
+              <FileUploader files={files} onChange={setFiles} folder="blog" />
             </CardContent>
           </Card>
         </div>

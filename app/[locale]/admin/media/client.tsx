@@ -21,7 +21,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/errors";
-import { type MediaFile } from "@prisma/client";
+import type { AdminMediaItem } from "@/lib/data/admin";
+import { mediaUrl } from "@/lib/media/url";
+import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
 import { deleteMediaFile } from "@/app/actions/media";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -36,17 +38,17 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface AdminMediaClientProps {
-  initialFiles: MediaFile[];
+  initialFiles: AdminMediaItem[];
 }
 
 export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps) {
   const t = useTranslations("admin");
   const errorMessage = useActionErrorMessage();
-  const [files, setFiles] = useState<MediaFile[]>(initialFiles);
+  const [files, setFiles] = useState<AdminMediaItem[]>(initialFiles);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"all" | "image" | "document">("all");
 
-  const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
+  const [selectedFile, setSelectedFile] = useState<AdminMediaItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [isUploading, setIsUploading] = useState(false);
@@ -67,7 +69,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
   const handleUpload = async (file: File) => {
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > MAX_UPLOAD_BYTES) {
       toast.error(t("fileSizeLimit"));
       return;
     }
@@ -86,10 +88,10 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setFiles((prev) => [data.file, ...prev]);
+        setFiles((prev) => [{ ...data.file, usageCount: 0 }, ...prev]);
         toast.success(t("fileUploaded"));
       } else {
-        throw new Error(data.error || t("uploadFailed"));
+        throw new Error(data.error ? errorMessage(data.error) : t("uploadFailed"));
       }
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -120,7 +122,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("URL kopyalandı!");
+    toast.success(t("urlCopied"));
   };
 
   const formatSize = (bytes: number) => {
@@ -235,7 +237,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                   {file.type.startsWith("image/") ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={file.url}
+                      src={mediaUrl(file.path) ?? undefined}
                       alt={file.name}
                       className="h-full w-full rounded-md object-cover"
                     />
@@ -281,7 +283,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                 {selectedFile.type.startsWith("image/") ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={selectedFile.url}
+                    src={mediaUrl(selectedFile.path) ?? undefined}
                     alt={selectedFile.name}
                     className="max-h-[300px] max-w-full rounded-md object-contain"
                   />
@@ -306,18 +308,26 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Public URL</Label>
+                  <Label className="text-xs text-muted-foreground">{t("publicUrl")}</Label>
                   <div className="flex gap-2">
-                    <Input readOnly value={selectedFile.url} className="h-8 bg-accent/30 text-xs" />
+                    <Input
+                      readOnly
+                      value={mediaUrl(selectedFile.path) ?? ""}
+                      className="h-8 bg-accent/30 text-xs"
+                    />
                     <Button
                       size="icon"
                       variant="secondary"
                       className="h-8 w-8 shrink-0"
-                      onClick={() => copyToClipboard(selectedFile.url)}
+                      onClick={() => copyToClipboard(mediaUrl(selectedFile.path) ?? "")}
                     >
                       <Copy className="h-3.5 w-3.5" />
                     </Button>
-                    <a href={selectedFile.url} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={mediaUrl(selectedFile.path) ?? undefined}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <Button size="icon" variant="outline" className="h-8 w-8 shrink-0">
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Button>
@@ -330,14 +340,12 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                   <p className="text-sm">{new Date(selectedFile.createdAt).toLocaleString()}</p>
                 </div>
 
-                {selectedFile.usedIn && (
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">{t("usedIn")}</Label>
-                    <p className="inline-block rounded-md border border-border/50 bg-accent/30 px-3 py-1.5 text-sm">
-                      {selectedFile.usedIn}
-                    </p>
-                  </div>
-                )}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">{t("usedIn")}</Label>
+                  <p className="inline-block rounded-md border border-border/50 bg-accent/30 px-3 py-1.5 text-sm">
+                    {t("usageCount", { count: selectedFile.usageCount })}
+                  </p>
+                </div>
 
                 <div className="mt-4 border-t border-border/50 pt-4">
                   <Button

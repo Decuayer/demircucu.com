@@ -9,14 +9,15 @@ import { ArrowLeft, Calendar, Building2 } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
 import { Link } from "@/i18n/navigation";
 import { getTranslated } from "@/lib/i18n-utils";
-import { toFileAttachments } from "@/lib/types/content";
+import { attachmentHref, toAttachments } from "@/lib/media/attachments";
 import { useParams } from "next/navigation";
 
-import { type Experience } from "@prisma/client";
+import type { PublicExperience } from "@/lib/types/content";
+import { tagLabel } from "@/lib/tags/view";
 import { FileIcon } from "lucide-react";
 
 interface ExperienceDetailClientProps {
-  experience: Experience & { tags: { id: string; nameTr: string; nameEn: string }[] };
+  experience: PublicExperience;
 }
 
 export default function ExperienceDetailClient({ experience }: ExperienceDetailClientProps) {
@@ -66,7 +67,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
           <div className="mb-8 flex flex-wrap gap-2">
             {experience.tags.map((tag) => (
               <Badge key={tag.id} variant="secondary" className="bg-accent/50">
-                {getTranslated(tag, "name", locale)}
+                {tagLabel(tag, locale)}
               </Badge>
             ))}
           </div>
@@ -90,8 +91,13 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
                 Ekli Dosyalar
               </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {toFileAttachments(experience.files).map((file, i) => (
-                  <a key={i} href={file.url} target="_blank" rel="noopener noreferrer">
+                {toAttachments(experience.files).map((file, i) => (
+                  <a
+                    key={i}
+                    href={attachmentHref(file) ?? undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
                       <CardContent className="flex items-center justify-between p-4">
                         <div className="flex items-center gap-3 overflow-hidden">

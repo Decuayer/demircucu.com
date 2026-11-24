@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 2 merge edildi; sıradaki Faz 3). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-24 (Faz 3 genişletme production'a uygulandı; PR #5 merge bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -13,7 +13,9 @@ dosyada veya ortamda olduklarını belirtir.
 | Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı         | `fix/db-connection-pool`, PR #2   |
 | Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı | `feat/phase-2-security-auth`      |
 | Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor     | —                                 |
-| Faz 3–10                         | Başlamadı                                                      | —                                 |
+| Faz 3: Veri modeli (genişletme)  | Production'a uygulandı (onaylı), PR #5 merge bekliyor          | `feat/phase-3-data-model`         |
+| Faz 3: Daraltma migration'ı      | Deploy doğrulandıktan sonra ayrı PR                            | —                                 |
+| Faz 4–10                         | Başlamadı                                                      | —                                 |
 
 ## 2. Tamamlanan işler
 
@@ -50,6 +52,32 @@ SRI, enforce; rate limit = Postgres, Turnstile yok; kayıt = açık, e-posta + p
 - **CI:** build job'ı seed'li Postgres'ten SELECT-only rolle build alıyor; `supabase` job'ı (Supabase CLI,
   supabase testleri, E2E); `staging-migrate.yml`; `preview-e2e.yml`.
 
+### Faz 3 (genişletme)
+
+Kararlar (kullanıcı, 2026-11-24): medya kolonları `MediaFile.path`'e FK (Restrict); Vestel logosu
+daraltmada boşalır, kullanıcı storage'a yükleyip seçer; analitik yaklaşım (a), ham veri 90 gün,
+`DailyStat` kalıcı; sapmalar kabul (`TagAlias` tablosu, `BigInt` repo id, engagement `PageView`
+içinde, `SkillCategory` yerine `parentId`, `images` / `url` / `usedIn` kaldırılıyor).
+
+- **Migration:** `20261124120000_phase3_expand` (yalnızca ekleme + backfill + trigger + RLS).
+  Eski kolonlar (`logo`, `images`, `coverImage`, `aboutPhoto`, `faviconUrl`, `MediaFile.url`,
+  `usedIn`, `_XToTag` tabloları) şemada "Legacy" olarak duruyor, uygulama kullanmıyor.
+- **Medya:** içerik storage path tutar; URL `lib/media/url.ts` ile üretilir. Ek dosyalar
+  `{name, path}` veya dış link `{name, url}`. Liste/HTML referansları `MediaUsage`'da, aynı
+  transaction'da yazılır. Kullanımdaki dosya silinemez (`mediaInUse`), storage hatasında satır geri
+  alınır. Elle URL ile görsel ekleme kaldırıldı (CSP ve FK ile uyumsuz).
+- **Etiket:** açık join tabloları (`source`, `hidden`), sync dışı kaynaklı satırlar korunur. Ağaç
+  döngüsü ve alias/slug çakışması trigger'la engelli (`app_private` şemasında).
+- **Okuma:** `lib/data/present.ts` public satırları şekillendirir (görünür etiketler, `logoUrl`,
+  override fallback'leri, büyük/iç alanlar hariç).
+- **Testler:** unit 212, integration 127 (backfill replay testi dahil), supabase 16, E2E 33
+  (yeni: yükleme → path → public görsel → silme engeli).
+- **Production sayımı (salt okunur, 2026-11-24, `scripts/audit-media-refs.ts`):** 8 medya; tüm
+  bucket referanslarının `MediaFile` kaydı var; 1 dış logo (Vestel); 1 ek dosya; HTML'de görsel
+  yok; 12 etiket, 12 etiket bağlantısı (0 proje, 11 deneyim, 1 blog).
+- **Staging:** migration uygulandı, `verify-db-lockdown` hepsi ok, drift yok, join tabloları
+  3/1/1, trigger'lar 3.
+
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
 | Sapma                                                                   | Gerekçe                                                                            |
@@ -63,6 +91,10 @@ SRI, enforce; rate limit = Postgres, Turnstile yok; kayıt = açık, e-posta + p
 | CSP nonce'suz (`'unsafe-inline'` script), SRI kısmi                     | PPR ile nonce mümkün değil; Next 16.4.6 SRI bazı chunk'larda `integrity` eklemiyor |
 | Upload limiti 5 MB yerine 4 MB                                          | Vercel fonksiyon gövde limiti 4,5 MB                                               |
 | Bilinmeyen slug'da ilk istek soft 404 (200 + noindex)                   | Partial Prefetching'in fallback shell'i; kullanıcı kabul etti, testli              |
+| `aliases String[]` yerine `TagAlias` tablosu                            | Alias benzersizliği DB'de garanti                                                  |
+| `githubRepoId` `BigInt`                                                 | GitHub repo id'leri int32 sınırına yaklaşıyor                                      |
+| Engagement ayrı tablo değil, `PageView` alanları                        | Tek satır, daha basit sorgu                                                        |
+| `SkillCategory` yok; kategoriler `parentId` kök düğümleri               | Tek ağaç; etiket sayısı az                                                         |
 
 ## 4. Ortamlar
 
@@ -101,8 +133,13 @@ Kurallar:
 | `20261124004754_comment_moderation_and_rate_limit` | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
 | `20261124004800_rls_lockdown`                      | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
 | `20261124004900_auth_profile_sync`                 | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
+| `20261124120000_phase3_expand`                     | `migrate deploy` (onaylı), lockdown ok, drift yok        | 2026-11-24 |
 
-- **Son yedek:** `~/backups/demircucu/backup-2026-11-24-pre-migrate.dump` (migration'dan hemen önce,
+- **Faz 3 yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-phase3.dump` (genişletmeden hemen
+  önce, 436 KB, mode 600, pg_dump 17 yerel Supabase konteynerinden; public 15, auth 27, storage 10
+  tablo verisi). Backfill sonucu: join tabloları 0/11/1, `aboutPhotoPath` ve `faviconPath` dolu,
+  Vestel logosu dönüştürülmedi (beklenen), 1 ek dosyaya path ve 1 `MediaUsage`, trigger'lar 3.
+- **Önceki yedek:** `~/backups/demircucu/backup-2026-11-24-pre-migrate.dump` (migration'dan hemen önce,
   426 KB, mode 600; `pg_restore --list`: public 14, auth 27, storage 10 tablo verisi). Önceki
   `backup-2026-11-24-pre-phase2.dump` güncel değildi (sonradan 1 blog yazısı eklenmiş). Storage
   dosyaları yedekte yok.
@@ -138,7 +175,8 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Kullanıcının bekleyen manuel adımları
 
-- Yok (Faz 2 adımları tamamlandı).
+- PR #5 merge; deploy bitene kadar admin panelde düzenleme yapılmaması.
+- Daraltma sonrası: Vestel logosunu medya kütüphanesine yükleyip deneyimde seçmek.
 
 ### Kararlar (2026-11-24)
 
@@ -159,7 +197,8 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 3:** medya referansları storage path olarak; **Faz 4:** etiket sistemi (geçici `connectTags`
+- **Faz 3 daraltma (ayrı PR, deploy doğrulandıktan sonra):** legacy kolonları ve `_XToTag`
+  tablolarını düşür, `files` içindeki eski `url` anahtarlarını temizle. **Faz 4:** etiket sistemi (geçici `connectTags`
   eşlemesi kalkacak); **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
 

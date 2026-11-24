@@ -19,12 +19,13 @@ const fadeUp = {
   }),
 };
 
-import type { Project, BlogPost, SiteSettings, Tag } from "@prisma/client";
+import type { PublicPost, PublicProject, PublicSiteSettings } from "@/lib/types/content";
+import { tagLabel } from "@/lib/tags/view";
 
 interface HomeClientProps {
-  featuredProjects: (Project & { tags: Tag[] })[];
-  latestPosts: (BlogPost & { tags: Tag[] })[];
-  settings?: SiteSettings | null;
+  featuredProjects: PublicProject[];
+  latestPosts: PublicPost[];
+  settings?: PublicSiteSettings | null;
 }
 
 export default function HomeClient({ featuredProjects, latestPosts, settings }: HomeClientProps) {
@@ -171,7 +172,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                             variant="secondary"
                             className="bg-accent/50 text-xs hover:bg-accent"
                           >
-                            {getTranslated(tag, "name", locale)}
+                            {tagLabel(tag, locale)}
                           </Badge>
                         ))}
                       </div>

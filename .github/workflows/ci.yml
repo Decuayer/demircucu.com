@@ -156,10 +156,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Start local Supabase (auth, API gateway, PostgREST, Mailpit)
+      - name: Start local Supabase (auth, API gateway, PostgREST, Storage, Mailpit)
         run: >-
           npx supabase start
-          -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+          -x realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
       - name: Supabase tests (RLS, grants, Data API, auth.users trigger)
         run: npm run test:supabase
       - run: npm run e2e:prepare

@@ -43,7 +43,6 @@ export async function POST(request: NextRequest) {
 
     const fields = uploadFieldsSchema.safeParse({
       folder: form.get("folder") ?? undefined,
-      usedIn: form.get("usedIn") || undefined,
       name: cleanDisplayName(file.name),
     });
     if (!fields.success) return error("invalidInput", 400);
@@ -63,14 +62,17 @@ export async function POST(request: NextRequest) {
     try {
       const mediaFile = await saveMediaFile({
         name: fields.data.name,
-        url: stored.publicUrl,
         type: decision.mime,
         size: bytes.byteLength,
         bucket: BUCKET_NAME,
         path: stored.path,
-        usedIn: fields.data.usedIn,
       });
-      return NextResponse.json({ success: true, url: stored.publicUrl, file: mediaFile });
+      return NextResponse.json({
+        success: true,
+        path: stored.path,
+        url: stored.publicUrl,
+        file: mediaFile,
+      });
     } catch (dbError) {
       // Do not leave an untracked object in the bucket.
       await deleteFileFromStorage(stored.path);

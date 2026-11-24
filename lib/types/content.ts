@@ -1,72 +1,22 @@
 /**
- * Shared content types for admin forms and server actions.
- * Phase 2 replaces the input types with types inferred from zod schemas.
+ * Shared content types for pages and admin forms. Input types come from the zod schemas
+ * (lib/validation/content.ts); row shapes come from the data layer.
  */
-import type { BlogPost, Experience, Project, Tag } from "@prisma/client";
+import type {
+  adminGetExperience,
+  adminGetPost,
+  adminGetProject,
+  adminGetSiteSettings,
+} from "@/lib/data/admin";
 
-export interface FileAttachment {
-  name: string;
-  url: string;
-}
+export type { PublicExperience, PublicPost, PublicProject } from "@/lib/data/present";
+export type { PublicSiteSettings } from "@/lib/data/settings";
+export type { Attachment } from "@/lib/media/attachments";
 
-export interface TagInput {
-  nameTr: string;
-  nameEn: string;
-  slug: string;
-}
-
-interface ContentRelationsInput {
-  tagsList?: TagInput[];
-  filesList?: FileAttachment[];
-}
-
-export interface ProjectInput extends ContentRelationsInput {
-  titleTr: string;
-  titleEn: string;
-  slug: string;
-  summaryTr?: string;
-  summaryEn?: string;
-  descriptionTr?: string | null;
-  descriptionEn?: string | null;
-  logo?: string | null;
-  githubUrl?: string | null;
-  liveUrl?: string | null;
-  order?: number;
-  published?: boolean;
-  featured?: boolean;
-}
-
-export interface ExperienceInput extends ContentRelationsInput {
-  company: string;
-  positionTr: string;
-  positionEn: string;
-  descriptionTr: string;
-  descriptionEn: string;
-  detailsTr?: string | null;
-  detailsEn?: string | null;
-  startDate?: Date;
-  endDate?: Date | null;
-  logo?: string | null;
-  order?: number;
-  published?: boolean;
-}
-
-export interface BlogPostInput extends ContentRelationsInput {
-  titleTr: string;
-  titleEn: string;
-  slug: string;
-  excerptTr: string;
-  excerptEn: string;
-  contentTr: string;
-  contentEn: string;
-  coverImage?: string | null;
-  published?: boolean;
-  featured?: boolean;
-}
-
-export type ProjectWithTags = Project & { tags: Tag[] };
-export type ExperienceWithTags = Experience & { tags: Tag[] };
-export type BlogPostWithTags = BlogPost & { tags: Tag[] };
+export type AdminProject = NonNullable<Awaited<ReturnType<typeof adminGetProject>>>;
+export type AdminExperience = NonNullable<Awaited<ReturnType<typeof adminGetExperience>>>;
+export type AdminPost = NonNullable<Awaited<ReturnType<typeof adminGetPost>>>;
+export type AdminSiteSettings = NonNullable<Awaited<ReturnType<typeof adminGetSiteSettings>>>;
 
 /** Shape of SiteSettings.skills entries (removed in Phase 4 in favour of tags). */
 export interface SkillSetting {
@@ -82,16 +32,4 @@ export interface HobbySetting {
   descTr?: string;
   descEn?: string;
   icon?: string;
-}
-
-/** Parses an untyped Prisma JSON column holding file attachments. */
-export function toFileAttachments(value: unknown): FileAttachment[] {
-  if (!Array.isArray(value)) return [];
-  return value.filter(
-    (item): item is FileAttachment =>
-      typeof item === "object" &&
-      item !== null &&
-      typeof (item as Record<string, unknown>).name === "string" &&
-      typeof (item as Record<string, unknown>).url === "string",
-  );
 }

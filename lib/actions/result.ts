@@ -1,5 +1,6 @@
 import { ZodError } from "zod";
 import { AuthorizationError } from "@/lib/auth/errors";
+import { UnknownMediaError } from "@/lib/media/usage-errors";
 
 /**
  * Error codes returned by server actions. They are i18n keys under `errors.*`; the client
@@ -17,6 +18,7 @@ export const ACTION_ERROR_CODES = [
   "weakPassword",
   "unsupportedType",
   "tooLarge",
+  "mediaInUse",
   "serverError",
 ] as const;
 
@@ -58,7 +60,10 @@ function isPrismaKnownError(error: unknown, code: string): boolean {
 export function toActionFailure(error: unknown, label: string): ActionFailure {
   if (error instanceof AuthorizationError) return fail(error.code);
   if (error instanceof ZodError) return fail("invalidInput", flattenZodError(error));
+  if (error instanceof UnknownMediaError) return fail("invalidInput");
   if (isPrismaKnownError(error, "P2002")) return fail("conflict");
+  // Foreign key violation: a media path or relation that does not exist.
+  if (isPrismaKnownError(error, "P2003")) return fail("invalidInput");
   if (isPrismaKnownError(error, "P2025")) return fail("notFound");
   console.error(`[action:${label}]`, error);
   return fail("serverError");

@@ -13,13 +13,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { TagSelector } from "@/components/ui/tag-selector";
 import { FileUploader } from "@/components/ui/file-uploader";
-import { toFileAttachments, type FileAttachment, type ProjectWithTags } from "@/lib/types/content";
+import type { AdminProject } from "@/lib/types/content";
+import { toAttachments, type Attachment } from "@/lib/media/attachments";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { createProject, updateProject } from "@/app/actions/admin";
 import { useTranslations } from "next-intl";
 
 interface ProjectFormClientProps {
-  initialData?: ProjectWithTags | null;
+  initialData?: AdminProject | null;
   isEdit?: boolean;
 }
 
@@ -35,7 +36,7 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
   const [titleTr, setTitleTr] = useState(initialData?.titleTr || "");
   const [titleEn, setTitleEn] = useState(initialData?.titleEn || "");
   const [slug, setSlug] = useState(initialData?.slug || "");
-  const [logo, setLogo] = useState(initialData?.logo || "");
+  const [logo, setLogo] = useState(initialData?.logoPath || "");
   const [summaryTr, setSummaryTr] = useState(initialData?.summaryTr || "");
   const [summaryEn, setSummaryEn] = useState(initialData?.summaryEn || "");
   const [descriptionTr, setDescriptionTr] = useState(initialData?.descriptionTr || "");
@@ -47,13 +48,12 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
 
   // Tags (Mapping relations to simplified objects for the server action)
   const [tags, setTags] = useState<string[]>(() => {
-    const initialTags =
-      initialData?.tags?.map((t) => t.nameTr || t.nameEn || "").filter(Boolean) || [];
+    const initialTags = initialData?.tags?.map((t) => t.name).filter(Boolean) || [];
     return Array.from(new Set(initialTags));
   });
 
   // Files
-  const [files, setFiles] = useState<FileAttachment[]>(() => toFileAttachments(initialData?.files));
+  const [files, setFiles] = useState<Attachment[]>(() => toAttachments(initialData?.files));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +71,7 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
       summaryEn,
       descriptionTr,
       descriptionEn,
-      logo,
+      logoPath: logo,
       githubUrl,
       liveUrl,
       published,
@@ -204,12 +204,7 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
 
               <div className="space-y-2">
                 <Label>{t("coverImage")}</Label>
-                <ImageUpload
-                  value={logo}
-                  onChange={setLogo}
-                  folder="projects"
-                  usedIn={isEdit ? `project:${initialData?.id}` : undefined}
-                />
+                <ImageUpload value={logo} onChange={setLogo} folder="projects" />
               </div>
             </CardContent>
           </Card>
@@ -247,12 +242,7 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <FileUploader
-                files={files}
-                onChange={setFiles}
-                folder="projects"
-                usedIn={isEdit ? `project:${initialData?.id}` : undefined}
-              />
+              <FileUploader files={files} onChange={setFiles} folder="projects" />
             </CardContent>
           </Card>
         </div>

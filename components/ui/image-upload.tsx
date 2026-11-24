@@ -1,186 +1,124 @@
 "use client";
 
-import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
-import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
-import { getErrorMessage } from "@/lib/errors";
+import { Button } from "@/components/ui/button";
+import { useActionErrorMessage } from "@/lib/actions/use-action-error";
+import { mediaUrl } from "@/lib/media/url";
+import { uploadToMediaLibrary, type UploadFolder } from "@/lib/media/upload-client";
+import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
 
 interface ImageUploadProps {
+  /** Storage path in the media bucket, or "" for none. */
   value: string;
-  onChange: (url: string) => void;
-  folder?: string;
-  usedIn?: string;
+  onChange: (path: string) => void;
+  folder?: UploadFolder;
 }
 
-export function ImageUpload({ value, onChange, folder = "general", usedIn }: ImageUploadProps) {
+/** Uploads an image to the media library and returns its storage path. */
+export function ImageUpload({ value, onChange, folder = "general" }: ImageUploadProps) {
+  const t = useTranslations("uploader");
+  const errorMessage = useActionErrorMessage();
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const [manualUrl, setManualUrl] = useState("");
-  const [showManual, setShowManual] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewUrl = mediaUrl(value);
 
   const handleUpload = async (file: File) => {
-    if (!file) return;
-
     if (!file.type.startsWith("image/")) {
-      toast.error("Lütfen geçerli bir görsel yükleyin.");
+      toast.error(t("notAnImage"));
       return;
     }
-
     if (file.size > MAX_UPLOAD_BYTES) {
-      toast.error("Görsel boyutu 4MB'dan küçük olmalıdır.");
+      toast.error(errorMessage("tooLarge"));
       return;
     }
-
-    try {
-      setIsUploading(true);
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", folder);
-      if (usedIn) formData.append("usedIn", usedIn);
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        onChange(data.url);
-        toast.success("Görsel başarıyla yüklendi.");
-      } else {
-        throw new Error(data.error || "Yükleme başarısız.");
-      }
-    } catch (error) {
-      toast.error(getErrorMessage(error));
-    } finally {
-      setIsUploading(false);
+    setIsUploading(true);
+    const result = await uploadToMediaLibrary(file, folder);
+    setIsUploading(false);
+    if (result.ok) {
+      onChange(result.path);
+      toast.success(t("imageUploaded"));
+    } else {
+      toast.error(errorMessage(result.error));
     }
   };
 
   const onDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
+    else if (e.type === "dragleave") setDragActive(false);
   };
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleUpload(e.dataTransfer.files[0]);
-    }
+    const file = e.dataTransfer.files?.[0];
+    if (file) void handleUpload(file);
   };
 
-  const handleManualUrlSubmit = () => {
-    if (manualUrl.trim()) {
-      onChange(manualUrl.trim());
-      setManualUrl("");
-      setShowManual(false);
-    }
-  };
+  if (value) {
+    return (
+      <div className="group relative flex aspect-video max-w-sm items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-accent/20">
+        {previewUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={previewUrl} alt={t("previewAlt")} className="h-full w-full object-contain" />
+        )}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+          <Button
+            type="button"
+            variant="destructive"
+            size="icon"
+            aria-label={t("remove")}
+            onClick={() => onChange("")}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {value ? (
-        <div className="group relative flex aspect-video max-w-sm items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-accent/20">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="Uploaded image" className="h-full w-full object-contain" />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-            <Button type="button" variant="destructive" size="icon" onClick={() => onChange("")}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <div
-            className={`relative cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors ${dragActive ? "border-violet-500 bg-violet-500/10" : "border-border/50 hover:border-violet-500/50 hover:bg-accent/30"} ${isUploading ? "pointer-events-none opacity-50" : ""} `}
-            onDragEnter={onDrag}
-            onDragLeave={onDrag}
-            onDragOver={onDrag}
-            onDrop={onDrop}
-            onClick={() => !isUploading && fileInputRef.current?.click()}
-          >
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/*"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  handleUpload(e.target.files[0]);
-                }
-              }}
-            />
-
-            <div className="flex flex-col items-center gap-2 text-muted-foreground">
-              {isUploading ? (
-                <>
-                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
-                  <p className="text-sm font-medium">Yükleniyor...</p>
-                </>
-              ) : (
-                <>
-                  <div className="mb-2 rounded-full bg-background p-3 shadow-sm">
-                    <Upload className="h-6 w-6 text-violet-400" />
-                  </div>
-                  <p className="text-sm font-medium">
-                    Görsel yüklemek için tıklayın veya sürükleyin
-                  </p>
-                  <p className="text-xs opacity-70">PNG, JPG, GIF, WEBP, AVIF (Max 4MB)</p>
-                </>
-              )}
+    <div
+      className={`relative cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors ${dragActive ? "border-violet-500 bg-violet-500/10" : "border-border/50 hover:border-violet-500/50 hover:bg-accent/30"} ${isUploading ? "pointer-events-none opacity-50" : ""}`}
+      onDragEnter={onDrag}
+      onDragLeave={onDrag}
+      onDragOver={onDrag}
+      onDrop={onDrop}
+      onClick={() => !isUploading && fileInputRef.current?.click()}
+    >
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void handleUpload(file);
+          e.target.value = "";
+        }}
+      />
+      <div className="flex flex-col items-center gap-2 text-muted-foreground">
+        {isUploading ? (
+          <>
+            <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+            <p className="text-sm font-medium">{t("uploading")}</p>
+          </>
+        ) : (
+          <>
+            <div className="mb-2 rounded-full bg-background p-3 shadow-sm">
+              <Upload className="h-6 w-6 text-violet-400" />
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="h-px flex-1 bg-border/50"></div>
-            <span className="text-xs text-muted-foreground uppercase">veya</span>
-            <div className="h-px flex-1 bg-border/50"></div>
-          </div>
-
-          {showManual ? (
-            <div className="flex gap-2">
-              <Input
-                value={manualUrl}
-                onChange={(e) => setManualUrl(e.target.value)}
-                placeholder="https://..."
-                className="flex-1 bg-accent/30"
-              />
-              <Button
-                type="button"
-                onClick={handleManualUrlSubmit}
-                className="bg-secondary text-secondary-foreground"
-              >
-                Ekle
-              </Button>
-              <Button type="button" variant="ghost" onClick={() => setShowManual(false)}>
-                İptal
-              </Button>
-            </div>
-          ) : (
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full border-border/50 text-muted-foreground"
-              onClick={() => setShowManual(true)}
-            >
-              <ImageIcon className="mr-2 h-4 w-4" />
-              URL ile görsel ekle
-            </Button>
-          )}
-        </div>
-      )}
+            <p className="text-sm font-medium">{t("imageDropHint")}</p>
+            <p className="text-xs opacity-70">{t("imageTypes")}</p>
+          </>
+        )}
+      </div>
     </div>
   );
 }

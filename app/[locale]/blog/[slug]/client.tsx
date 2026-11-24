@@ -21,13 +21,14 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { getTranslated } from "@/lib/i18n-utils";
-import { toFileAttachments } from "@/lib/types/content";
+import { attachmentHref, toAttachments } from "@/lib/media/attachments";
 import { useParams } from "next/navigation";
 
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { addComment, toggleLike } from "@/app/actions/blog_interaction";
-import type { BlogPost, Tag } from "@prisma/client";
+import type { PublicPost } from "@/lib/types/content";
+import { tagLabel } from "@/lib/tags/view";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 
 interface PublicComment {
@@ -38,7 +39,7 @@ interface PublicComment {
 }
 
 interface BlogDetailClientProps {
-  post: BlogPost & { tags: Tag[] };
+  post: PublicPost;
   initialComments: PublicComment[];
   initialLikesCount: number;
   initialUserLiked: boolean;
@@ -116,7 +117,7 @@ export default function BlogDetailClient({
               <div className="mb-4 flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
                   <Badge key={tag.id} variant="secondary" className="bg-accent/50">
-                    {getTranslated(tag, "name", locale)}
+                    {tagLabel(tag, locale)}
                   </Badge>
                 ))}
               </div>
@@ -157,15 +158,20 @@ export default function BlogDetailClient({
             />
 
             {/* Files */}
-            {toFileAttachments(post.files).length > 0 && (
+            {toAttachments(post.files).length > 0 && (
               <div className="mb-10 space-y-3">
                 <h3 className="flex items-center gap-2 text-lg font-semibold">
                   <FileIcon className="h-5 w-5 text-violet-400" />
                   Ekli Dosyalar
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {toFileAttachments(post.files).map((file, i) => (
-                    <a key={i} href={file.url} target="_blank" rel="noopener noreferrer">
+                  {toAttachments(post.files).map((file, i) => (
+                    <a
+                      key={i}
+                      href={attachmentHref(file) ?? undefined}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
                         <CardContent className="flex items-center gap-3 p-4">
                           <FileIcon className="h-4 w-4 shrink-0 text-cyan-400" />
