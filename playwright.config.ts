@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = Number(process.env.E2E_PORT ?? 3100);
@@ -5,6 +6,21 @@ const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
 // E2E runs target the local Supabase database (auth trigger, RLS), never .env.local values.
 const E2E_DATABASE_URL =
   process.env.E2E_DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
+
+/**
+ * Secret key of the local Supabase stack for the server's Storage uploads. `next start` reads
+ * server-only variables at runtime, so the value used for the build is not enough.
+ */
+function localSecretKey(): string | undefined {
+  if (process.env.E2E_BASE_URL) return undefined;
+  if (process.env.SUPABASE_TEST_SECRET_KEY) return process.env.SUPABASE_TEST_SECRET_KEY;
+  try {
+    const out = execFileSync("npx", ["supabase", "status", "-o", "json"], { encoding: "utf8" });
+    return (JSON.parse(out.slice(out.indexOf("{"))) as Record<string, string>).SECRET_KEY;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Expects the local Supabase stack (`npm run supabase:start`, migrated and seeded) and a
@@ -44,6 +60,7 @@ export default defineConfig({
           DATABASE_URL: E2E_DATABASE_URL,
           DIRECT_URL: E2E_DATABASE_URL,
           NEXT_PUBLIC_APP_URL: BASE_URL,
+          SUPABASE_SERVICE_ROLE_KEY: localSecretKey() ?? "",
         },
       },
 });
