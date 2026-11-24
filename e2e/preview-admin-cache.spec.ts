@@ -46,7 +46,7 @@ test("admin edit reaches the cached public pages within seconds (preview)", asyn
   await page.locator("main").getByLabel("E-posta").fill(email!);
   await page.locator("main").getByLabel("Şifre").fill(password!);
   await page.locator("main").getByRole("button", { name: "Giriş Yap" }).click();
-  await expect(page).toHaveURL(/\/tr\/admin$/);
+  await expect(page).toHaveURL(/\/tr\/admin$/, { timeout: 30_000 });
 
   await page.goto("/tr/admin/projects");
   const card = page

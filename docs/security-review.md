@@ -107,7 +107,9 @@ PUBLIC` (no-op on production, whose ACL is already owner-only); `ALTER DEFAULT P
 - `lib/rate-limit`: one atomic `INSERT ... ON CONFLICT` per check (fixed window), keys are
   `<policy>:<sha256(identifier)>` (no raw IPs or e-mails stored), rows older than 25 hours are pruned
   opportunistically. Fails open if the database is unreachable.
-- Limits (`lib/rate-limit/policies.ts`): login 20 / 15 min per IP and 5 / 15 min per account;
+- Limits (`lib/rate-limit/policies.ts`): login 20 / 15 min per IP, 5 / 15 min per account and IP,
+  50 / 15 min per account (the per-account limit alone let anyone lock the admin out with five
+  wrong passwords; found on the Preview, fixed before production);
   register 3 / hour per IP; password reset and resend 5 / hour per IP and 3 / hour per account;
   contact 3 / 10 min and 10 / day per IP; comments 5 / min and 50 / day per user; likes 30 / min per
   user.
@@ -121,6 +123,14 @@ PUBLIC` (no-op on production, whose ACL is already owner-only); `ALTER DEFAULT P
   `lib/cache/tags.ts` and checked action by action in the integration tests.
 - Comments: 2000 character limit; `Comment.hidden` with admin hide, show and delete
   (`/admin/comments`); hidden comments are not shown publicly.
+- Shared cache (Preview finding). The default `"use cache"` handler is in-memory per instance and
+  tracks tag expirations locally. On Vercel, admin edits regenerated the public list page from
+  stale data in 2 of 4 tries, and the CDN kept it for the full `cacheLife`. Tagged data functions
+  now use `"use cache: remote"` (guarded by `lib/cache/directives.test.ts`), and `invalidate()`
+  expires the same tags again 5 s after the response (`after()`), because a tag expiry needs
+  ~2-3 s to reach every instance. Measured afterwards: 7 of 7 edits fresh on the first request;
+  `e2e/preview-admin-cache.spec.ts` runs on every Preview and fails if an edit is not visible
+  within 15 s or does not stay visible.
 
 ### S9: Registration and auth flows
 
@@ -138,6 +148,11 @@ PUBLIC` (no-op on production, whose ACL is already owner-only); `ALTER DEFAULT P
 - Sign-out redirects to the current locale.
 
 ### S10: Security headers and CSP
+
+- Production content audit (read-only, `scripts/audit-content-hosts.ts`, 2026-11-24): every image
+  is in the project's own storage bucket except one experience logo hotlinked from
+  `statics.vestel.com.tr`, which no page renders today. Plain links (GitHub, LinkedIn, Instagram,
+  customer sites) are not affected by CSP. No CSP change needed.
 
 - Decision: allowlist CSP with Subresource Integrity, enforced, no nonces (owner, 2026-11-24).
   Nonces would make every page dynamic, which contradicts Cache Components. App Router emits inline
@@ -174,11 +189,13 @@ PUBLIC` (no-op on production, whose ACL is already owner-only); `ALTER DEFAULT P
 - **Build safety.** During `next build` every Prisma write raises `BuildWriteError`
   (`lib/db/build-guard.ts`); CI builds through a SELECT-only role. Build workers use one
   connection each; a Supabase session-pooler URL (port 5432) is rejected.
-- **Soft 404 (accepted trade-off of Partial Prefetching).** The first request for an unknown slug
-  is answered from the route's fallback shell, so the status is 200 with
+- **Soft 404 (accepted trade-off of Partial Prefetching, owner decision 2026-11-24).** The first
+  request for an unknown slug is answered from the route's fallback shell, so the status is 200 with
   `<meta name="robots" content="noindex">` and the not-found UI; later requests get a cached 404.
+  `e2e/smoke.spec.ts` checks noindex on the first and second request with a fresh slug per run, and
+  that unknown slugs never appear in `/sitemap.xml` (no sitemap yet; it lands in the SEO phase).
 - **Read-your-own-writes under `next start`.** After `updateTag`, the first request may still
-  receive the build-time prerender; the next one is fresh. To be re-checked on a Vercel Preview.
+  receive the build-time prerender; the next one is fresh (local only; on Vercel see S8).
 
 ## Dependency audit
 
