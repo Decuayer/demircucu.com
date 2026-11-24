@@ -194,15 +194,20 @@ Kurallar:
 
 ## 6. Production migration'ları ve yedek
 
-| Migration                                          | Uygulama                                                 | Tarih      |
-| -------------------------------------------------- | -------------------------------------------------------- | ---------- |
-| `0_init`                                           | `migrate resolve --applied` (baseline, şema değişmedi)   | 2026-11-24 |
-| `20261124004754_comment_moderation_and_rate_limit` | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
-| `20261124004800_rls_lockdown`                      | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
-| `20261124004900_auth_profile_sync`                 | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
-| `20261124120000_phase3_expand`                     | `migrate deploy` (onaylı), lockdown ok, drift yok        | 2026-11-24 |
-| `20261125090000_phase3_contract`                   | `migrate deploy` (onaylı, kod deploy'dan sonra), ok      | 2026-11-24 |
+| Migration                                          | Uygulama                                                          | Tarih      |
+| -------------------------------------------------- | ----------------------------------------------------------------- | ---------- |
+| `0_init`                                           | `migrate resolve --applied` (baseline, şema değişmedi)            | 2026-11-24 |
+| `20261124004754_comment_moderation_and_rate_limit` | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok          | 2026-11-24 |
+| `20261124004800_rls_lockdown`                      | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok          | 2026-11-24 |
+| `20261124004900_auth_profile_sync`                 | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok          | 2026-11-24 |
+| `20261124120000_phase3_expand`                     | `migrate deploy` (onaylı), lockdown ok, drift yok                 | 2026-11-24 |
+| `20261125090000_phase3_contract`                   | `migrate deploy` (onaylı, kod deploy'dan sonra), ok               | 2026-11-24 |
+| `20261126090000_phase5_github`                     | `migrate deploy` (onaylı, merge'den önce), lockdown ok, drift yok | 2026-11-24 |
 
+- **Faz 5 yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-phase5.dump` (migration'dan hemen önce,
+  476 KB, mode 600; public 26, auth 27, storage 10 tablo verisi). Sonuç: `UnmappedTopic` yok,
+  `GithubSyncSettings` 1 satır (RLS açık), canlı sayfalar 200. `media` bucket limiti staging ve
+  prod'da 25 MB (prod'da 9 nesne, hepsi politikaya uygun).
 - **Faz 4 etiket taşıması yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-phase4-tags.dump`
   (474 KB, mode 600; public 26, auth 27, storage 10 tablo verisi). `migrate-tags --apply` sonrası
   33 etiket (ayrıntı Faz 4 bölümünde).
@@ -275,7 +280,7 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Faz 5 devreye alma sırası
 
-1. Prod yedeği + `20261126090000_phase5_github` (onaylı, merge'den önce) ve `ensure-storage-bucket --apply`.
+1. ~~Prod yedeği + migration + bucket 25 MB~~ (yapıldı, 2026-11-24). Eşleme dry-run: 14 eşleşme, çakışma yok, 12 repo taslak gelecek.
 2. GitHub App + Vercel env (`docs/github-sync.md` → Setup), merge, deploy.
 3. `link-existing-projects.ts` dry-run → çakışma kararları → `--apply`; sonra admin "Şimdi senkronize et".
 
