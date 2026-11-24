@@ -9,6 +9,8 @@ import type { Profile } from "@prisma/client";
 export const auth: { current: Profile | null } = { current: null };
 export const cache = { updateTag: vi.fn(), revalidateTag: vi.fn() };
 export const headerValues = { ip: "203.0.113.7" };
+/** Callbacks passed to `after()`; not run (the follow-up expiry is unit-tested in lib/cache). */
+export const afterTasks: (() => unknown)[] = [];
 
 vi.mock("@/lib/auth/session", () => ({
   getCurrentUser: vi.fn(async () => auth.current),
@@ -21,6 +23,11 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
   cacheTag: vi.fn(),
   cacheLife: vi.fn(),
+}));
+
+vi.mock("next/server", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  after: vi.fn((task: () => unknown) => afterTasks.push(task)),
 }));
 
 vi.mock("next/headers", () => ({

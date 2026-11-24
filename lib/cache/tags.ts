@@ -1,4 +1,5 @@
-import { updateTag } from "next/cache";
+import { revalidateTag, updateTag } from "next/cache";
+import { after } from "next/server";
 
 /**
  * Cache tags used by `"use cache"` data functions (`cacheTag`) and invalidated by mutations.
@@ -75,11 +76,28 @@ function withPrevious(
 }
 
 /**
+ * Delay before the follow-up expiry. Tag expirations reach the shared cache of every instance
+ * within ~3 s on Vercel (measured on the Phase 2 Preview).
+ */
+export const SETTLE_MS = 5_000;
+
+/**
  * Expires every tag affected by the given changes. Server actions only (`updateTag` gives
  * read-your-own-writes: the next request waits for fresh data).
+ *
+ * A request that arrives while the expiry is still propagating between instances (for example
+ * the client router prefetching a public page right after the admin save) can regenerate the
+ * page from stale data, which the CDN would then keep until `cacheLife` ends. The tags are
+ * therefore expired once more after SETTLE_MS, once the response has been sent (`after`), so
+ * such a page is replaced on the next request.
  */
 export function invalidate(...changes: ContentChange[]): string[] {
   const tags = [...new Set(changes.flatMap(tagsFor))];
+  if (tags.length === 0) return tags;
   for (const tag of tags) updateTag(tag);
+  after(async () => {
+    await new Promise((resolve) => setTimeout(resolve, SETTLE_MS));
+    for (const tag of tags) revalidateTag(tag, { expire: 0 });
+  });
   return tags;
 }

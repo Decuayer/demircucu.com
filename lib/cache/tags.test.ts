@@ -1,9 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const updateTag = vi.hoisted(() => vi.fn());
-vi.mock("next/cache", () => ({ updateTag }));
+const { updateTag, revalidateTag, afterTasks } = vi.hoisted(() => ({
+  updateTag: vi.fn(),
+  revalidateTag: vi.fn(),
+  afterTasks: [] as (() => Promise<void>)[],
+}));
+vi.mock("next/cache", () => ({ updateTag, revalidateTag }));
+vi.mock("next/server", () => ({ after: (task: () => Promise<void>) => afterTasks.push(task) }));
 
-const { CacheTags, invalidate, tagsFor } = await import("./tags");
+const { CacheTags, invalidate, SETTLE_MS, tagsFor } = await import("./tags");
 
 describe("tagsFor", () => {
   it.each([
@@ -29,11 +34,39 @@ describe("tagsFor", () => {
 });
 
 describe("invalidate", () => {
-  beforeEach(() => updateTag.mockClear());
+  beforeEach(() => {
+    updateTag.mockClear();
+    revalidateTag.mockClear();
+    afterTasks.length = 0;
+  });
 
   it("expires each tag once", () => {
     const tags = invalidate({ entity: "project", slug: "a" }, { entity: "project", slug: "a" });
     expect(tags).toEqual(["projects", "project:a"]);
     expect(updateTag).toHaveBeenCalledTimes(2);
+  });
+
+  it("expires the same tags again after the settle delay, once the response is sent", async () => {
+    vi.useFakeTimers();
+    try {
+      invalidate({ entity: "post", slug: "p" });
+      expect(afterTasks).toHaveLength(1);
+      expect(revalidateTag).not.toHaveBeenCalled();
+      const done = afterTasks[0]!();
+      await vi.advanceTimersByTimeAsync(SETTLE_MS);
+      await done;
+      expect(revalidateTag.mock.calls).toEqual([
+        ["posts", { expire: 0 }],
+        ["post:p", { expire: 0 }],
+      ]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("schedules nothing when no tag is affected", () => {
+    invalidate({ entity: "media" });
+    expect(updateTag).not.toHaveBeenCalled();
+    expect(afterTasks).toHaveLength(0);
   });
 });

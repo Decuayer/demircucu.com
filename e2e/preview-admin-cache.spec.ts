@@ -1,14 +1,19 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * Read-your-own-writes on a deployed Preview (staging data): after an admin edit, the very first
- * request for the public page must already show the new title. No polling, unlike the local
- * `admin-cache.spec.ts`, whose `next start` server can answer the first request from the stale
- * build-time prerender.
+ * Admin edits on a deployed Preview (staging data) must reach the cached public pages quickly
+ * and for good.
+ *
+ * On Vercel a tag expiry needs ~2-3 s to reach every instance's shared cache. A request in that
+ * window (often the client router prefetching a public link right after the save) can regenerate
+ * the page from stale data. Before the fix that page then stayed at the CDN until `cacheLife`
+ * ended (> 70 s observed, i.e. hours); now `invalidate()` expires the tags again after SETTLE_MS
+ * (lib/cache/tags.ts). The test allows that window and fails on lasting staleness.
  *
  * Needs E2E_BASE_URL and a staging admin (E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD, created with
  * scripts/staging-set-role.ts --create) and the seeded `sample-project`.
  */
+const FRESH_WITHIN_MS = 15_000;
 const email = process.env.E2E_ADMIN_EMAIL;
 const password = process.env.E2E_ADMIN_PASSWORD;
 const SLUG = "sample-project";
@@ -29,7 +34,7 @@ async function setTitle(page: Page, editUrl: string, title: string): Promise<voi
   await expect(page).toHaveURL(/\/tr\/admin\/projects$/, { timeout: 30_000 });
 }
 
-test("admin edit is visible on the first public request (preview)", async ({ page }) => {
+test("admin edit reaches the cached public pages within seconds (preview)", async ({ page }) => {
   // Warm every cache entry the edit must expire.
   expect((await page.goto(`/tr/projects/${SLUG}`))?.status()).toBe(200);
   const original = (await page.locator("main h1").first().innerText()).trim();
@@ -53,14 +58,32 @@ test("admin edit is visible on the first public request (preview)", async ({ pag
   const newTitle = `Preview ${Date.now()}`;
   try {
     await setTitle(page, href!, newTitle);
-    // Exactly one request per page: the first response must already be fresh.
-    await page.goto(`/tr/projects/${SLUG}`);
-    expect(await page.locator("main").innerText()).toContain(newTitle);
+    for (const path of [`/tr/projects/${SLUG}`, "/tr/projects", "/en/projects"]) {
+      const expected = path.startsWith("/en") ? null : newTitle;
+      await expect
+        .poll(
+          async () => {
+            await page.goto(path);
+            return page.locator("main").innerText();
+          },
+          { timeout: FRESH_WITHIN_MS, intervals: [500, 1000, 2000] },
+        )
+        .toContain(expected ?? "Sample Project");
+    }
+    // Still fresh after the follow-up expiry has run.
+    await page.waitForTimeout(6_000);
     await page.goto("/tr/projects");
     expect(await page.locator("main").innerText()).toContain(newTitle);
   } finally {
     await setTitle(page, href!, original);
   }
-  await page.goto(`/tr/projects/${SLUG}`);
-  expect(await page.locator("main").innerText()).toContain(original);
+  await expect
+    .poll(
+      async () => {
+        await page.goto("/tr/projects");
+        return page.locator("main").innerText();
+      },
+      { timeout: FRESH_WITHIN_MS, intervals: [500, 1000, 2000] },
+    )
+    .not.toContain(newTitle);
 });
