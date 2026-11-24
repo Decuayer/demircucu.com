@@ -1,21 +1,20 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 3 genişletme production'da; daraltma PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-24 (Faz 3 kapandı; sıradaki Faz 4). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
 ## 1. Durum özeti
 
-| Faz / iş                         | Durum                                                          | Branch / PR                       |
-| -------------------------------- | -------------------------------------------------------------- | --------------------------------- |
-| Faz 0: Keşif                     | Tamamlandı, onaylandı                                          | (PR #1 açıklamasında)             |
-| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                   | `chore/phase-1-test-infra`, PR #1 |
-| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı         | `fix/db-connection-pool`, PR #2   |
-| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı | `feat/phase-2-security-auth`      |
-| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor     | —                                 |
-| Faz 3: Veri modeli (genişletme)  | Tamamlandı, **merge edildi** (PR #5), production'da doğrulandı | `feat/phase-3-data-model`         |
-| Faz 3: Daraltma migration'ı      | Staging'e uygulandı; önce kod deploy, sonra production         | `feat/phase-3-contract`           |
-| Faz 4–10                         | Başlamadı                                                      | —                                 |
+| Faz / iş                         | Durum                                                           | Branch / PR                       |
+| -------------------------------- | --------------------------------------------------------------- | --------------------------------- |
+| Faz 0: Keşif                     | Tamamlandı, onaylandı                                           | (PR #1 açıklamasında)             |
+| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                    | `chore/phase-1-test-infra`, PR #1 |
+| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı          | `fix/db-connection-pool`, PR #2   |
+| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı  | `feat/phase-2-security-auth`      |
+| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor      | —                                 |
+| Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod | `feat/phase-3-*`                  |
+| Faz 4–10                         | Başlamadı                                                       | —                                 |
 
 ## 2. Tamamlanan işler
 
@@ -52,16 +51,17 @@ SRI, enforce; rate limit = Postgres, Turnstile yok; kayıt = açık, e-posta + p
 - **CI:** build job'ı seed'li Postgres'ten SELECT-only rolle build alıyor; `supabase` job'ı (Supabase CLI,
   supabase testleri, E2E); `staging-migrate.yml`; `preview-e2e.yml`.
 
-### Faz 3 (genişletme)
+### Faz 3 (PR #5 genişletme, PR #6 daraltma)
 
 Kararlar (kullanıcı, 2026-11-24): medya kolonları `MediaFile.path`'e FK (Restrict); Vestel logosu
 daraltmada boşalır, kullanıcı storage'a yükleyip seçer; analitik yaklaşım (a), ham veri 90 gün,
 `DailyStat` kalıcı; sapmalar kabul (`TagAlias` tablosu, `BigInt` repo id, engagement `PageView`
 içinde, `SkillCategory` yerine `parentId`, `images` / `url` / `usedIn` kaldırılıyor).
 
-- **Migration:** `20261124120000_phase3_expand` (yalnızca ekleme + backfill + trigger + RLS).
-  Eski kolonlar (`logo`, `images`, `coverImage`, `aboutPhoto`, `faviconUrl`, `MediaFile.url`,
-  `usedIn`, `_XToTag` tabloları) şemada "Legacy" olarak duruyor, uygulama kullanmıyor.
+- **Migration'lar:** `20261124120000_phase3_expand` (ekleme + backfill + trigger + RLS) ve
+  `20261125090000_phase3_contract` (eski kolonlar `logo`, `images`, `coverImage`, `aboutPhoto`,
+  `faviconUrl`, `MediaFile.url`, `usedIn` ve `_XToTag` tabloları silindi; ek dosyalarda path varsa
+  eski `url` anahtarı temizlendi). Sıra: genişletme migration'ı → kod deploy → daraltma kodu deploy → daraltma migration'ı.
 - **Medya:** içerik storage path tutar; URL `lib/media/url.ts` ile üretilir. Ek dosyalar
   `{name, path}` veya dış link `{name, url}`. Liste/HTML referansları `MediaUsage`'da, aynı
   transaction'da yazılır. Kullanımdaki dosya silinemez (`mediaInUse`), storage hatasında satır geri
@@ -70,13 +70,14 @@ içinde, `SkillCategory` yerine `parentId`, `images` / `url` / `usedIn` kaldır�
   döngüsü ve alias/slug çakışması trigger'la engelli (`app_private` şemasında).
 - **Okuma:** `lib/data/present.ts` public satırları şekillendirir (görünür etiketler, `logoUrl`,
   override fallback'leri, büyük/iç alanlar hariç).
-- **Testler:** unit 212, integration 127 (backfill replay testi dahil), supabase 16, E2E 33
-  (yeni: yükleme → path → public görsel → silme engeli).
-- **Production sayımı (salt okunur, 2026-11-24, `scripts/audit-media-refs.ts`, daraltmada silindi):** 8 medya; tüm
+- **Testler:** unit 212, integration 131 (genişletme + daraltma replay testi dahil), supabase 16,
+  E2E 33 (yeni: yükleme → path → public görsel → silme engeli). CI'daki yerel Supabase'te Storage
+  açık; E2E sunucusu yerel secret key'i alıyor.
+- **Production sayımı (salt okunur, 2026-11-24, `scripts/audit-media-refs.ts`, daraltmada silindi):**
+  8 medya; tüm
   bucket referanslarının `MediaFile` kaydı var; 1 dış logo (Vestel); 1 ek dosya; HTML'de görsel
   yok; 12 etiket, 12 etiket bağlantısı (0 proje, 11 deneyim, 1 blog).
-- **Staging:** migration uygulandı, `verify-db-lockdown` hepsi ok, drift yok, join tabloları
-  3/1/1, trigger'lar 3.
+- **Staging:** iki migration uygulandı, `verify-db-lockdown` hepsi ok, drift yok.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
@@ -103,8 +104,8 @@ Secret değerleri bu dosyada **yok**. Sadece konumları:
 | Ortam      | DB / Supabase                                                                                                             | Env dosyası / yeri                                  | Not                                                                                   |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | Yerel      | Docker Postgres `localhost:54329`; yerel Supabase API 54321, DB 54322, Studio 54323, Mailpit 54324                        | `.env.local` (mode 600)                             | Supabase'te e-posta doğrulaması açık, parola min 10, şablonlar `supabase/templates/`  |
-| Staging    | Supabase `eu-west-1`; DATABASE_URL transaction pooler 6543, DIRECT_URL 5432                                               | `.env.staging.local` (mode 600); Vercel Preview env | 4 migration uygulandı, kilit doğrulandı, `media` bucket oluşturuldu, `sb_secret_` key |
-| Production | Supabase `ap-northeast-2` (Seul); DATABASE_URL transaction pooler 6543, DIRECT_URL session pooler 5432 (sadece migration) | `.env.prod.local`; Vercel Production env            | 4 migration uygulandı, kilit doğrulandı; Data API kapalı; legacy JWT anahtarları      |
+| Staging    | Supabase `eu-west-1`; DATABASE_URL transaction pooler 6543, DIRECT_URL 5432                                               | `.env.staging.local` (mode 600); Vercel Preview env | 6 migration uygulandı, kilit doğrulandı, `media` bucket oluşturuldu, `sb_secret_` key |
+| Production | Supabase `ap-northeast-2` (Seul); DATABASE_URL transaction pooler 6543, DIRECT_URL session pooler 5432 (sadece migration) | `.env.prod.local`; Vercel Production env            | 6 migration uygulandı, kilit doğrulandı; Data API kapalı; legacy JWT anahtarları      |
 
 Kurallar:
 
@@ -134,8 +135,15 @@ Kurallar:
 | `20261124004800_rls_lockdown`                      | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
 | `20261124004900_auth_profile_sync`                 | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
 | `20261124120000_phase3_expand`                     | `migrate deploy` (onaylı), lockdown ok, drift yok        | 2026-11-24 |
+| `20261125090000_phase3_contract`                   | `migrate deploy` (onaylı, kod deploy'dan sonra), ok      | 2026-11-24 |
 
-- **Faz 3 yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-phase3.dump` (genişletmeden hemen
+- **Daraltma yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-contract.dump` (daraltmadan hemen
+  önce, 483 KB, mode 600; public 29, auth 27, storage 10 tablo verisi). Sonuç: eski kolon ve
+  `_XToTag` tablosu kalmadı; join tabloları 0/11/1, `MediaUsage` 1, hem `url` hem `path` taşıyan ek
+  dosya 0; canlı sayfalar 200. Vestel logosunun dış URL'i planlandığı gibi silindi.
+- **Yedek alma:** yerelde `pg_dump` yok; `docker exec -e PGURL="$DIRECT_URL" supabase_db_cucu sh -c
+'pg_dump "$PGURL" -Fc --no-owner' > dosya` (pg_dump 17, sunucu 17.6).
+- **Faz 3 genişletme yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-phase3.dump` (genişletmeden hemen
   önce, 436 KB, mode 600, pg_dump 17 yerel Supabase konteynerinden; public 15, auth 27, storage 10
   tablo verisi). Backfill sonucu: join tabloları 0/11/1, `aboutPhotoPath` ve `faviconPath` dolu,
   Vestel logosu dönüştürülmedi (beklenen), 1 ek dosyaya path ve 1 `MediaUsage`, trigger'lar 3.
@@ -175,8 +183,8 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Kullanıcının bekleyen manuel adımları
 
-- Daraltma PR'ının merge'ü ve deploy; ardından production daraltma migration'ı için onay.
-- Daraltma sonrası: Vestel logosunu medya kütüphanesine yükleyip deneyimde seçmek.
+- Vestel logosunu deneyim formundaki "Şirket Logosu" alanından yüklemek (doğrudan yükleme
+  çalışıyor; medya kütüphanesinden seçme Faz 6'da).
 
 ### Kararlar (2026-11-24)
 
@@ -185,7 +193,8 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
   fazında kendi storage'ımıza taşınacak.
 - Frankfurt taşıması yapılmayacak: production Supabase Seul, Vercel `icn1`.
 - Leaked password protection yok (ücretsiz plan).
-- Faz 3: medya referansları tam URL yerine storage path olarak tutulacak.
+- Faz 3: medya referansları storage path + `MediaFile.path` FK; analitik kendi Postgres'imiz, ham
+  veri 90 gün, `DailyStat` kalıcı (saklama ve DNT/GPC davranışı Faz 7'de uygulanacak).
 
 ### Açık konular
 
@@ -197,12 +206,9 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 3 daraltma (`20261125090000_phase3_contract`):** legacy kolonlar ve `_XToTag` tabloları
-  düşer, `files` içindeki eski `url` anahtarları silinir. Sıra: kod deploy (legacy kolonları artık
-  seçmez), sonra migration; tersi admin listelerini bozar. Production ön kontrolü (salt okunur):
-  kaybolacak gerçek değer yalnızca Vestel logosu; 3 proje logosu ve 2 kapak boş string (eski
-  formlar), etiket bağlantılarının hepsi join tablolarında. **Faz 4:** etiket sistemi (geçici `connectTags`
-  eşlemesi kalkacak); **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
+- **Faz 4:** etiket sistemi ve `scripts/migrate-tags.ts` (geçici `resolveTagIds` eşlemesi kalkacak;
+  mevcut etiketlerde `nameTr = nameEn = name`, çeviri olmayanlar temizlenecek; `SiteSettings.skills`
+  etiketlere taşınacak); **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için).
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
 
 ### Bilinen riskler
