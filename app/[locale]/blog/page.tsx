@@ -1,7 +1,8 @@
 import { getPublishedPosts } from "@/lib/data/posts";
-import BlogClient from "./client";
+import { getTagFilterData } from "@/lib/data/skills";
+import FilteredBlog from "./filtered";
 
-export default async function BlogPage() {
-  const posts = await getPublishedPosts();
-  return <BlogClient posts={posts} />;
+export default async function Page() {
+  const [posts, filterData] = await Promise.all([getPublishedPosts(), getTagFilterData()]);
+  return <FilteredBlog posts={posts} filterData={filterData} />;
 }

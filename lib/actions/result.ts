@@ -1,6 +1,7 @@
 import { ZodError } from "zod";
 import { AuthorizationError } from "@/lib/auth/errors";
 import { UnknownMediaError } from "@/lib/media/usage-errors";
+import { TagCycleError, TagInUseError } from "@/lib/tags/errors";
 
 /**
  * Error codes returned by server actions. They are i18n keys under `errors.*`; the client
@@ -19,6 +20,8 @@ export const ACTION_ERROR_CODES = [
   "unsupportedType",
   "tooLarge",
   "mediaInUse",
+  "tagInUse",
+  "tagCycle",
   "serverError",
 ] as const;
 
@@ -61,6 +64,12 @@ export function toActionFailure(error: unknown, label: string): ActionFailure {
   if (error instanceof AuthorizationError) return fail(error.code);
   if (error instanceof ZodError) return fail("invalidInput", flattenZodError(error));
   if (error instanceof UnknownMediaError) return fail("invalidInput");
+  if (error instanceof TagInUseError) return fail("tagInUse");
+  if (error instanceof TagCycleError) return fail("tagCycle");
+  // Tag integrity triggers (SQLSTATE 23514); the message names the constraint.
+  const message = error instanceof Error ? error.message : "";
+  if (message.includes("tag tree cycle")) return fail("tagCycle");
+  if (/equals a tag slug|is already an alias/.test(message)) return fail("conflict");
   if (isPrismaKnownError(error, "P2002")) return fail("conflict");
   // Foreign key violation: a media path or relation that does not exist.
   if (isPrismaKnownError(error, "P2003")) return fail("invalidInput");

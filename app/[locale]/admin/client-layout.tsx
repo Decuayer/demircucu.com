@@ -13,6 +13,7 @@ import {
   Shield,
   Image as ImageIcon,
   MessageSquare,
+  Tags,
 } from "lucide-react";
 
 const adminNavItems = [
@@ -20,6 +21,7 @@ const adminNavItems = [
   { href: "/admin/experiences", key: "experiences", icon: Briefcase },
   { href: "/admin/projects", key: "projects", icon: Code2 },
   { href: "/admin/blog", key: "blog", icon: Newspaper },
+  { href: "/admin/tags", key: "tags", icon: Tags },
   { href: "/admin/media", key: "media", icon: ImageIcon },
   { href: "/admin/comments", key: "comments", icon: MessageSquare },
   { href: "/admin/contacts", key: "messages", icon: Mail },

@@ -7,12 +7,6 @@ export const visibleTagsInclude = {
   orderBy: { createdAt: "asc" },
 } as const;
 
-/** Prisma `include` for every tag of a content row (admin forms). */
-export const allTagsInclude = {
-  include: { tag: true },
-  orderBy: { createdAt: "asc" },
-} as const;
-
 /** Flattens join rows (`{ tag }[]`) to tags, skipping tags hidden globally. */
 export function flattenTags(
   rows: { tag: Tag }[],

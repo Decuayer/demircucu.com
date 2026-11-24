@@ -18,13 +18,6 @@ export type AdminExperience = NonNullable<Awaited<ReturnType<typeof adminGetExpe
 export type AdminPost = NonNullable<Awaited<ReturnType<typeof adminGetPost>>>;
 export type AdminSiteSettings = NonNullable<Awaited<ReturnType<typeof adminGetSiteSettings>>>;
 
-/** Shape of SiteSettings.skills entries (removed in Phase 4 in favour of tags). */
-export interface SkillSetting {
-  nameTr: string;
-  nameEn: string;
-  level: number;
-}
-
 /** Shape of SiteSettings.hobbies entries. */
 export interface HobbySetting {
   nameTr: string;

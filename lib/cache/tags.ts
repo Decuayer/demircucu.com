@@ -12,9 +12,10 @@ import { after } from "next/server";
  * | Change                         | Tags                                                  |
  * | ------------------------------ | ----------------------------------------------------- |
  * | site settings                  | settings                                              |
- * | project create/update/delete   | projects, project:<slug> (+ project:<previous slug>)  |
- * | experience create/update/delete| experiences, experience:<id>                          |
- * | blog post create/update/delete | posts, post:<slug> (+ post:<previous slug>)           |
+ * | project create/update/delete   | projects, project:<slug> (+ previous slug), tags      |
+ * | experience create/update/delete| experiences, experience:<id>, tags                    |
+ * | blog post create/update/delete | posts, post:<slug> (+ previous slug), tags            |
+ * | tag create/update/merge/delete | tags, projects, experiences, posts                    |
  * | comment / like                 | post-interactions:<post id>                           |
  * | contact message, media file    | none (admin pages render per request)                 |
  */
@@ -27,6 +28,8 @@ export const CacheTags = {
   posts: "posts",
   post: (slug: string) => `post:${slug}`,
   postInteractions: (postId: string) => `post-interactions:${postId}`,
+  /** Skill tree, skill pages and counts. Content changes expire it (counts, first/last use). */
+  tags: "tags",
 } as const;
 
 export type ContentChange =
@@ -35,6 +38,7 @@ export type ContentChange =
   | { entity: "experience"; id: string }
   | { entity: "post"; slug: string; previousSlug?: string }
   | { entity: "postInteractions"; postId: string }
+  | { entity: "tags" }
   | { entity: "contactMessage" }
   | { entity: "media" };
 
@@ -44,22 +48,25 @@ export function tagsFor(change: ContentChange): string[] {
       return [CacheTags.settings];
     case "project":
       return withPrevious(
-        [CacheTags.projects, CacheTags.project(change.slug)],
+        [CacheTags.projects, CacheTags.project(change.slug), CacheTags.tags],
         change.previousSlug,
         CacheTags.project,
         change.slug,
       );
     case "experience":
-      return [CacheTags.experiences, CacheTags.experience(change.id)];
+      return [CacheTags.experiences, CacheTags.experience(change.id), CacheTags.tags];
     case "post":
       return withPrevious(
-        [CacheTags.posts, CacheTags.post(change.slug)],
+        [CacheTags.posts, CacheTags.post(change.slug), CacheTags.tags],
         change.previousSlug,
         CacheTags.post,
         change.slug,
       );
     case "postInteractions":
       return [CacheTags.postInteractions(change.postId)];
+    case "tags":
+      // Tag names and visibility appear on every content page.
+      return [CacheTags.tags, CacheTags.projects, CacheTags.experiences, CacheTags.posts];
     case "contactMessage":
     case "media":
       return [];

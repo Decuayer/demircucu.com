@@ -13,6 +13,7 @@ const admin = await import("@/app/actions/admin");
 const settings = await import("@/app/actions/settings");
 const interactions = await import("@/app/actions/blog_interaction");
 const contact = await import("@/app/actions/contact");
+const tags = await import("@/app/actions/tags");
 
 const project = {
   titleTr: "T",
@@ -61,36 +62,36 @@ const CASES: Case[] = [
   {
     name: "createProject",
     run: () => admin.createProject({ ...project, slug: "fresh" }),
-    expected: async () => ["project:fresh", "projects"],
+    expected: async () => ["project:fresh", "projects", "tags"],
   },
   {
     name: "updateProject (slug change expires old and new slug)",
     run: async () =>
       admin.updateProject((await sampleProject()).id, { ...project, slug: "renamed" }),
-    expected: async () => ["project:renamed", "project:sample-project", "projects"],
+    expected: async () => ["project:renamed", "project:sample-project", "projects", "tags"],
   },
   {
     name: "deleteProject",
     run: async () => admin.deleteProject((await sampleProject()).id),
-    expected: async () => ["project:sample-project", "projects"],
+    expected: async () => ["project:sample-project", "projects", "tags"],
   },
   {
     name: "createExperience",
     run: () => admin.createExperience(experience),
     expected: async () => {
       const created = await prisma.experience.findFirstOrThrow({ where: { company: "C" } });
-      return [`experience:${created.id}`, "experiences"];
+      return [`experience:${created.id}`, "experiences", "tags"];
     },
   },
   {
     name: "updateExperience",
     run: async () => admin.updateExperience((await anExperience()).id, experience),
-    expected: async () => [`experience:${(await anExperience()).id}`, "experiences"],
+    expected: async () => [`experience:${(await anExperience()).id}`, "experiences", "tags"],
   },
   {
     name: "createBlogPost",
     run: () => admin.createBlogPost({ ...post, slug: "fresh-post" }),
-    expected: async () => ["post:fresh-post", "posts"],
+    expected: async () => ["post:fresh-post", "posts", "tags"],
   },
   {
     name: "updateBlogPost",
@@ -99,6 +100,7 @@ const CASES: Case[] = [
       `post-interactions:${(await helloPost()).id}`,
       "post:hello-world",
       "posts",
+      "tags",
     ],
   },
   {
@@ -128,6 +130,14 @@ const CASES: Case[] = [
         message: "Hello there, long enough.",
       }),
     expected: async () => [],
+  },
+  {
+    name: "updateTag (tag names appear on every content page)",
+    run: async () =>
+      tags.updateTag((await prisma.tag.findUniqueOrThrow({ where: { slug: "python" } })).id, {
+        name: "Python 3",
+      }),
+    expected: async () => ["experiences", "posts", "projects", "tags"],
   },
 ];
 

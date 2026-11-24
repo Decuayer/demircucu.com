@@ -11,7 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { TagSelector } from "@/components/ui/tag-selector";
+import { TagSelector, toTagPayload, type SelectedTag } from "@/components/admin/tag-selector";
+import type { TagOption } from "@/lib/tags/options";
 import { FileUploader } from "@/components/ui/file-uploader";
 import type { AdminProject } from "@/lib/types/content";
 import { toAttachments, type Attachment } from "@/lib/media/attachments";
@@ -21,10 +22,15 @@ import { useTranslations } from "next-intl";
 
 interface ProjectFormClientProps {
   initialData?: AdminProject | null;
+  tagOptions: TagOption[];
   isEdit?: boolean;
 }
 
-export default function ProjectFormClient({ initialData, isEdit }: ProjectFormClientProps) {
+export default function ProjectFormClient({
+  initialData,
+  tagOptions: initialTagOptions,
+  isEdit,
+}: ProjectFormClientProps) {
   const t = useTranslations("admin");
   const errorMessage = useActionErrorMessage();
   const router = useRouter();
@@ -46,11 +52,12 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
   const [published, setPublished] = useState(initialData?.published ?? true);
   const [featured, setFeatured] = useState(initialData?.featured ?? false);
 
-  // Tags (Mapping relations to simplified objects for the server action)
-  const [tags, setTags] = useState<string[]>(() => {
-    const initialTags = initialData?.tags?.map((t) => t.name).filter(Boolean) || [];
-    return Array.from(new Set(initialTags));
-  });
+  const [tagOptions, setTagOptions] = useState(initialTagOptions);
+  const [tags, setTags] = useState<SelectedTag[]>(
+    () =>
+      initialData?.tags.map((t) => ({ id: t.id, source: t.source, linkHidden: t.linkHidden })) ??
+      [],
+  );
 
   // Files
   const [files, setFiles] = useState<Attachment[]>(() => toAttachments(initialData?.files));
@@ -76,11 +83,7 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
       liveUrl,
       published,
       featured,
-      tagsList: tags.map((tag) => ({
-        nameTr: tag,
-        nameEn: tag, // For now, we use same name for both languages for tech tags
-        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      })),
+      ...toTagPayload(tags),
       filesList: files,
     };
 
@@ -270,7 +273,12 @@ export default function ProjectFormClient({ initialData, isEdit }: ProjectFormCl
               <CardTitle>{t("technologies")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <TagSelector tags={tags} onChange={setTags} />
+              <TagSelector
+                options={tagOptions}
+                onOptionsChange={setTagOptions}
+                value={tags}
+                onChange={setTags}
+              />
             </CardContent>
           </Card>
         </div>

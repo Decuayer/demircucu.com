@@ -158,7 +158,7 @@ describe("tag join tables", () => {
     const result = await admin.updateProject(project.id, {
       ...projectInput,
       slug: "sample-project",
-      tagsList: [{ nameTr: "Python", nameEn: "Python", slug: "python" }],
+      tagIds: [python.id],
     });
     expect(result).toEqual({ success: true });
     const rows = await prisma.projectTag.findMany({

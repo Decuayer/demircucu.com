@@ -68,15 +68,20 @@ export async function seed(prisma: PrismaClient): Promise<void> {
       parent?: string;
       aliases?: readonly string[];
     };
-    await prisma.tag.upsert({
+    // Tags created before the tag tree existed (older local databases) get their fields too.
+    const fields = { ...data, ...(parent ? { parent: { connect: { slug: parent } } } : {}) };
+    const row = await prisma.tag.upsert({
       where: { slug: tag.slug },
-      update: {},
-      create: {
-        ...data,
-        ...(parent ? { parent: { connect: { slug: parent } } } : {}),
-        ...(aliases ? { aliases: { create: aliases.map((alias) => ({ alias })) } } : {}),
-      },
+      update: fields,
+      create: fields,
+      select: { id: true },
     });
+    if (aliases) {
+      await prisma.tagAlias.createMany({
+        data: aliases.map((alias) => ({ alias, tagId: row.id })),
+        skipDuplicates: true,
+      });
+    }
   }
 
   await prisma.siteSettings.upsert({

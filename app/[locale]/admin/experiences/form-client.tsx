@@ -11,7 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { TagSelector } from "@/components/ui/tag-selector";
+import { TagSelector, toTagPayload, type SelectedTag } from "@/components/admin/tag-selector";
+import type { TagOption } from "@/lib/tags/options";
 import { FileUploader } from "@/components/ui/file-uploader";
 import type { AdminExperience } from "@/lib/types/content";
 import { toAttachments, type Attachment } from "@/lib/media/attachments";
@@ -21,10 +22,15 @@ import { useTranslations } from "next-intl";
 
 interface ExperienceFormClientProps {
   initialData?: AdminExperience | null;
+  tagOptions: TagOption[];
   isEdit?: boolean;
 }
 
-export default function ExperienceFormClient({ initialData, isEdit }: ExperienceFormClientProps) {
+export default function ExperienceFormClient({
+  initialData,
+  tagOptions: initialTagOptions,
+  isEdit,
+}: ExperienceFormClientProps) {
   const t = useTranslations("admin");
   const errorMessage = useActionErrorMessage();
   const router = useRouter();
@@ -49,11 +55,12 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
   );
   const [published, setPublished] = useState(initialData?.published ?? true);
 
-  // Tags (Mapping relations to simplified objects for the server action)
-  const [tags, setTags] = useState<string[]>(() => {
-    const initialTags = initialData?.tags?.map((t) => t.name).filter(Boolean) || [];
-    return Array.from(new Set(initialTags));
-  });
+  const [tagOptions, setTagOptions] = useState(initialTagOptions);
+  const [tags, setTags] = useState<SelectedTag[]>(
+    () =>
+      initialData?.tags.map((t) => ({ id: t.id, source: t.source, linkHidden: t.linkHidden })) ??
+      [],
+  );
 
   // Files
   const [files, setFiles] = useState<Attachment[]>(() => toAttachments(initialData?.files));
@@ -78,11 +85,7 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
       startDate: new Date(startDate),
       endDate: endDate ? new Date(endDate) : undefined,
       published,
-      tagsList: tags.map((tag) => ({
-        nameTr: tag,
-        nameEn: tag,
-        slug: tag.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      })),
+      ...toTagPayload(tags),
       filesList: files,
     };
 
@@ -268,7 +271,12 @@ export default function ExperienceFormClient({ initialData, isEdit }: Experience
               <CardTitle>{t("tags")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <TagSelector tags={tags} onChange={setTags} />
+              <TagSelector
+                options={tagOptions}
+                onOptionsChange={setTagOptions}
+                value={tags}
+                onChange={setTags}
+              />
             </CardContent>
           </Card>
         </div>

@@ -1,93 +1,96 @@
 import "server-only";
 import type { Prisma } from "@prisma/client";
-import type { TagInput } from "@/lib/validation/content";
-
-/**
- * Resolves the tag selector's free-text tags to existing tags (by slug, then by any name) and
- * creates only the ones that are really new. Interim logic until the canonical tag system
- * (Phase 4) replaces the selector; it never touches GITHUB / LANGUAGE join rows.
- */
-export async function resolveTagIds(
-  tx: Prisma.TransactionClient,
-  tags: TagInput[],
-): Promise<string[]> {
-  if (tags.length === 0) return [];
-  const names = tags.flatMap((t) => [t.nameTr, t.nameEn]);
-  const existing = await tx.tag.findMany({
-    where: {
-      OR: [
-        { slug: { in: tags.map((t) => t.slug) } },
-        { name: { in: names } },
-        { nameTr: { in: names } },
-        { nameEn: { in: names } },
-      ],
-    },
-    select: { id: true, slug: true, name: true, nameTr: true, nameEn: true },
-  });
-
-  const ids: string[] = [];
-  for (const tag of tags) {
-    const match =
-      existing.find((e) => e.slug === tag.slug) ??
-      existing.find((e) =>
-        [e.name, e.nameTr, e.nameEn].some((n) => n === tag.nameTr || n === tag.nameEn),
-      );
-    if (match) {
-      ids.push(match.id);
-      continue;
-    }
-    const created = await tx.tag.create({
-      data: { slug: tag.slug, name: tag.nameEn, nameTr: tag.nameTr, nameEn: tag.nameEn },
-      select: { id: true, slug: true, name: true, nameTr: true, nameEn: true },
-    });
-    existing.push(created);
-    ids.push(created.id);
-  }
-  return [...new Set(ids)];
-}
 
 type JoinTable = "project" | "experience" | "blogPost";
 
+export interface ContentTagsInput {
+  /** MANUAL tags; omitted means "leave the tags as they are". */
+  tagIds?: string[];
+  /** Attached tags hidden on this row; omitted means "leave visibility as it is". */
+  hiddenTagIds?: string[];
+}
+
 /**
- * Makes the MANUAL tags of one entity exactly `tagIds`. Rows with another source (GitHub
- * topics, languages) are kept; a MANUAL row is not added for a tag that is already attached
- * from another source.
+ * Applies the tag selector's result to one content row. MANUAL rows become exactly `tagIds`;
+ * rows with another source (GitHub topics, languages) are never removed here, only hidden or
+ * shown; a MANUAL row is not added for a tag that is already attached from another source.
  */
-export async function replaceManualTags(
+export async function applyContentTags(
   tx: Prisma.TransactionClient,
   table: JoinTable,
   entityId: string,
-  tagIds: string[],
+  { tagIds, hiddenTagIds }: ContentTagsInput,
 ): Promise<void> {
+  const ids = tagIds && [...new Set(tagIds)];
+  const hidden = hiddenTagIds && [...new Set(hiddenTagIds)];
   switch (table) {
     case "project": {
-      await tx.projectTag.deleteMany({
-        where: { projectId: entityId, source: "MANUAL", tagId: { notIn: tagIds } },
-      });
-      await tx.projectTag.createMany({
-        data: tagIds.map((tagId) => ({ projectId: entityId, tagId, source: "MANUAL" as const })),
-        skipDuplicates: true,
-      });
+      const where = { projectId: entityId };
+      if (ids) {
+        await tx.projectTag.deleteMany({
+          where: { ...where, source: "MANUAL", tagId: { notIn: ids } },
+        });
+        await tx.projectTag.createMany({
+          data: ids.map((tagId) => ({ ...where, tagId, source: "MANUAL" as const })),
+          skipDuplicates: true,
+        });
+      }
+      if (hidden) {
+        await tx.projectTag.updateMany({
+          where: { ...where, tagId: { in: hidden } },
+          data: { hidden: true },
+        });
+        await tx.projectTag.updateMany({
+          where: { ...where, tagId: { notIn: hidden } },
+          data: { hidden: false },
+        });
+      }
       return;
     }
     case "experience": {
-      await tx.experienceTag.deleteMany({
-        where: { experienceId: entityId, source: "MANUAL", tagId: { notIn: tagIds } },
-      });
-      await tx.experienceTag.createMany({
-        data: tagIds.map((tagId) => ({ experienceId: entityId, tagId, source: "MANUAL" as const })),
-        skipDuplicates: true,
-      });
+      const where = { experienceId: entityId };
+      if (ids) {
+        await tx.experienceTag.deleteMany({
+          where: { ...where, source: "MANUAL", tagId: { notIn: ids } },
+        });
+        await tx.experienceTag.createMany({
+          data: ids.map((tagId) => ({ ...where, tagId, source: "MANUAL" as const })),
+          skipDuplicates: true,
+        });
+      }
+      if (hidden) {
+        await tx.experienceTag.updateMany({
+          where: { ...where, tagId: { in: hidden } },
+          data: { hidden: true },
+        });
+        await tx.experienceTag.updateMany({
+          where: { ...where, tagId: { notIn: hidden } },
+          data: { hidden: false },
+        });
+      }
       return;
     }
     case "blogPost": {
-      await tx.blogPostTag.deleteMany({
-        where: { blogPostId: entityId, source: "MANUAL", tagId: { notIn: tagIds } },
-      });
-      await tx.blogPostTag.createMany({
-        data: tagIds.map((tagId) => ({ blogPostId: entityId, tagId, source: "MANUAL" as const })),
-        skipDuplicates: true,
-      });
+      const where = { blogPostId: entityId };
+      if (ids) {
+        await tx.blogPostTag.deleteMany({
+          where: { ...where, source: "MANUAL", tagId: { notIn: ids } },
+        });
+        await tx.blogPostTag.createMany({
+          data: ids.map((tagId) => ({ ...where, tagId, source: "MANUAL" as const })),
+          skipDuplicates: true,
+        });
+      }
+      if (hidden) {
+        await tx.blogPostTag.updateMany({
+          where: { ...where, tagId: { in: hidden } },
+          data: { hidden: true },
+        });
+        await tx.blogPostTag.updateMany({
+          where: { ...where, tagId: { notIn: hidden } },
+          data: { hidden: false },
+        });
+      }
       return;
     }
   }
