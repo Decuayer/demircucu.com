@@ -26,6 +26,15 @@ const nextConfig: NextConfig = {
     // worker renders concurrently so they queue on that connection instead of timing out.
     staticGenerationMaxConcurrency: 4,
   },
+  turbopack: {
+    resolveAlias: {
+      // pdf.js 6's modern build calls brand-new built-ins (Map#getOrInsertComputed, ...) without
+      // polyfills; browsers that lack them crash the PDF viewer and with it the whole page. The
+      // legacy build of the same version bundles the polyfills (worker: copy-pdfjs-assets.mjs).
+      "pdfjs-dist": "pdfjs-dist/legacy/build/pdf.mjs",
+      "pdfjs-dist/web/pdf_viewer.mjs": "pdfjs-dist/legacy/web/pdf_viewer.mjs",
+    },
+  },
   images: {
     remotePatterns: [
       {

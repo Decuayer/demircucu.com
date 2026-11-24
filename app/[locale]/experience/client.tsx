@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDate } from "@/lib/format-date";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -23,12 +24,7 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
   const params = useParams();
   const locale = (params.locale as string) || "en";
 
-  function formatDate(date: Date) {
-    return new Intl.DateTimeFormat(locale, {
-      month: "short",
-      year: "numeric",
-    }).format(new Date(date));
-  }
+  const monthYear = (date: Date) => formatDate(date, locale, { month: "short", year: "numeric" });
 
   return (
     <div className="py-16 md:py-24">
@@ -78,8 +74,8 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
                   <div className="flex items-center gap-2 text-sm text-muted-foreground md:justify-end">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {formatDate(exp.startDate)} —{" "}
-                      {exp.endDate ? formatDate(exp.endDate) : t("present")}
+                      {monthYear(exp.startDate)} —{" "}
+                      {exp.endDate ? monthYear(exp.endDate) : t("present")}
                     </span>
                   </div>
                 </div>

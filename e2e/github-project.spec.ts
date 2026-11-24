@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { expect, test, type Page } from "@playwright/test";
 import { renderReadme } from "../lib/github/readme/render";
 import { ADMIN, adminClient, clearRateLimits, sql } from "./helpers/supabase";
@@ -49,12 +50,20 @@ function watchCsp(page: Page): string[] {
   return violations;
 }
 
-test("GitHub project: README, Mermaid and PDF viewer under the CSP", async ({ page }) => {
+/**
+ * Last push 22:34 UTC: already the next day in Istanbul. Server (UTC) and browser must still
+ * print the same date (hydration).
+ */
+const PUSHED_AT = "2026-01-24T22:34:58Z";
+
+/** A published GitHub project with a rendered README and one mirrored PDF. */
+async function seedGithubProject() {
   const storage = adminClient().storage;
   const { error: bucketError } = await storage.createBucket("media", { public: true });
   if (bucketError && !/exists/i.test(bucketError.message)) throw bucketError;
 
-  const stamp = Date.now();
+  // Unique per call: tests in this file run in parallel and must not share rows or files.
+  const stamp = randomUUID().slice(0, 8);
   const slug = `e2e-github-${stamp}`;
   const pdfPath = `github/e2e-${stamp}/report.pdf`;
   const upload = await storage
@@ -70,11 +79,11 @@ test("GitHub project: README, Mermaid and PDF viewer under the CSP", async ({ pa
   );
   const [project] = await sql<{ id: string }>(
     `INSERT INTO public."Project" (id, slug, source, "githubFullName", "githubDescription", "primaryLanguage",
-       languages, stars, published, "syncStatus", "updatedAt")
+       languages, stars, published, "syncStatus", "pushedAt", "updatedAt")
      VALUES (gen_random_uuid()::text, $1, 'GITHUB', 'Decuayer/e2e-demo', 'Demo from GitHub', 'TypeScript',
-       '{"TypeScript": 900, "CSS": 100}', 7, true, 'OK', now())
+       '{"TypeScript": 900, "CSS": 100}', 7, false, 'OK', $2, now())
      RETURNING id`,
-    [slug],
+    [slug, PUSHED_AT],
   );
   const [doc] = await sql<{ id: string }>(
     `INSERT INTO public."ProjectDocument" (id, "projectId", title, "repoPath", "mediaFileId", "htmlUrl", "mimeType", size, sha, "updatedAt")
@@ -91,11 +100,23 @@ test("GitHub project: README, Mermaid and PDF viewer under the CSP", async ({ pa
       documents: new Map([["docs/report.pdf", `/projects/${slug}/docs/${doc!.id}`]]),
     }),
   );
-  await sql(`UPDATE public."Project" SET "readmeHtml" = $1, "readmeVersion" = 1 WHERE id = $2`, [
-    rendered.html,
-    project!.id,
-  ]);
+  // Published last, in one statement with the README: a parallel test on /projects would
+  // otherwise prefetch (and cache) the page while it is still half written.
+  await sql(
+    `UPDATE public."Project" SET "readmeHtml" = $1, "readmeVersion" = 1, published = true WHERE id = $2`,
+    [rendered.html, project!.id],
+  );
 
+  const cleanup = async () => {
+    await sql(`DELETE FROM public."Project" WHERE id = $1`, [project!.id]);
+    await sql(`DELETE FROM public."MediaFile" WHERE id = $1`, [media!.id]);
+    await storage.from("media").remove([pdfPath]);
+  };
+  return { slug, docId: doc!.id, cleanup };
+}
+
+test("GitHub project: README, Mermaid and PDF viewer under the CSP", async ({ page }) => {
+  const { slug, docId, cleanup } = await seedGithubProject();
   try {
     const violations = watchCsp(page);
     await page.goto(`/en/projects/${slug}`);
@@ -117,16 +138,64 @@ test("GitHub project: README, Mermaid and PDF viewer under the CSP", async ({ pa
 
     // The README's PDF link opens the document page with the pdf.js viewer.
     await readme.getByRole("link", { name: "design report" }).click();
-    await expect(page).toHaveURL(new RegExp(`/en/projects/${slug}/docs/${doc!.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/en/projects/${slug}/docs/${docId}$`));
     await expect(page.getByRole("heading", { level: 1, name: "Design report" })).toBeVisible();
     await expect(page.locator(".react-pdf__Page canvas")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText("1 / 1")).toBeVisible();
 
     expect(violations).toEqual([]);
   } finally {
-    await sql(`DELETE FROM public."Project" WHERE id = $1`, [project!.id]);
-    await sql(`DELETE FROM public."MediaFile" WHERE id = $1`, [media!.id]);
-    await storage.from("media").remove([pdfPath]);
+    await cleanup();
+  }
+});
+
+/** Built-ins pdf.js 6's modern build uses without polyfills; many current browsers lack them. */
+const STRIP_NEW_BUILTINS = `
+  for (const proto of [Map.prototype, WeakMap.prototype]) {
+    delete proto.getOrInsertComputed;
+    delete proto.getOrInsert;
+  }
+  delete Math.sumPrecise;
+  delete Uint8Array.fromBase64;
+  delete Uint8Array.prototype.toBase64;
+`;
+
+test("PDF viewer works in browsers without the newest built-ins", async ({ browser }) => {
+  const { slug, docId, cleanup } = await seedGithubProject();
+  const context = await browser.newContext();
+  await context.addInitScript(STRIP_NEW_BUILTINS);
+  const page = await context.newPage();
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  try {
+    await page.goto(`/en/projects/${slug}/docs/${docId}`);
+    await expect(page.locator(".react-pdf__Page canvas")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("This page couldn’t load")).toHaveCount(0);
+
+    await page.goto(`/en/projects/${slug}`);
+    await page.getByRole("tab", { name: /Documents/ }).click();
+    await expect(page.locator(".react-pdf__Page canvas")).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  } finally {
+    await context.close();
+    await cleanup();
+  }
+});
+
+test("dates hydrate without mismatch in the visitor's time zone", async ({ browser }) => {
+  const { slug, cleanup } = await seedGithubProject();
+  const context = await browser.newContext({ timezoneId: "Europe/Istanbul" });
+  const page = await context.newPage();
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  try {
+    await page.goto(`/tr/projects/${slug}`);
+    await expect(page.getByText("Son güncelleme: 25 Oca 2026")).toBeVisible();
+    await page.waitForLoadState("networkidle");
+    expect(errors).toEqual([]);
+  } finally {
+    await context.close();
+    await cleanup();
   }
 });
 
@@ -134,7 +203,7 @@ test("admin project list shows the sync panel and GitHub projects cannot be dele
   page,
 }) => {
   await clearRateLimits();
-  const slug = `e2e-gh-admin-${Date.now()}`;
+  const slug = `e2e-gh-admin-${randomUUID().slice(0, 8)}`;
   const [project] = await sql<{ id: string }>(
     `INSERT INTO public."Project" (id, slug, source, "githubFullName", published, "syncStatus", "syncError", "updatedAt")
      VALUES (gen_random_uuid()::text, $1, 'GITHUB', 'Decuayer/' || $1, true, 'ERROR', 'GitHub /repos -> 502', now())

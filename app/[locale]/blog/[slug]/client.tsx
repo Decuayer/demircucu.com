@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -129,7 +130,7 @@ export default function BlogDetailClient({
                 <Separator orientation="vertical" className="h-4" />
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
-                  <time>{new Date(post.createdAt).toLocaleDateString()}</time>
+                  <time>{formatDate(post.createdAt, locale)}</time>
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
@@ -262,7 +263,7 @@ export default function BlogDetailClient({
                           {comment.author.name || t("anonymousUser")}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(comment.createdAt).toLocaleDateString()}
+                          {formatDate(comment.createdAt, locale)}
                         </p>
                       </div>
                     </div>

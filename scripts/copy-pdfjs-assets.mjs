@@ -1,5 +1,5 @@
 /**
- * Copies the PDF.js worker and its data files (standard fonts, CMaps, WASM decoders) from
+ * Copies the PDF.js (legacy) worker and its data files (standard fonts, CMaps, WASM decoders) from
  * pdfjs-dist into public/pdfjs/, so the PDF viewer loads them from our own origin (CSP
  * `worker-src 'self'`, `connect-src 'self'`) in exactly the version react-pdf uses.
  * Runs before `dev` and `build`; the output is git-ignored.
@@ -18,7 +18,8 @@ const out = join(process.cwd(), "public", "pdfjs");
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
-cpSync(join(pdfjs, "build", "pdf.worker.min.mjs"), join(out, "pdf.worker.min.mjs"));
+// Legacy worker: polyfills the built-ins the modern build expects (see next.config.ts).
+cpSync(join(pdfjs, "legacy", "build", "pdf.worker.min.mjs"), join(out, "pdf.worker.min.mjs"));
 for (const dir of ["standard_fonts", "cmaps", "wasm"]) {
   cpSync(join(pdfjs, dir), join(out, dir), { recursive: true });
 }
