@@ -1,19 +1,19 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-24 (Faz 2 PR'ı açıldı). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-24 (Faz 2 production migration uygulandı, merge bekleniyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
 ## 1. Durum özeti
 
-| Faz / iş                         | Durum                                                        | Branch / PR                       |
-| -------------------------------- | ------------------------------------------------------------ | --------------------------------- |
-| Faz 0: Keşif                     | Tamamlandı, onaylandı                                        | (PR #1 açıklamasında)             |
-| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                 | `chore/phase-1-test-infra`, PR #1 |
-| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı       | `fix/db-connection-pool`, PR #2   |
-| Faz 2: Güvenlik ve auth          | Kod tamam, PR açık; **production migration'ı onay bekliyor** | `feat/phase-2-security-auth`      |
-| Frankfurt mini fazı              | Plan henüz sunulmadı (Faz 2 merge'ünden sonra)               | —                                 |
-| Faz 3–10                         | Başlamadı                                                    | —                                 |
+| Faz / iş                         | Durum                                                                 | Branch / PR                       |
+| -------------------------------- | --------------------------------------------------------------------- | --------------------------------- |
+| Faz 0: Keşif                     | Tamamlandı, onaylandı                                                 | (PR #1 açıklamasında)             |
+| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                          | `chore/phase-1-test-infra`, PR #1 |
+| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı                | `fix/db-connection-pool`, PR #2   |
+| Faz 2: Güvenlik ve auth          | Kod tamam, PR #3 açık; production migration uygulandı, merge bekliyor | `feat/phase-2-security-auth`      |
+| Frankfurt mini fazı              | Plan henüz sunulmadı (Faz 2 merge'ünden sonra)                        | —                                 |
+| Faz 3–10                         | Başlamadı                                                             | —                                 |
 
 ## 2. Tamamlanan işler
 
@@ -96,23 +96,29 @@ Kurallar:
 
 ## 6. Production migration'ları ve yedek
 
-| Migration                                          | Uygulama                                               | Tarih      |
-| -------------------------------------------------- | ------------------------------------------------------ | ---------- |
-| `0_init`                                           | `migrate resolve --applied` (baseline, şema değişmedi) | 2026-11-24 |
-| `20261124004754_comment_moderation_and_rate_limit` | **Onay bekliyor**                                      | —          |
-| `20261124004800_rls_lockdown`                      | **Onay bekliyor**                                      | —          |
-| `20261124004900_auth_profile_sync`                 | **Onay bekliyor**                                      | —          |
+| Migration                                          | Uygulama                                                 | Tarih      |
+| -------------------------------------------------- | -------------------------------------------------------- | ---------- |
+| `0_init`                                           | `migrate resolve --applied` (baseline, şema değişmedi)   | 2026-11-24 |
+| `20261124004754_comment_moderation_and_rate_limit` | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
+| `20261124004800_rls_lockdown`                      | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
+| `20261124004900_auth_profile_sync`                 | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok | 2026-11-24 |
 
-- **Son yedek:** `~/backups/demircucu/backup-2026-11-24-pre-phase2.dump` (`pg_dump -Fc` 17.12,
-  426 KB, mode 600; `pg_restore --list` ile doğrulandı: public'te 14 tablo, `auth`, `storage`).
-  Önceki: `backup-2026-11-24.dump`. Storage dosyaları yedekte yok.
-- **Dry-run (salt-okunur, 2026-11-24):** `prisma migrate status` 3 bekleyen migration gösteriyor;
-  `verify-db-lockdown`: 14 tabloda RLS kapalı (açılacak), `anon`/`authenticated` erişimi zaten yok,
-  `auth.users` trigger'ı yok (eklenecek), profilsiz auth kullanıcısı 0 (backfill 0 satır). Migration
-  rolü `postgres`, `auth.users` üzerinde TRIGGER yetkisi var, `app_private` yok, `public` ACL zaten
-  sahibe özel (`REVOKE ... FROM PUBLIC` etkisiz).
-- Uygulama komutu (onaydan sonra):
-  `(set -a; . ./.env.prod.local; set +a; DATABASE_URL=$DIRECT_URL npx prisma migrate deploy && npx tsx scripts/verify-db-lockdown.ts)`
+- **Son yedek:** `~/backups/demircucu/backup-2026-11-24-pre-migrate.dump` (migration'dan hemen önce,
+  426 KB, mode 600; `pg_restore --list`: public 14, auth 27, storage 10 tablo verisi). Önceki
+  `backup-2026-11-24-pre-phase2.dump` güncel değildi (sonradan 1 blog yazısı eklenmiş). Storage
+  dosyaları yedekte yok.
+- **Uygulama (2026-11-24):** `prisma migrate deploy` 3 migration; `migrate status` güncel;
+  `migrate diff` fark yok; `verify-db-lockdown`: RLS'siz tablo yok, `anon`/`authenticated` erişimi
+  yok, 3 `auth.users` trigger'ı var, profilsiz kullanıcı 0. Data API production'da kapalı
+  (`/rest/v1` 503 PGRST002, önceki 42501 yerine). Canlı sitedeki (eski kod) sayfalar 200.
+- **Merge'e kadar eski kod ile yeni şema:** uygulama `postgres` rolüyle bağlanıyor (tablo sahibi,
+  `BYPASSRLS`, `FORCE RLS` yok), RLS eski kodu etkilemez. Eski `signUp` önce Supabase'de kullanıcı
+  açıp sonra `Profile` oluşturuyor; trigger profili önce oluşturduğu için eski kod unique hatası
+  alıp "Profil oluşturulurken hata" gösterir (hesap ve profil yine oluşur, isim boş kalır).
+  Dahili SMTP yalnızca takım adreslerine gönderdiği için pratikte kayıt yok; risk düşük.
+- **Production `media` bucket:** 4 MB ve izinli türler uygulandı (`ensure-storage-bucket.ts
+--apply`); mevcut 8 nesnenin hepsi sınırlar içinde.
+- Komutlar: `(set -a; . ./.env.prod.local; set +a; DATABASE_URL=$DIRECT_URL npx prisma migrate deploy && npx tsx scripts/verify-db-lockdown.ts)`
 
 ## 7. Ölçümler
 
@@ -137,13 +143,14 @@ PR açıklamasında adım adım: production migration onayı, Supabase panel aya
 production), GitHub secret'ları, Vercel env kontrolü, production anahtar geçişi planı, production
 `media` bucket limitleri, `chmod 600 .env.prod.local`, `.env.staging.local`'a bypass secret.
 
-### Kullanıcıya sorulacaklar / karar bekleyenler
+### Kararlar (2026-11-24)
 
-- Soft 404: Partial Prefetching açıkken bilinmeyen slug'larda ilk istek 200 + noindex dönüyor.
-  Seçenek: olduğu gibi kalsın (SEO'ya zararsız, noindex var) veya `partialPrefetching` kapatılsın
-  (gerçek 404, ama App Shell prefetch kazanımı kaybolur).
-- Production içeriğinde Supabase dışı host'tan görsel var mı (CSP engeller)? Otomatik sayım izni
-  verilmedi; kullanıcı onaylarsa salt-okunur sayılacak.
+- Soft 404: Partial Prefetching açık kalıyor; ilk istekte noindex ve sitemap koruması testli.
+- CSP değişmiyor; tek harici görsel (Vestel deneyim logosu) gösterilmiyor, deneyim tasarımı
+  fazında kendi storage'ımıza taşınacak.
+- Yeni anahtar formatı Frankfurt taşımasıyla birlikte.
+- E-posta: dahili SMTP yalnızca takım üyelerine ve saatte 2 e-posta; production için custom SMTP
+  (Resend önerildi) kullanıcı kararında.
 
 ### Sonraki planlar
 
@@ -154,9 +161,11 @@ production), GitHub secret'ları, Vercel env kontrolü, production anahtar geçi
 
 ### Bilinen riskler
 
-- `next start` altında `updateTag` sonrası ilk istek build-time prerender'ı dönebiliyor; sonraki istek
-  güncel. Vercel Preview'da doğrulanmalı.
-- CSP: production içeriğindeki harici görseller (varsa) engellenir.
+- `next start` altında `updateTag` sonrası ilk istek build-time prerender'ı dönebiliyor (yalnızca
+  yerel). Vercel'de tag yayılımı ~2–3 sn; `"use cache: remote"` + 5 sn sonra ikinci geçersizleştirme
+  ile Preview'da 7/7 ilk istek güncel; test 15 sn sınırını ve kalıcılığı kontrol ediyor.
+- Staging'deki otomasyon admini (`preview-e2e-admin@example.com`) yalnızca staging'de; parolası
+  `.env.staging.local`'da.
 - `use cache` kayıtları deploy'lar arasında taşınmıyor; build DB okuyor (env ve pooler doğru olmalı;
   session pooler artık hata veriyor).
 - `game-catalog` projesinin `githubUrl` alanında prompt metni var; proje kaydedilirken URL
