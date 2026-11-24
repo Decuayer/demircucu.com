@@ -10,8 +10,9 @@
  * names only, never connection details. Safe to run again: a second run reports no changes.
  * Pages cache tag data, so run --apply before the deploy that should show it (or redeploy).
  */
-import type { Prisma } from "@prisma/client";
-import { createPrismaClient } from "@/lib/prisma";
+import { PrismaClient, type Prisma } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import { migrateTags, type MigrationReport } from "@/lib/tags/migrate";
 
 const args = new Set(process.argv.slice(2));
@@ -73,7 +74,14 @@ async function printTree(tx: Prisma.TransactionClient) {
   walk(null, 0);
 }
 
-const prisma = createPrismaClient(process.env.DIRECT_URL || process.env.DATABASE_URL);
+// One connection for one long transaction. Not createPrismaClient(): its transaction-pooler
+// check guards deployed functions, while DIRECT_URL (session pooler or direct) suits a script.
+const pool = new Pool({
+  connectionString: process.env.DIRECT_URL || process.env.DATABASE_URL,
+  max: 1,
+  allowExitOnIdle: true,
+});
+const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
 async function main(): Promise<void> {
   console.log(apply ? "APPLY: changes will be committed." : "DRY RUN: changes are rolled back.");
