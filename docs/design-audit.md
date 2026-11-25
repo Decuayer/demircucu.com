@@ -300,7 +300,10 @@ Tek vurgu + nötr skala, light ve dark için token'lar (`globals.css`, `oklch`):
 
 ## Karar gerektiren sorular
 
-Rapor sohbette de seçenekleriyle sunuldu; cevaplar buraya işlenecek.
+Kararlar (kullanıcı, 2026-11-26): 1 tek violet, 2 sistem teması + düğme, 3 Geist kalır, 4 yeni ana
+sayfa yapısı, 5 CV indirme (migration), 6 deneyimde konum (migration, CV ile birlikte), 7 otomatik
+kapak + admin seçimi, 8 `/api/track` nötr yola (eski yol bir süre çalışır), 9 tüm içerik
+formlarında uyarı, 10 hobiler küçültülmüş kalır. İçerik notlarını kullanıcı admin'den düzeltecek.
 
 1. Vurgu rengi.
 2. Varsayılan tema.
