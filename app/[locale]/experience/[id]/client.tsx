@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -42,11 +43,12 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
             <div className="mb-4 flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20">
                 {experience.logoUrl ? (
-                  // TODO(phase-6): migrate to next/image together with the project logo.
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={experience.logoUrl}
                     alt={experience.company}
+                    width={40}
+                    height={40}
+                    loading="eager"
                     className="h-10 w-10 rounded object-contain"
                   />
                 ) : (

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { formatDate } from "@/lib/format-date";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -86,11 +87,11 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
                     <CardContent className="space-y-3 p-6">
                       <div className="flex items-center justify-between gap-3">
                         {exp.logoUrl && (
-                          // TODO(phase-6): migrate to next/image together with the project logo.
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={exp.logoUrl}
                             alt=""
+                            width={40}
+                            height={40}
                             className="h-10 w-10 shrink-0 rounded-lg border border-border/50 bg-background/50 object-contain p-1"
                           />
                         )}

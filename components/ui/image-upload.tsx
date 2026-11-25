@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
@@ -60,8 +61,14 @@ export function ImageUpload({ value, onChange, folder = "general" }: ImageUpload
     return (
       <div className="group relative flex aspect-video max-w-sm items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-accent/20">
         {previewUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={previewUrl} alt={t("previewAlt")} className="h-full w-full object-contain" />
+          <Image
+            src={previewUrl}
+            alt={t("previewAlt")}
+            fill
+            sizes="384px"
+            unoptimized={previewUrl.endsWith(".ico")}
+            className="object-contain"
+          />
         )}
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
           <Button

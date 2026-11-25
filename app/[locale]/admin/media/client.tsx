@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useState, useRef, useTransition } from "react";
 import { useTranslations } from "next-intl";
@@ -286,12 +287,16 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
               >
                 <div className="relative flex aspect-square items-center justify-center bg-accent/20 p-2">
                   {file.type.startsWith("image/") ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={mediaUrl(file.path) ?? undefined}
-                      alt={file.name}
-                      className="h-full w-full rounded-md object-cover"
-                    />
+                    <span className="relative block h-full w-full">
+                      <Image
+                        src={mediaUrl(file.path) ?? ""}
+                        alt={file.name}
+                        fill
+                        sizes="(min-width: 1024px) 200px, 45vw"
+                        unoptimized={file.path.endsWith(".ico")}
+                        className="rounded-md object-cover"
+                      />
+                    </span>
                   ) : (
                     <FileIcon className="h-12 w-12 text-cyan-400 opacity-80" />
                   )}
@@ -332,12 +337,16 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
             <div className="grid grid-cols-1 gap-6 py-4 md:grid-cols-2">
               <div className="flex min-h-[200px] items-center justify-center rounded-xl border border-border/50 bg-accent/20 p-4">
                 {selectedFile.type.startsWith("image/") ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={mediaUrl(selectedFile.path) ?? undefined}
-                    alt={selectedFile.name}
-                    className="max-h-[300px] max-w-full rounded-md object-contain"
-                  />
+                  <span className="relative block h-[300px] w-full">
+                    <Image
+                      src={mediaUrl(selectedFile.path) ?? ""}
+                      alt={selectedFile.name}
+                      fill
+                      sizes="320px"
+                      unoptimized={selectedFile.path.endsWith(".ico")}
+                      className="rounded-md object-contain"
+                    />
+                  </span>
                 ) : (
                   <FileIcon className="h-24 w-24 text-cyan-400" />
                 )}

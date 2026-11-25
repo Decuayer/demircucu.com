@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { formatDate } from "@/lib/format-date";
 import { useLocale, useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -158,10 +159,12 @@ export default function ProjectDetailClient({
             <div className="mb-4 flex items-center gap-4">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20">
                 {project.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={project.logoUrl}
                     alt={title}
+                    width={40}
+                    height={40}
+                    loading="eager"
                     className="h-10 w-10 rounded object-contain"
                   />
                 ) : (

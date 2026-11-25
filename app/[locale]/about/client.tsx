@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
@@ -264,13 +265,18 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
             {/* Photo */}
             <div className="mb-10 flex justify-center md:float-left md:mr-10 md:mb-8 md:block">
               <div className="relative">
-                <div className="flex h-64 w-64 items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20 shadow-2xl md:h-72 md:w-72">
+                <div className="relative flex h-64 w-64 items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20 shadow-2xl md:h-72 md:w-72">
                   {settings?.aboutPhotoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={settings.aboutPhotoUrl}
-                      alt="Profile"
-                      className="h-full w-full object-cover"
+                      alt={t("photoAlt")}
+                      fill
+                      sizes="(min-width: 768px) 288px, 256px"
+                      preload
+                      {...(settings.aboutPhotoBlur
+                        ? { placeholder: "blur" as const, blurDataURL: settings.aboutPhotoBlur }
+                        : {})}
+                      className="object-cover"
                     />
                   ) : (
                     <span className="text-6xl">👨‍💻</span>

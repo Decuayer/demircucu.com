@@ -3,6 +3,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { CacheTags } from "@/lib/cache/tags";
 import { sanitizeHtml } from "@/lib/sanitize/html";
+import { optimizeImagesIn } from "@/lib/data/html-images";
 import { presentPost, publicPostQuery } from "@/lib/data/present";
 
 export async function getPublishedPosts() {
@@ -41,13 +42,14 @@ export async function getPublishedPostBySlug(slug: string) {
   });
   const post = row && presentPost(row);
   // Rendered with dangerouslySetInnerHTML: sanitize again on read (rows may predate S4).
-  return (
-    post && {
-      ...post,
+  if (!post) return null;
+  return {
+    ...post,
+    ...(await optimizeImagesIn({
       contentTr: sanitizeHtml(post.contentTr),
       contentEn: sanitizeHtml(post.contentEn),
-    }
-  );
+    })),
+  };
 }
 
 export async function getPublishedPostSlugs(): Promise<string[]> {
