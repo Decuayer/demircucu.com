@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { mediaUrl } from "@/lib/media/url";
 import { uploadToMediaLibrary, type UploadFolder } from "@/lib/media/upload-client";
-import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
 
 interface ImageUploadProps {
   /** Storage path in the media bucket, or "" for none. */
@@ -29,10 +28,6 @@ export function ImageUpload({ value, onChange, folder = "general" }: ImageUpload
   const handleUpload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
       toast.error(t("notAnImage"));
-      return;
-    }
-    if (file.size > MAX_UPLOAD_BYTES) {
-      toast.error(errorMessage("tooLarge"));
       return;
     }
     setIsUploading(true);

@@ -59,4 +59,18 @@ test.describe("upload endpoint", () => {
     expect(res.status()).toBe(401);
     expect(await res.json()).toEqual({ error: "unauthenticated" });
   });
+
+  test("signs upload URLs only for admins on the same origin", async ({ request, baseURL }) => {
+    const data = { size: 10, type: "image/png" };
+    const crossOrigin = await request.post("/api/upload/sign", {
+      headers: { origin: "https://evil.test" },
+      data,
+    });
+    expect(crossOrigin.status()).toBe(403);
+    const anonymous = await request.post("/api/upload/sign", {
+      headers: { origin: new URL(baseURL!).origin },
+      data,
+    });
+    expect(anonymous.status()).toBe(401);
+  });
 });

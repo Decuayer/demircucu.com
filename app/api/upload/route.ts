@@ -2,10 +2,18 @@ import { type NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/guards";
 import { AuthorizationError } from "@/lib/auth/errors";
 import { isSameOrigin } from "@/lib/http/same-origin";
-import { inspectUpload } from "@/lib/upload/inspect";
-import { cleanDisplayName, MAX_UPLOAD_BYTES, uploadFieldsSchema } from "@/lib/upload/policy";
-import { BUCKET_NAME, deleteFileFromStorage, uploadFileToStorage } from "@/lib/supabase/storage";
-import { saveMediaFile } from "@/lib/data/media";
+import { prisma } from "@/lib/prisma";
+import { ingestUpload } from "@/lib/media/ingest";
+import { cleanDisplayName, completeRequestSchema, MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
+import {
+  BUCKET_NAME,
+  deleteFileFromStorage,
+  downloadObject,
+  putObject,
+} from "@/lib/supabase/storage";
+
+/** Large PDFs and image processing; well inside the Hobby limit. */
+export const maxDuration = 60;
 
 type UploadErrorCode =
   | "forbidden"
@@ -20,6 +28,11 @@ function error(code: UploadErrorCode, status: number) {
   return NextResponse.json({ error: code }, { status });
 }
 
+/**
+ * Step 2 of an upload (step 1: `POST /api/upload/sign`). The object the browser put into
+ * `incoming/` is verified from its bytes, processed and stored under a content-hash name; the
+ * incoming object is always removed.
+ */
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request.headers)) return error("forbidden", 403);
 
@@ -32,54 +45,34 @@ export async function POST(request: NextRequest) {
     throw failure;
   }
 
-  // Reject oversized bodies before buffering them.
-  const declaredLength = Number(request.headers.get("content-length") ?? 0);
-  if (declaredLength > MAX_UPLOAD_BYTES + 64 * 1024) return error("tooLarge", 413);
+  const parsed = completeRequestSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return error("invalidInput", 400);
+  const { path: incoming, folder } = parsed.data;
 
   try {
-    const form = await request.formData();
-    const file = form.get("file");
-    if (!(file instanceof File)) return error("invalidInput", 400);
-
-    const fields = uploadFieldsSchema.safeParse({
-      folder: form.get("folder") ?? undefined,
-      name: cleanDisplayName(file.name),
-    });
-    if (!fields.success) return error("invalidInput", 400);
-    if (file.size > MAX_UPLOAD_BYTES) return error("tooLarge", 413);
-
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const decision = await inspectUpload(bytes);
-    if (!decision.ok) return error(decision.reason, decision.reason === "tooLarge" ? 413 : 415);
-
-    const stored = await uploadFileToStorage(bytes, {
-      ext: decision.ext,
-      contentType: decision.mime,
-      folder: fields.data.folder,
-    });
-    if (!stored.success) return error("serverError", 502);
-
-    try {
-      const mediaFile = await saveMediaFile({
-        name: fields.data.name,
-        type: decision.mime,
-        size: bytes.byteLength,
-        bucket: BUCKET_NAME,
-        path: stored.path,
-      });
-      return NextResponse.json({
-        success: true,
-        path: stored.path,
-        url: stored.publicUrl,
-        file: mediaFile,
-      });
-    } catch (dbError) {
-      // Do not leave an untracked object in the bucket.
-      await deleteFileFromStorage(stored.path);
-      throw dbError;
+    const download = await downloadObject(incoming, MAX_UPLOAD_BYTES);
+    if (!download.ok) {
+      return download.reason === "tooLarge" ? error("tooLarge", 413) : error("invalidInput", 400);
     }
+    const bytes = download.bytes;
+
+    const result = await ingestUpload(
+      { bytes, folder, name: cleanDisplayName(parsed.data.name) },
+      {
+        db: prisma,
+        bucket: BUCKET_NAME,
+        store: { put: putObject, remove: deleteFileFromStorage },
+      },
+    );
+    if (!result.ok) {
+      const reason = result.reason === "invalidImage" ? "unsupportedType" : result.reason;
+      return error(reason, reason === "tooLarge" ? 413 : 415);
+    }
+    return NextResponse.json({ success: true, path: result.file.path, file: result.file });
   } catch (failure) {
     console.error("[api/upload]", failure);
     return error("serverError", 500);
+  } finally {
+    await deleteFileFromStorage(incoming);
   }
 }

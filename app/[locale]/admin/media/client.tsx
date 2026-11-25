@@ -21,10 +21,9 @@ import {
   Eraser,
 } from "lucide-react";
 import { toast } from "sonner";
-import { getErrorMessage } from "@/lib/errors";
 import type { AdminMediaItem } from "@/lib/data/admin";
 import { mediaUrl } from "@/lib/media/url";
-import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
+import { uploadToMediaLibrary } from "@/lib/media/upload-client";
 import { deleteMediaFile } from "@/app/actions/media";
 import { deleteUnusedGithubMedia } from "@/app/actions/github";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -81,48 +80,27 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
   const handleUpload = async (file: File) => {
     if (!file) return;
 
-    if (file.size > MAX_UPLOAD_BYTES) {
-      toast.error(t("fileSizeLimit"));
+    setIsUploading(true);
+    const result = await uploadToMediaLibrary(file, "media-library");
+    setIsUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (!result.ok) {
+      toast.error(errorMessage(result.error));
       return;
     }
-
-    try {
-      setIsUploading(true);
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", "media-library");
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setFiles((prev) => [
-          {
-            ...data.file,
-            source: "UPLOAD",
-            repoFullName: null,
-            originUrl: null,
-            width: null,
-            height: null,
-            usageCount: 0,
-            usedIn: [],
-          },
-          ...prev,
-        ]);
-        toast.success(t("fileUploaded"));
-      } else {
-        throw new Error(data.error ? errorMessage(data.error) : t("uploadFailed"));
-      }
-    } catch (error) {
-      toast.error(getErrorMessage(error));
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+    setFiles((prev) => [
+      {
+        ...result.file,
+        createdAt: new Date(result.file.createdAt),
+        source: "UPLOAD",
+        repoFullName: null,
+        originUrl: null,
+        usageCount: 0,
+        usedIn: [],
+      },
+      ...prev.filter((f) => f.id !== result.file.id),
+    ]);
+    toast.success(t("fileUploaded"));
   };
 
   // Handle file deletion

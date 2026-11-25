@@ -1,7 +1,7 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { UPLOAD_FOLDERS } from "@/lib/upload/policy";
+import { INCOMING_FOLDER } from "@/lib/upload/policy";
 
 let adminClient: SupabaseClient | undefined;
 
@@ -30,37 +30,8 @@ export function getSupabaseAdmin(): SupabaseClient {
 /** Public bucket; created once per environment (see docs/security-review.md, S6). */
 export const BUCKET_NAME = "media";
 
-/** Uploaded files never change (random names), so browsers and the CDN may cache them for a year. */
+/** Stored files never change (random or content-hash names), so browsers and the CDN may cache them for a year. */
 const IMMUTABLE_CACHE_SECONDS = "31536000";
-
-export type UploadResult =
-  | { success: true; path: string; publicUrl: string }
-  | { success: false; error: "storageUnavailable" };
-
-/**
- * Stores an already validated file under `<folder>/<uuid>.<ext>`. The object name never uses
- * the client-supplied file name.
- */
-export async function uploadFileToStorage(
-  file: Uint8Array,
-  options: { ext: string; contentType: string; folder: (typeof UPLOAD_FOLDERS)[number] },
-): Promise<UploadResult> {
-  try {
-    const storage = getSupabaseAdmin().storage.from(BUCKET_NAME);
-    const path = `${options.folder}/${randomUUID()}.${options.ext}`;
-    const { data, error } = await storage.upload(path, file, {
-      contentType: options.contentType,
-      cacheControl: IMMUTABLE_CACHE_SECONDS,
-      upsert: false,
-    });
-    if (error) throw error;
-    const { data: urlData } = storage.getPublicUrl(data.path);
-    return { success: true, path: data.path, publicUrl: urlData.publicUrl };
-  } catch (error) {
-    console.error("[storage] upload failed:", (error as Error).message);
-    return { success: false, error: "storageUnavailable" };
-  }
-}
 
 export async function deleteFileFromStorage(
   path: string,
@@ -89,4 +60,45 @@ export async function putObject(
     .storage.from(BUCKET_NAME)
     .upload(path, bytes, { contentType, cacheControl: IMMUTABLE_CACHE_SECONDS, upsert: true });
   if (error) throw new Error(`storage upload failed: ${error.message}`);
+}
+
+/** One-time upload URL for `incoming/<uuid>` (valid two hours, no overwrite). */
+export async function createIncomingUpload(): Promise<
+  { ok: true; path: string; signedUrl: string } | { ok: false }
+> {
+  try {
+    const path = `${INCOMING_FOLDER}/${randomUUID()}`;
+    const { data, error } = await getSupabaseAdmin()
+      .storage.from(BUCKET_NAME)
+      .createSignedUploadUrl(path);
+    if (error) throw error;
+    return { ok: true, path, signedUrl: data.signedUrl };
+  } catch (error) {
+    console.error("[storage] signed upload failed:", (error as Error).message);
+    return { ok: false };
+  }
+}
+
+/** Reads an object that may be at most `maxBytes` long. */
+export async function downloadObject(
+  path: string,
+  maxBytes: number,
+): Promise<{ ok: true; bytes: Uint8Array } | { ok: false; reason: "missing" | "tooLarge" }> {
+  const { data, error } = await getSupabaseAdmin().storage.from(BUCKET_NAME).download(path);
+  if (error || !data) return { ok: false, reason: "missing" };
+  if (data.size > maxBytes) return { ok: false, reason: "tooLarge" };
+  return { ok: true, bytes: new Uint8Array(await data.arrayBuffer()) };
+}
+
+/** Removes abandoned signed uploads older than `maxAgeMs` (best effort). */
+export async function purgeStaleIncoming(maxAgeMs: number, now = Date.now()): Promise<number> {
+  const storage = getSupabaseAdmin().storage.from(BUCKET_NAME);
+  const { data, error } = await storage.list(INCOMING_FOLDER, { limit: 100 });
+  if (error || !data) return 0;
+  const stale = data
+    .filter((o) => o.created_at && now - Date.parse(o.created_at) > maxAgeMs)
+    .map((o) => `${INCOMING_FOLDER}/${o.name}`);
+  if (stale.length === 0) return 0;
+  const { error: removeError } = await storage.remove(stale);
+  return removeError ? 0 : stale.length;
 }

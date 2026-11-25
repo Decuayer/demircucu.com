@@ -13,27 +13,13 @@
  * directly could run scripts. Animated GIFs are stored unchanged to keep the animation.
  */
 import { createHash } from "node:crypto";
-import { fileTypeFromBuffer } from "file-type";
-import sharp from "sharp";
 import type { PrismaClient } from "@prisma/client";
 import { USER_AGENT, type FetchLike } from "./auth";
 
 import { MIRROR_LIMITS } from "@/lib/upload/policy";
+import { MAX_IMAGE_EDGE, prepareImage } from "@/lib/media/image";
 
-export { MIRROR_LIMITS };
-
-/** Longest edge kept for mirrored images; larger ones are scaled down. */
-export const MAX_IMAGE_EDGE = 2400;
-
-const IMAGE_TYPES = {
-  "image/png": "png",
-  "image/jpeg": "jpg",
-  "image/gif": "gif",
-  "image/webp": "webp",
-  "image/avif": "avif",
-} as const;
-
-type ImageMime = keyof typeof IMAGE_TYPES;
+export { MIRROR_LIMITS, MAX_IMAGE_EDGE, prepareImage };
 
 export type DownloadResult =
   | { ok: true; bytes: Buffer; contentType: string | null; finalUrl: string }
@@ -91,119 +77,6 @@ export async function download(
 }
 
 export const sha256 = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
-
-function looksLikeSvg(bytes: Buffer, contentType: string | null): boolean {
-  if (contentType?.includes("image/svg+xml")) return true;
-  const head = bytes
-    .subarray(0, 1024)
-    .toString("utf8")
-    .replace(/<\?xml[^>]*>|<!--[\s\S]*?-->|<!DOCTYPE[^>]*>/gi, "")
-    .trimStart();
-  return head.startsWith("<svg");
-}
-
-export interface PreparedImage {
-  bytes: Buffer;
-  mime: ImageMime;
-  ext: string;
-  width: number | null;
-  height: number | null;
-  blurDataUrl: string | null;
-}
-
-export type PrepareResult =
-  { ok: true; image: PreparedImage } | { ok: false; reason: "unsupportedType" | "invalidImage" };
-
-async function blurOf(input: Buffer): Promise<string | null> {
-  try {
-    const tiny = await sharp(input, { animated: false })
-      .resize(16, 16, { fit: "inside" })
-      .webp({ quality: 40 })
-      .toBuffer();
-    return `data:image/webp;base64,${tiny.toString("base64")}`;
-  } catch {
-    return null;
-  }
-}
-
-/** Verifies and optimises downloaded image bytes. */
-export async function prepareImage(
-  bytes: Buffer,
-  contentType: string | null,
-): Promise<PrepareResult> {
-  try {
-    if (looksLikeSvg(bytes, contentType)) {
-      // Rasterised at 2x so diagrams stay sharp on high-density screens.
-      const png = await sharp(bytes, { density: 144 })
-        .resize(MAX_IMAGE_EDGE, MAX_IMAGE_EDGE, { fit: "inside", withoutEnlargement: true })
-        .png({ compressionLevel: 9 })
-        .toBuffer({ resolveWithObject: true });
-      return {
-        ok: true,
-        image: {
-          bytes: png.data,
-          mime: "image/png",
-          ext: "png",
-          // Displayed at the SVG's own size (half the 2x raster).
-          width: Math.round(png.info.width / 2) || null,
-          height: Math.round(png.info.height / 2) || null,
-          blurDataUrl: await blurOf(png.data),
-        },
-      };
-    }
-
-    const detected = await fileTypeFromBuffer(bytes);
-    if (!detected || !(detected.mime in IMAGE_TYPES))
-      return { ok: false, reason: "unsupportedType" };
-    const mime = detected.mime as ImageMime;
-    const meta = await sharp(bytes, { animated: true }).metadata();
-    const width = meta.width ?? null;
-    const height = meta.pageHeight ?? meta.height ?? null;
-    const animated = (meta.pages ?? 1) > 1;
-
-    let output = bytes;
-    let outWidth = width;
-    let outHeight = height;
-    if (!animated && mime !== "image/gif") {
-      const oversized = (width ?? 0) > MAX_IMAGE_EDGE || (height ?? 0) > MAX_IMAGE_EDGE;
-      let pipeline = sharp(bytes).rotate();
-      if (oversized) pipeline = pipeline.resize(MAX_IMAGE_EDGE, MAX_IMAGE_EDGE, { fit: "inside" });
-      switch (mime) {
-        case "image/png":
-          pipeline = pipeline.png({ compressionLevel: 9, adaptiveFiltering: true });
-          break;
-        case "image/jpeg":
-          pipeline = pipeline.jpeg({ quality: 82, mozjpeg: true });
-          break;
-        case "image/webp":
-          pipeline = pipeline.webp({ quality: 82 });
-          break;
-        case "image/avif":
-          pipeline = pipeline.avif({ quality: 55 });
-          break;
-      }
-      const result = await pipeline.toBuffer({ resolveWithObject: true });
-      if (oversized || result.data.length < bytes.length) {
-        output = result.data;
-        outWidth = result.info.width;
-        outHeight = result.info.height;
-      }
-    }
-    return {
-      ok: true,
-      image: {
-        bytes: output,
-        mime,
-        ext: IMAGE_TYPES[mime],
-        width: outWidth,
-        height: outHeight,
-        blurDataUrl: await blurOf(output),
-      },
-    };
-  } catch {
-    return { ok: false, reason: "invalidImage" };
-  }
-}
 
 export function isPdf(bytes: Uint8Array): boolean {
   return Buffer.from(bytes.subarray(0, 5)).toString("latin1") === "%PDF-";
