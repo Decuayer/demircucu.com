@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useState, useRef, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -152,14 +151,10 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
     <div className="space-y-6">
       {/* Header & Controls */}
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 text-2xl font-bold"
-        >
+        <h1 className="enter flex items-center gap-3 text-2xl font-bold">
           <ImageIcon className="h-6 w-6 text-violet-400" />
           {t("mediaLibrary")}
-        </motion.h1>
+        </h1>
 
         <div className="flex w-full items-center gap-3 md:w-auto">
           <div className="relative flex-1 md:w-64">
@@ -275,11 +270,10 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       ) : (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {filteredFiles.map((file, i) => (
-            <motion.div
+            <div
               key={file.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.05 }}
+              className="enter enter-scale"
+              style={{ "--enter-delay": `${i * 50}ms` } as React.CSSProperties}
             >
               <Card
                 className="group cursor-pointer overflow-hidden border-border/50 bg-card/50 transition-colors hover:border-violet-500/50"
@@ -322,7 +316,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

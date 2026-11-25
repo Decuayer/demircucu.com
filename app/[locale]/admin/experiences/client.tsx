@@ -2,7 +2,6 @@
 
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -57,14 +56,10 @@ export default function AdminExperiencesClient({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 text-2xl font-bold"
-        >
+        <h1 className="enter flex items-center gap-3 text-2xl font-bold">
           <Briefcase className="h-6 w-6 text-violet-400" />
           {t("experiences")}
-        </motion.h1>
+        </h1>
         <Link href="/admin/experiences/new">
           <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
             <Plus className="mr-2 h-4 w-4" />
@@ -75,11 +70,10 @@ export default function AdminExperiencesClient({
 
       <div className="space-y-3">
         {experiences.map((exp, i) => (
-          <motion.div
+          <div
             key={exp.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
+            className="enter"
+            style={{ "--enter-delay": `${i * 50}ms` } as React.CSSProperties}
           >
             <Card className="border-border/50 bg-card/50 transition-colors hover:bg-card">
               <CardContent className="flex items-center justify-between p-4">
@@ -112,7 +106,7 @@ export default function AdminExperiencesClient({
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         ))}
       </div>
 

@@ -5,7 +5,6 @@ import { formatDate } from "@/lib/format-date";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Briefcase, ArrowRight, Calendar } from "lucide-react";
@@ -31,11 +30,7 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
     <div className="py-16 md:py-24">
       <div className="container mx-auto max-w-4xl px-4 md:px-6">
         {/* Page Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-16 text-center"
-        >
+        <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
             className="mb-4 border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-violet-400"
@@ -44,7 +39,7 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
             {t("title")}
           </Badge>
           <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
-        </motion.div>
+        </div>
 
         {filter}
 
@@ -55,15 +50,11 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
 
           <div className="space-y-12">
             {experiences.map((exp, i) => (
-              <motion.div
+              <div
                 key={exp.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`relative flex flex-col gap-8 md:flex-row ${
+                className={`reveal ${`relative flex flex-col gap-8 md:flex-row ${
                   i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                }`}
+                }`}`}
               >
                 {/* Timeline dot */}
                 <div className="absolute left-0 z-10 h-4 w-4 -translate-x-[7px] rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 ring-4 ring-background md:left-1/2 md:-translate-x-2" />
@@ -117,7 +108,7 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
                     </CardContent>
                   </Card>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

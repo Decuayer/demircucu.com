@@ -5,7 +5,6 @@ import type { AdminSiteSettings } from "@/lib/types/content";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -330,14 +329,10 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
   return (
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 text-2xl font-bold"
-        >
+        <h1 className="enter flex items-center gap-3 text-2xl font-bold">
           <Settings className="h-6 w-6 text-violet-400" />
           {t("siteSettings")}
-        </motion.h1>
+        </h1>
         <Button
           onClick={handleSubmit}
           disabled={isPending}

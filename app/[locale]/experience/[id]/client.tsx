@@ -1,9 +1,6 @@
-"use client";
-
 import Image from "next/image";
 import { formatDate } from "@/lib/format-date";
-import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Building2 } from "lucide-react";
@@ -11,7 +8,6 @@ import { GithubIcon } from "@/components/icons";
 import { Link } from "@/i18n/navigation";
 import { getTranslated } from "@/lib/i18n-utils";
 import { attachmentHref, toAttachments } from "@/lib/media/attachments";
-import { useParams } from "next/navigation";
 
 import type { PublicExperience } from "@/lib/types/content";
 import { TagChips } from "@/components/tags/tag-chips";
@@ -23,13 +19,12 @@ interface ExperienceDetailClientProps {
 
 export default function ExperienceDetailClient({ experience }: ExperienceDetailClientProps) {
   const t = useTranslations("experience");
-  const params = useParams();
-  const locale = params.locale as string;
+  const locale = useLocale();
 
   return (
     <div className="py-16 md:py-24">
       <div className="container mx-auto max-w-4xl px-4 md:px-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="enter">
           {/* Back button */}
           <Link href="/experience">
             <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground">
@@ -125,7 +120,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
               </Button>
             </a>
           )}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

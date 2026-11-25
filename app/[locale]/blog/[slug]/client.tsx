@@ -2,7 +2,6 @@
 
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -103,7 +102,7 @@ export default function BlogDetailClient({
   return (
     <div className="py-16 md:py-24">
       <div className="container mx-auto max-w-3xl px-4 md:px-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="enter">
           <Link href="/blog">
             <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -275,7 +274,7 @@ export default function BlogDetailClient({
               ))}
             </div>
           </section>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

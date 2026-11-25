@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Newspaper, Eye, MessageSquare, Mail, TrendingUp, ArrowUpRight } from "lucide-react";
 
@@ -44,19 +43,18 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <div className="enter">
         <h1 className="mb-2 text-3xl font-bold">{t("dashboard")}</h1>
         <p className="text-muted-foreground">{t("overview")}</p>
-      </motion.div>
+      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
-          <motion.div
+          <div
             key={stat.key}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
+            className="enter"
+            style={{ "--enter-delay": `${i * 100}ms` } as React.CSSProperties}
           >
             <Card className="border-border/50 bg-card/50 transition-colors hover:bg-card">
               <CardContent className="p-6">
@@ -81,16 +79,12 @@ export default function AdminDashboard() {
                 <p className="text-sm text-muted-foreground">{t(stat.key)}</p>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         ))}
       </div>
 
       {/* Recent Messages */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
+      <div className="enter" style={{ "--enter-delay": "400ms" } as React.CSSProperties}>
         <Card className="border-border/50 bg-card/50">
           <CardContent className="p-6">
             <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
@@ -119,7 +113,7 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 }

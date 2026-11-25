@@ -2,7 +2,6 @@
 
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
@@ -49,22 +48,17 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
 
   return (
     <div className="space-y-6">
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-3 text-2xl font-bold"
-      >
+      <h1 className="enter flex items-center gap-3 text-2xl font-bold">
         <Mail className="h-6 w-6 text-cyan-400" />
         {t("messages")}
-      </motion.h1>
+      </h1>
 
       <div className="space-y-3">
         {messages.map((msg, i) => (
-          <motion.div
+          <div
             key={msg.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
+            className="enter"
+            style={{ "--enter-delay": `${i * 50}ms` } as React.CSSProperties}
           >
             <Card className="border-border/50 bg-card/50 transition-colors hover:bg-card">
               <CardContent className="p-4">
@@ -92,7 +86,7 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         ))}
       </div>
 

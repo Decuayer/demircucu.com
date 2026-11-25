@@ -1,23 +1,11 @@
-"use client";
-
-import { useTranslations } from "next-intl";
+import type { CSSProperties } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Code2, Briefcase, Newspaper, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
 import { getTranslated, formatDate } from "@/lib/i18n-utils";
-import { useParams } from "next/navigation";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" as const },
-  }),
-};
 
 import type { PublicPost, PublicProject, PublicSiteSettings } from "@/lib/types/content";
 import { TagChips } from "@/components/tags/tag-chips";
@@ -30,8 +18,7 @@ interface HomeClientProps {
 
 export default function HomeClient({ featuredProjects, latestPosts, settings }: HomeClientProps) {
   const t = useTranslations("home");
-  const params = useParams();
-  const locale = params.locale as string;
+  const locale = useLocale();
 
   return (
     <div className="relative">
@@ -54,8 +41,8 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
         </div>
 
         <div className="container mx-auto px-4 text-center md:px-6">
-          <motion.div initial="hidden" animate="visible" className="mx-auto max-w-3xl space-y-6">
-            <motion.div variants={fadeUp} custom={0}>
+          <div className="mx-auto max-w-3xl space-y-6">
+            <div className="enter" style={{ "--enter-delay": "0ms" } as CSSProperties}>
               <Badge
                 variant="secondary"
                 className="border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-xs font-medium text-violet-400 hover:bg-violet-500/20"
@@ -63,12 +50,11 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                 <Sparkles className="mr-1 h-3 w-3" />
                 {getTranslated(settings, "heroSub", locale) || t("heroSub")}
               </Badge>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              variants={fadeUp}
-              custom={1}
-              className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl"
+            <h1
+              className="enter mb-6 text-4xl font-extrabold tracking-tight md:text-6xl"
+              style={{ "--enter-delay": "100ms" } as CSSProperties}
             >
               {t("heroTitle")}{" "}
               <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
@@ -81,20 +67,18 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                   </>
                 )}
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              variants={fadeUp}
-              custom={2}
-              className="mx-auto mb-8 max-w-2xl text-xl leading-relaxed text-muted-foreground"
+            <p
+              className="enter mx-auto mb-8 max-w-2xl text-xl leading-relaxed text-muted-foreground"
+              style={{ "--enter-delay": "200ms" } as CSSProperties}
             >
               {getTranslated(settings, "heroSub", locale) || t("heroSub")}
-            </motion.p>
+            </p>
 
-            <motion.div
-              variants={fadeUp}
-              custom={3}
-              className="flex items-center justify-center gap-4 pt-4"
+            <div
+              className="enter flex items-center justify-center gap-4 pt-4"
+              style={{ "--enter-delay": "300ms" } as CSSProperties}
             >
               <Link href="/contact">
                 <Button
@@ -110,8 +94,8 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                   {t("featuredProjects")}
                 </Button>
               </Link>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
 
         {/* Scroll indicator */}
@@ -125,12 +109,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
       {/* Featured Projects */}
       <section className="border-t border-border/40 py-24">
         <div className="container mx-auto px-4 md:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 flex items-center justify-between"
-          >
+          <div className="reveal mb-12 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
                 <Code2 className="h-5 w-5 text-violet-400" />
@@ -142,17 +121,11 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                 {t("viewAll")} <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             </Link>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredProjects.map((project, i) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
+            {featuredProjects.map((project) => (
+              <div key={project.id} className="reveal">
                 <Card className="group relative h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card hover:shadow-lg hover:shadow-violet-500/5">
                   <CardContent className="space-y-4 p-6">
                     <div className="flex items-center justify-between">
@@ -172,7 +145,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                     <TagChips tags={project.tags} locale={locale} chipClassName="text-xs" />
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -181,12 +154,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
       {/* Latest Blog Posts */}
       <section className="border-t border-border/40 py-24">
         <div className="container mx-auto px-4 md:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 flex items-center justify-between"
-          >
+          <div className="reveal mb-12 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10">
                 <Newspaper className="h-5 w-5 text-cyan-400" />
@@ -198,17 +166,11 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                 {t("viewAll")} <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             </Link>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {latestPosts.map((post, i) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
+            {latestPosts.map((post) => (
+              <div key={post.id} className="reveal">
                 <Link href={`/blog/${post.slug}`}>
                   <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
                     <CardContent className="space-y-4 p-6">
@@ -236,7 +198,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                     </CardContent>
                   </Card>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -245,12 +207,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
       {/* About Preview / CTA */}
       <section className="border-t border-border/40 py-24">
         <div className="container mx-auto px-4 md:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet-500/5 via-background to-cyan-500/5 p-8 text-center md:p-16"
-          >
+          <div className="reveal relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet-500/5 via-background to-cyan-500/5 p-8 text-center md:p-16">
             <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-violet-500/10 blur-3xl" />
             <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
             <div className="relative space-y-6">
@@ -283,7 +240,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

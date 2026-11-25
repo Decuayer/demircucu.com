@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Archive, Code2, ExternalLink, ArrowRight, Star } from "lucide-react";
@@ -29,11 +28,7 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
     <div className="py-16 md:py-24">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
         {/* Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-16 text-center"
-        >
+        <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
             className="mb-4 border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-cyan-400"
@@ -42,20 +37,14 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
             {t("title")}
           </Badge>
           <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
-        </motion.div>
+        </div>
 
         {filter}
 
         {/* Projects grid (animations are per card; the filtered list re-renders in place) */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {projects.map((project, i) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
+          {projects.map((project) => (
+            <div key={project.id} className="reveal">
               <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
                 <CardContent className="flex h-full flex-col space-y-4 p-6">
                   {/* Project header */}
@@ -140,7 +129,7 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
                   </Link>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
