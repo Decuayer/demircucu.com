@@ -6,17 +6,17 @@ dosyada veya ortamda olduklarını belirtir.
 
 ## 1. Durum özeti
 
-| Faz / iş                         | Durum                                                               | Branch / PR                                           |
-| -------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------- |
-| Faz 0: Keşif                     | Tamamlandı, onaylandı                                               | (PR #1 açıklamasında)                                 |
-| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                        | `chore/phase-1-test-infra`, PR #1                     |
-| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı              | `fix/db-connection-pool`, PR #2                       |
-| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı      | `feat/phase-2-security-auth`                          |
-| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor          | —                                                     |
-| Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod     | `feat/phase-3-*`                                      |
-| Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da            | `feat/phase-4-tags`, PR #8                            |
-| Faz 5: GitHub entegrasyonu       | **Kapandı**: PR #10 merge, prod'da senkron çalışıyor; düzeltme PR'ı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates` |
-| Faz 6–10                         | Başlamadı                                                           | —                                                     |
+| Faz / iş                         | Durum                                                                | Branch / PR                                                                     |
+| -------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Faz 0: Keşif                     | Tamamlandı, onaylandı                                                | (PR #1 açıklamasında)                                                           |
+| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                         | `chore/phase-1-test-infra`, PR #1                                               |
+| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı               | `fix/db-connection-pool`, PR #2                                                 |
+| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı       | `feat/phase-2-security-auth`                                                    |
+| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor           | —                                                                               |
+| Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod      | `feat/phase-3-*`                                                                |
+| Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da             | `feat/phase-4-tags`, PR #8                                                      |
+| Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
+| Faz 6–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
 
@@ -115,7 +115,7 @@ kuyruk yok), hatalar admin "Etiketler" sayfasında düzeltilir; önerilen ağaç
 - **Testler:** unit 283, integration 180, supabase 16, E2E 41. `admin-media` E2E bir kez zaman aşımına
   düştü (paralel yük), tekrarlarda geçti.
 
-### Faz 5 (PR #10 ve kapanış PR'ı `fix/phase-5-pdf-legacy-dates`)
+### Faz 5 (PR #10, kapanış PR'ları #11 ve #12)
 
 Kararlar (kullanıcı, 2026-11-24): tetikleyici GitHub App webhook + admin butonu + günlük cron
 (Vercel Hobby); kapsam: fork/arşiv hariç (admin'den açılabilir), ilk içe aktarma taslak, sonradan
@@ -162,7 +162,8 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
     boundary'ye fırlattığı için tüm sayfa düşüyordu. `lib/pdf/polyfills.js` viewer'da pdf.js'ten
     önce yükleniyor ve worker'ın başına ekleniyor; `ViewerBoundary` artık bir PDF hatasında
     sadece viewer'ı "Doküman yüklenemedi + indir" ile değiştiriyor. Prod'da tek tek built-in
-    silerek doğrulandı (yalnızca bu ikisi çökertiyor).
+    silerek doğrulandı (yalnızca bu ikisi çökertiyor). PR #12 merge; kullanıcı Safari'de doküman sekmesini ve README
+    doküman linkini doğruladı (2026-11-25).
   - E2E: yeni built-in'leri silinmiş tarayıcıda PDF (metin katmanı ve README linkinden geçiş dahil), İstanbul saat dilimi + UTC sunucu (`TZ=UTC`),
     seed'lerde UUID ve projeyi en son yayımlama (paralel prefetch yarışı). İki regresyon testi
     düzeltme olmadan başarısız oldu, düzeltmeyle geçti.
