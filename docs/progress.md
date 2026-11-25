@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-25 (Faz 6 kapandı; Faz 7 onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 6 kapandı, prod'da doğrulandı; Faz 7 planı onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -16,8 +16,9 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod      | `feat/phase-3-*`                                                                |
 | Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da             | `feat/phase-4-tags`, PR #8                                                      |
 | Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
-| Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14 merge, backfill prod'da, ölçüldü    | `feat/phase-6-images-perf`, PR #14                                              |
-| Faz 7–10                         | Başlamadı                                                            | —                                                                               |
+| Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14, #15 merge; prod'da doğrulandı      | `feat/phase-6-images-perf`, PR #14; `docs/phase-6-close`, PR #15                |
+| Faz 7: Analitik ve dashboard     | Plan onay bekliyor                                                   | `feat/phase-7-analytics`                                                        |
+| Faz 8–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
 
@@ -204,7 +205,8 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
   düzeltildi; `.env.local` olmadan yerelde doğrulandı.
 - **Devreye alma (2026-11-25, kullanıcı):** prod `check-media` kırık yok; `backfill-media-meta`
   dry-run sonra `--apply` (8 görsel). Merge sonrası prod Lighthouse 99–100 (önce 55–90), 107 sayfada
-  kırık görsel yok, sitemap `https`.
+  kırık görsel yok, sitemap `https`. Vercel Production `NEXT_PUBLIC_APP_URL` `https://` yapıldı;
+  admin'den imzalı upload denendi, geçti (2026-11-26, kullanıcı).
 - **Testler:** unit 440, integration 187, E2E 49 (yeni: tüm sitemap'te kırık/optimize edilmemiş
   görsel yok; README görseli AVIF/WebP + srcset; imzalı upload yetkisi; admin logo akışları imzalı
   upload üzerinden).
@@ -332,9 +334,6 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 ## 8. Açık konular, bekleyen manuel adımlar, bilinen riskler
 
 ### Kullanıcının bekleyen manuel adımları
-
-- **Faz 6 (isteğe bağlı):** Vercel Production `NEXT_PUBLIC_APP_URL` değerini `https://` yapın (kod
-  zaten yükseltiyor, sitemap `https`); admin'den bir görsel yükleyip imzalı upload'u deneyin.
 
 - Admin "Etiketler"de taşıma sonrası düzeltmeler (isteğe bağlı): `swfit` → "Swift"; `git-github`
   → `git`'e birleştir; Numpy / Tensorflow'u AI altına taşı ve yazımını düzelt; gerrit, linux
