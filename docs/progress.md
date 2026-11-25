@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-26 (Faz 7 merge edildi; cron → Vercel Schedules geçişi PR'da). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 7 kapandı, prod'da doğrulandı; Faz 8 planı onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -17,8 +17,9 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da             | `feat/phase-4-tags`, PR #8                                                      |
 | Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
 | Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14, #15 merge; prod'da doğrulandı      | `feat/phase-6-images-perf`, PR #14; `docs/phase-6-close`, PR #15                |
-| Faz 7: Analitik ve dashboard     | PR #16 merge; Schedules geçişi `chore/vercel-schedules`              | `feat/phase-7-analytics`                                                        |
-| Faz 8–10                         | Başlamadı                                                            | —                                                                               |
+| Faz 7: Analitik ve dashboard     | **Kapandı** (2026-11-26): PR #16, #17 merge; prod'da doğrulandı      | `feat/phase-7-analytics`, `chore/vercel-schedules`                              |
+| Faz 8: Tasarım denetimi          | Plan onay bekliyor                                                   | `feat/phase-8-design`                                                           |
+| Faz 9–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
 
@@ -211,7 +212,7 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
   görsel yok; README görseli AVIF/WebP + srcset; imzalı upload yetkisi; admin logo akışları imzalı
   upload üzerinden).
 
-### Faz 7 (`feat/phase-7-analytics`)
+### Faz 7 (PR #16, Schedules PR #17)
 
 Kararlar (kullanıcı, 2026-11-26): DNT/GPC gönderen ziyaretçi hiç kaydedilmez; `/privacy` iki dilde,
 footer'da link, metin yayından önce onaylanacak; grafikler shadcn chart (recharts); `isbot` ve
@@ -241,6 +242,8 @@ yeterli), yeni env yok. Ayrıntı: `docs/analytics.md`.
   yazıldı). `vercel.json` `crons` → `schedules` (`github-sync`, `analytics`; `path` + `GET`, route
   kodu ve `CRON_SECRET` kontrolü aynı). Hobby: 15 dk jitter; runtime logları ~30 dk tutuluyor,
   çalışma geçmişi Schedules sayfasında. Özel (`handleSchedule`) fonksiyonlara geçiş yapılmadı.
+- **Devreye alma (2026-11-26, kullanıcı):** PR #16 ve #17 merge; admin dışı ziyaretlerin verisi
+  dashboard'a geliyor; Schedules'ta `github-sync` ve `analytics` active.
 - **Testler:** unit 530, integration 222, E2E 54 (yeni `e2e/analytics.spec.ts` 6 test).
   Coverage eşikleri yükseldi.
 
@@ -396,8 +399,14 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; admin paneli mobilde
-  menüsüz (kenar menüsü `md` altında gizli, mobil gezinme yok; Faz 7'de fark edildi); **Faz 9:** coverage.
+- **Faz 8:**
+  - Hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i.
+  - Admin paneli mobilde menüsüz: kenar menüsü `md` altında gizli, mobil gezinme yok (Faz 7'de fark
+    edildi).
+  - `/api/track` yolu reklam/takip engelleyicilerin filtre listelerine (`/track`, `/api/track`
+    kalıpları) takılabilir; bu ziyaretçiler sayılmaz. Daha nötr bir yol (ör. `/api/v`) ve
+    engellenme oranının ölçülmesi değerlendirilecek.
+- **Faz 9:** coverage.
 
 ### Bilinen riskler
 
