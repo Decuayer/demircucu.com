@@ -43,6 +43,8 @@ export default function ExperienceFormClient({
   const [positionTr, setPositionTr] = useState(initialData?.positionTr || "");
   const [positionEn, setPositionEn] = useState(initialData?.positionEn || "");
   const [logo, setLogo] = useState(initialData?.logoPath || "");
+  const [locationTr, setLocationTr] = useState(initialData?.locationTr || "");
+  const [locationEn, setLocationEn] = useState(initialData?.locationEn || "");
   const [descriptionTr, setDescriptionTr] = useState(initialData?.descriptionTr || "");
   const [descriptionEn, setDescriptionEn] = useState(initialData?.descriptionEn || "");
   const [detailsTr, setDetailsTr] = useState(initialData?.detailsTr || "");
@@ -78,6 +80,8 @@ export default function ExperienceFormClient({
       positionTr,
       positionEn,
       logoPath: logo,
+      locationTr,
+      locationEn,
       descriptionTr,
       descriptionEn,
       detailsTr,
@@ -141,6 +145,33 @@ export default function ExperienceFormClient({
                   required
                   className="bg-accent/30"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="experience-location-tr">
+                    {t("location")} (TR) ({t("optional")})
+                  </Label>
+                  <Input
+                    id="experience-location-tr"
+                    value={locationTr}
+                    onChange={(e) => setLocationTr(e.target.value)}
+                    className="bg-accent/30"
+                    placeholder="İzmir, Türkiye"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="experience-location-en">
+                    {t("location")} (EN) ({t("optional")})
+                  </Label>
+                  <Input
+                    id="experience-location-en"
+                    value={locationEn}
+                    onChange={(e) => setLocationEn(e.target.value)}
+                    className="bg-accent/30"
+                    placeholder="Izmir, Türkiye"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

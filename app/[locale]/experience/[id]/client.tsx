@@ -3,7 +3,7 @@ import { formatDate } from "@/lib/format-date";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Calendar, Building2 } from "lucide-react";
+import { ArrowLeft, Calendar, Building2, MapPin } from "lucide-react";
 import { GithubIcon } from "@/components/icons";
 import { Link } from "@/i18n/navigation";
 import { getTranslated } from "@/lib/i18n-utils";
@@ -65,6 +65,16 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
                   {experience.endDate ? formatDate(experience.endDate, locale) : t("present")}
                 </span>
               </div>
+              {(experience.locationTr || experience.locationEn) && (
+                <div className="flex items-center gap-1">
+                  <MapPin aria-hidden className="h-4 w-4" />
+                  <span>
+                    {(locale === "en" ? experience.locationEn : experience.locationTr) ||
+                      experience.locationTr ||
+                      experience.locationEn}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
