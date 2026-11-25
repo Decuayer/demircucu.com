@@ -6,20 +6,20 @@ remediation and the test that guards it. Last full review: 2026-11-24 (Phase 2,
 
 ## Summary
 
-| #   | Finding                                               | Status                      | Remediation (Phase 2)                                                           | Guarded by                                                                 |
-| --- | ----------------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| S1  | Tables reachable through the Supabase Data API        | Verified (partly mitigated) | RLS without policies + REVOKE + default privileges; Data API off (owner, panel) | `tests/integration/rls.int.test.ts`, `tests/supabase/rls.supabase.test.ts` |
-| S2  | Session never refreshed, `middleware.ts` deprecated   | Verified                    | `proxy.ts`: next-intl + Supabase refresh, protected-route redirect              | `lib/auth/routes.test.ts`, `e2e/auth.spec.ts`                              |
-| S3  | Unprotected reads exported from `"use server"` files  | Verified                    | Reads moved to `lib/data/*` (`server-only`); admin reads call `requireAdmin`    | `tests/integration/authz-matrix.int.test.ts`                               |
-| S4  | Stored XSS through `dangerouslySetInnerHTML`          | Verified                    | One sanitizer (`lib/sanitize/html.ts`), applied on save and on render           | `lib/sanitize/html.test.ts`, authz-matrix "sanitizes rich text on save"    |
-| S5  | No input validation, mass assignment in settings      | Verified                    | zod schema per action, `.strict()` settings allowlist, error codes only         | `lib/actions/result.test.ts`, authz-matrix "error responses"               |
-| S6  | Upload accepts any type, unvalidated folder           | Verified                    | Magic-byte type detection, allowlist, folder enum, per-type limits, CSRF check  | `lib/upload/policy.test.ts`, `e2e/security.spec.ts`                        |
-| S7  | No rate limiting or spam protection                   | Verified                    | Postgres fixed-window limiter, contact honeypot, slow failed sign-ins           | `tests/integration/rate-limit.int.test.ts`                                 |
-| S8  | Client-chosen `revalidatePath`, no comment moderation | Verified                    | Cache tags derived on the server, comment length limit, admin hide/delete       | `tests/integration/cache-invalidation.int.test.ts`                         |
-| S9  | Registration gaps (policy, orphans, flows)            | Verified                    | zod + password policy, `auth.users` trigger, callback, reset and verify pages   | `tests/supabase/profile-trigger.supabase.test.ts`, `e2e/auth.spec.ts`      |
-| S10 | No security headers / CSP                             | Verified                    | CSP (allowlist, no nonces) + SRI, HSTS, nosniff, Referrer/Permissions-Policy    | `lib/security/headers.test.ts`, `e2e/security.spec.ts`                     |
-| S11 | Service-role client created at import time            | Fixed in Phase 1            | Lazy, `server-only`; now also accepts the new `sb_secret_` keys                 | `lib/supabase/storage.test.ts`                                             |
-| S12 | Unbounded `pg` pool in serverless                     | Fixed in PR #2, extended    | Pool max 3, build max 1, session pooler (5432) rejected at runtime              | `lib/db/pool-config.test.ts`, `tests/integration/db-pool.int.test.ts`      |
+| #   | Finding                                               | Status                      | Remediation (Phase 2)                                                           | Guarded by                                                                      |
+| --- | ----------------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| S1  | Tables reachable through the Supabase Data API        | Verified (partly mitigated) | RLS without policies + REVOKE + default privileges; Data API off (owner, panel) | `tests/integration/rls.int.test.ts`, `tests/supabase/rls.supabase.test.ts`      |
+| S2  | Session never refreshed, `middleware.ts` deprecated   | Verified                    | `proxy.ts`: next-intl + Supabase refresh, protected-route redirect              | `lib/auth/routes.test.ts`, `e2e/auth.spec.ts`                                   |
+| S3  | Unprotected reads exported from `"use server"` files  | Verified                    | Reads moved to `lib/data/*` (`server-only`); admin reads call `requireAdmin`    | `tests/integration/authz-matrix.int.test.ts`                                    |
+| S4  | Stored XSS through `dangerouslySetInnerHTML`          | Verified                    | One sanitizer (`lib/sanitize/html.ts`), applied on save and on render           | `lib/sanitize/html.test.ts`, authz-matrix "sanitizes rich text on save"         |
+| S5  | No input validation, mass assignment in settings      | Verified                    | zod schema per action, `.strict()` settings allowlist, error codes only         | `lib/actions/result.test.ts`, authz-matrix "error responses"                    |
+| S6  | Upload accepts any type, unvalidated folder           | Verified                    | Magic-byte type detection, allowlist, folder enum, per-type limits, CSRF check  | `lib/upload/policy.test.ts`, `lib/media/ingest.test.ts`, `e2e/security.spec.ts` |
+| S7  | No rate limiting or spam protection                   | Verified                    | Postgres fixed-window limiter, contact honeypot, slow failed sign-ins           | `tests/integration/rate-limit.int.test.ts`                                      |
+| S8  | Client-chosen `revalidatePath`, no comment moderation | Verified                    | Cache tags derived on the server, comment length limit, admin hide/delete       | `tests/integration/cache-invalidation.int.test.ts`                              |
+| S9  | Registration gaps (policy, orphans, flows)            | Verified                    | zod + password policy, `auth.users` trigger, callback, reset and verify pages   | `tests/supabase/profile-trigger.supabase.test.ts`, `e2e/auth.spec.ts`           |
+| S10 | No security headers / CSP                             | Verified                    | CSP (allowlist, no nonces) + SRI, HSTS, nosniff, Referrer/Permissions-Policy    | `lib/security/headers.test.ts`, `e2e/security.spec.ts`                          |
+| S11 | Service-role client created at import time            | Fixed in Phase 1            | Lazy, `server-only`; now also accepts the new `sb_secret_` keys                 | `lib/supabase/storage.test.ts`                                                  |
+| S12 | Unbounded `pg` pool in serverless                     | Fixed in PR #2, extended    | Pool max 3, build max 1, session pooler (5432) rejected at runtime              | `lib/db/pool-config.test.ts`, `tests/integration/db-pool.int.test.ts`           |
 
 ## Findings
 
@@ -88,12 +88,18 @@ PUBLIC` (no-op on production, whose ACL is already owner-only); `ALTER DEFAULT P
 ### S6: Uploads
 
 - `lib/upload/policy.ts`: the type is detected from magic bytes (`file-type`), never from the name
-  or client MIME type. Allowed: PNG, JPEG, GIF, WebP, AVIF, ICO (512 KB), PDF; 4 MB maximum (Vercel
-  functions accept 4.5 MB bodies). SVG and HTML are rejected.
-- `folder` is an enum; `usedIn` is validated; object names are random UUIDs; files are stored with
-  `Cache-Control: max-age=31536000`. `listBuckets` per upload is gone; if the database insert fails
-  the uploaded object is removed.
-- `/api/upload` checks `Origin` against the host (CSRF) before authentication.
+  or client MIME type. Allowed: PNG, JPEG, GIF, WebP, AVIF (10 MB), ICO (512 KB), PDF (25 MB).
+  SVG and HTML are rejected.
+- Phase 6: signed direct uploads. `POST /api/upload/sign` (admin, same origin) returns a one-time
+  URL for `incoming/<uuid>`; the browser puts the file there (no function body limit); `POST
+/api/upload` downloads it, applies the policy, processes images with sharp (EXIF/GPS always
+  removed, longest edge 2400 px) and stores the result at `<folder>/<sha256>.<ext>`. The incoming
+  object is always deleted; abandoned ones are purged after a day. Identical content reuses the
+  existing `MediaFile`. `folder` is an enum; files are stored with
+  `Cache-Control: max-age=31536000`; if the database insert fails the stored object is removed.
+- The image optimizer (`next/image`) only fetches the project's `media` bucket path and GitHub
+  avatars (`lib/media/image-config.ts`), so `/_next/image` cannot be used as an open proxy.
+- `/api/upload` and `/api/upload/sign` check `Origin` against the host (CSRF) before authentication.
 - Storage-level second layer: `scripts/ensure-storage-bucket.ts` sets the bucket's MIME allowlist
   and size limit. Applied on staging; production pending (owner action).
 - **Staging verification with `sb_secret_` key:** upload, public read (`200 image/png`,

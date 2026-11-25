@@ -72,13 +72,11 @@ test("uploaded logo is stored as a path, rendered publicly and protected from de
     // Wait for hydration: a change event on the server-rendered input would be lost.
     await page.waitForLoadState("networkidle");
     const upload = page.waitForResponse((r) => r.url().endsWith("/api/upload"));
-    await page
-      .locator('input[type=file][accept="image/*"]')
-      .setInputFiles({
-        name: "logo.png",
-        mimeType: "image/png",
-        buffer: onePixelPng([0x7c, 0x3a, 0xed]),
-      });
+    await page.locator('input[type=file][accept="image/*"]').setInputFiles({
+      name: "logo.png",
+      mimeType: "image/png",
+      buffer: onePixelPng([0x7c, 0x3a, 0xed]),
+    });
     expect((await upload).status()).toBe(200);
     await expect(page.getByRole("img", { name: "Yüklenen görselin önizlemesi" })).toBeVisible();
     await page.locator("form button[type=submit]").click();
@@ -151,13 +149,11 @@ test("experience logo uploaded in admin is shown on the list and detail pages", 
     await page.goto(`/tr/admin/experiences/${experience!.id}/edit`);
     await page.waitForLoadState("networkidle");
     const upload = page.waitForResponse((r) => r.url().endsWith("/api/upload"));
-    await page
-      .locator('input[type=file][accept="image/*"]')
-      .setInputFiles({
-        name: "logo.png",
-        mimeType: "image/png",
-        buffer: onePixelPng([0x22, 0xc5, 0x5e]),
-      });
+    await page.locator('input[type=file][accept="image/*"]').setInputFiles({
+      name: "logo.png",
+      mimeType: "image/png",
+      buffer: onePixelPng([0x22, 0xc5, 0x5e]),
+    });
     expect((await upload).status()).toBe(200);
     await expect(page.getByRole("img", { name: "Yüklenen görselin önizlemesi" })).toBeVisible();
     await page.locator("form button[type=submit]").click();
