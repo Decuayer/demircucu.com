@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-25 (Faz 6 PR'ı açık; merge sonrası manuel adımlar bölüm 8'de). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-25 (Faz 6 kapandı; Faz 7 onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -16,7 +16,7 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod      | `feat/phase-3-*`                                                                |
 | Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da             | `feat/phase-4-tags`, PR #8                                                      |
 | Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
-| Faz 6: Görsel ve performans      | **PR açık**: merge, backfill ve prod ölçümü bekliyor                 | `feat/phase-6-images-perf`                                                      |
+| Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14 merge, backfill prod'da, ölçüldü    | `feat/phase-6-images-perf`, PR #14                                              |
 | Faz 7–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
@@ -172,7 +172,7 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
   testten yalnızca `admin-media` deneyim logosu testi bir kez 15 sn sınırını aştı (Faz 4'ten beri
   bilinen yük kaynaklı zaman aşımı).
 
-### Faz 6 (görsel ve performans)
+### Faz 6 (PR #14)
 
 Ölçüm ve önce/sonra tablosu: `docs/performance-report.md`.
 
@@ -198,6 +198,13 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
 - **Script'ler:** `scripts/check-media.ts` (salt okunur rapor, kırıkta çıkış 1),
   `scripts/backfill-media-meta.ts` (Faz 6 öncesi yüklemelere boyut + blur; varsayılan dry-run,
   `--apply`, idempotent; dosyalara dokunmaz). Yerelde dry-run → apply → tekrar 0 doğrulandı.
+- **CI düzeltmesi:** E2E sunucusuna yerel Supabase URL'i verilmiyordu; `next start`
+  `next.config.ts`'i yeniden okuduğu için optimizer'ın izinli Storage host'u boş kaldı ve her medya
+  görseli 400 döndü (yerelde `.env.local` sağladığı için görünmedi). `playwright.config.ts`
+  düzeltildi; `.env.local` olmadan yerelde doğrulandı.
+- **Devreye alma (2026-11-25, kullanıcı):** prod `check-media` kırık yok; `backfill-media-meta`
+  dry-run sonra `--apply` (8 görsel). Merge sonrası prod Lighthouse 99–100 (önce 55–90), 107 sayfada
+  kırık görsel yok, sitemap `https`.
 - **Testler:** unit 440, integration 187, E2E 49 (yeni: tüm sitemap'te kırık/optimize edilmemiş
   görsel yok; README görseli AVIF/WebP + srcset; imzalı upload yetkisi; admin logo akışları imzalı
   upload üzerinden).
@@ -326,10 +333,8 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Kullanıcının bekleyen manuel adımları
 
-- **Faz 6:** Vercel Production `NEXT_PUBLIC_APP_URL` → `https://www.demircucu.com` (şu an `http://`);
-  merge sonrası prod'da `check-media.ts` (salt okunur) ve `backfill-media-meta.ts` dry-run, çıktı
-  onayından sonra `--apply` (yalnızca `MediaFile.width/height/blurDataUrl`); admin'den bir görsel
-  yükleyip imzalı upload'u doğrulama.
+- **Faz 6 (isteğe bağlı):** Vercel Production `NEXT_PUBLIC_APP_URL` değerini `https://` yapın (kod
+  zaten yükseltiyor, sitemap `https`); admin'den bir görsel yükleyip imzalı upload'u deneyin.
 
 - Admin "Etiketler"de taşıma sonrası düzeltmeler (isteğe bağlı): `swfit` → "Swift"; `git-github`
   → `git`'e birleştir; Numpy / Tensorflow'u AI altına taşı ve yazımını düzelt; gerrit, linux
@@ -354,7 +359,6 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 6 sonrası:** prod "sonra" Lighthouse ölçümü `docs/performance-report.md` bölüm 4'e.
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
 
 ### Bilinen riskler
