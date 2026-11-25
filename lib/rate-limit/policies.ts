@@ -27,6 +27,8 @@ export const RATE_LIMITS = {
   commentPerUser: { name: "comment-user", limit: 5, windowSeconds: MINUTE },
   commentPerUserDaily: { name: "comment-user-day", limit: 50, windowSeconds: DAY },
   likePerUser: { name: "like-user", limit: 30, windowSeconds: MINUTE },
+  // Analytics beacons: a page view, its engagement beacon and a few clicks per page.
+  trackPerIp: { name: "track-ip", limit: 60, windowSeconds: MINUTE },
 } as const satisfies Record<string, RateLimitPolicy>;
 
 /** Rows older than this are removed opportunistically; longer than the longest window. */

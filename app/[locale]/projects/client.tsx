@@ -68,6 +68,7 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
                         <a
                           href={project.liveUrl}
                           target="_blank"
+                          data-track="live"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
                           className="rounded-lg p-2 transition-colors hover:bg-accent"
