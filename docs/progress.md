@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-26 (Faz 8A denetim raporu hazır; rapor ve tasarım yönü onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 8B başladı: PR 1 erişilebilirlik ve hata sayfaları). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -18,7 +18,7 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
 | Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14, #15 merge; prod'da doğrulandı      | `feat/phase-6-images-perf`, PR #14; `docs/phase-6-close`, PR #15                |
 | Faz 7: Analitik ve dashboard     | **Kapandı** (2026-11-26): PR #16, #17 merge; prod'da doğrulandı      | `feat/phase-7-analytics`, `chore/vercel-schedules`                              |
-| Faz 8: Tasarım denetimi          | 8A rapor hazır (`docs/design-audit.md`), onay bekliyor               | `feat/phase-8-design`                                                           |
+| Faz 8: Tasarım denetimi          | 8A PR #18; 8B küçük PR'larla sürüyor                                 | `feat/phase-8-design`                                                           |
 | Faz 9–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
@@ -258,6 +258,23 @@ build'inden; `@axe-core/playwright` dev bağımlılığı; ekran görüntüleri 
   `scripts/design-audit-gallery.ts`. Sitenin koduna dokunulmadı.
 - **Rapor:** `docs/design-audit.md` (12 öne çıkan bulgu, site geneli, sayfa bazında, 2.3 durumu,
   içerik notları, tasarım yönü önerisi, 10 karar sorusu).
+
+### Faz 8B (küçük PR'lar)
+
+Kararlar (kullanıcı, 2026-11-26): rapor onaylandı; 1a tek violet, 2a sistem teması + düğme, 3a Geist,
+4a yeni ana sayfa, 5a CV + 6a konum (tek migration, yedek + dry-run ile onaya), 7b otomatik kapak +
+admin seçimi, 8a `/api/track` nötr yola (eski yol bir süre çalışır), 9a tüm formlarda uyarı, 10a
+hobiler küçük. İçerik notlarını kullanıcı admin'den düzeltir. Sıra: önce erişilebilirlik ve hata
+sayfaları.
+
+- **PR 1 (`fix/phase-8-a11y-errors`):** adsız buton/linkler (mobil menü, mobil giriş linki, admin
+  ikon düğmeleri, proje kartı ikonları, editör araç çubuğu `aria-pressed` ile), etiketsiz form
+  alanları ve `Switch`'ler, editör alanının adı, TagSelector `aria-controls`, gezinme
+  landmark'larının adları, "İçeriğe geç" linki, README kod bloklarına klavye odağı, sekme paneli
+  focus halkası; `[locale]/not-found` + catch-all (`[...rest]`), `[locale]/error`, `global-error`,
+  `[locale]/loading`; admin tarihlerinde hydration hatası (`formatDate`, sabit saat dilimi);
+  `Permissions-Policy`'den tanınmayan iki özellik; TipTap çift `link` eklentisi. Yerel denetimde
+  düzeltilen kurallar 0'a indi (`button-name` 281 → 0, `label` 72 → 0, hydration #418 9 → 0).
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
