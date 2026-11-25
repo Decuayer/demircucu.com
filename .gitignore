@@ -51,3 +51,6 @@ next-env.d.ts
 /docs/claude-code-task.md
 links.md
 /public/pdfjs
+
+# Phase 8 design audit screenshots and gallery (local only)
+/audit-screenshots
