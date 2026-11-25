@@ -69,10 +69,10 @@ export default defineConfig({
         autoUpdate: process.env.CI
           ? false
           : (newThreshold: number) => Math.floor(newThreshold * 100) / 100,
-        lines: 26.69,
-        statements: 27.75,
-        functions: 21.19,
-        branches: 29.44,
+        lines: 26.84,
+        statements: 27.87,
+        functions: 21.46,
+        branches: 29.53,
       },
     },
   },

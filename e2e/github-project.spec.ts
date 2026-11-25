@@ -158,6 +158,11 @@ const STRIP_NEW_BUILTINS = `
   delete Math.sumPrecise;
   delete Uint8Array.fromBase64;
   delete Uint8Array.prototype.toBase64;
+  // Not polyfilled by the pdf.js legacy build (lib/pdf/polyfills.js): Safari has no async-iterable
+  // streams (text layer), Safari < 17.4 no Promise.withResolvers.
+  delete Promise.withResolvers;
+  delete ReadableStream.prototype.values;
+  delete ReadableStream.prototype[Symbol.asyncIterator];
 `;
 
 test("PDF viewer works in browsers without the newest built-ins", async ({ browser }) => {
@@ -168,13 +173,27 @@ test("PDF viewer works in browsers without the newest built-ins", async ({ brows
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   try {
+    // The text layer is where Safari failed (`for await` over a ReadableStream).
+    const viewerWorks = async () => {
+      await expect(page.locator(".react-pdf__Page canvas")).toBeVisible({ timeout: 15_000 });
+      await expect(page.locator(".react-pdf__Page__textContent span").first()).toBeAttached({
+        timeout: 15_000,
+      });
+      await expect(page.getByText("This page couldn’t load")).toHaveCount(0);
+    };
+
     await page.goto(`/en/projects/${slug}/docs/${docId}`);
-    await expect(page.locator(".react-pdf__Page canvas")).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText("This page couldn’t load")).toHaveCount(0);
+    await viewerWorks();
 
     await page.goto(`/en/projects/${slug}`);
     await page.getByRole("tab", { name: /Documents/ }).click();
-    await expect(page.locator(".react-pdf__Page canvas")).toBeVisible({ timeout: 15_000 });
+    await viewerWorks();
+
+    // README link to the document (client-side navigation).
+    await page.getByRole("tab", { name: /README/ }).click();
+    await page.locator("a[data-document]").first().click();
+    await expect(page).toHaveURL(new RegExp(`/docs/${docId}$`));
+    await viewerWorks();
     expect(errors).toEqual([]);
   } finally {
     await context.close();
