@@ -92,6 +92,10 @@ link above 25 MB). Same blob sha = no download. The viewer is pdf.js (react-pdf)
 navigation, zoom, full screen and download; it renders to canvas (works on iOS Safari). The worker,
 fonts, CMaps and WASM decoders are copied to `public/pdfjs/` before `dev` / `build`
 (`scripts/copy-pdfjs-assets.mjs`), so the CSP (`worker-src 'self'`) holds; `isEvalSupported` is off.
+pdf.js 6 calls very new built-ins: the legacy build (Turbopack alias in `next.config.ts`) polyfills
+most of them; `lib/pdf/polyfills.js` adds async-iterable `ReadableStream` (Safari) and
+`Promise.withResolvers`, in the page and at the top of the worker. `ViewerBoundary` contains any
+remaining viewer error so it never takes down the page.
 
 ## Mermaid
 

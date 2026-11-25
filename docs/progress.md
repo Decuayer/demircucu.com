@@ -156,10 +156,17 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
   - Hydration hatası (#418): sunucu (UTC) ve tarayıcı (yerel saat dilimi / varsayılan dil) farklı
     tarih basıyordu (Tatum: 22:34 UTC push). `lib/format-date.ts` (sayfa dili, `Europe/Istanbul`);
     proje, deneyim ve blog tarihleri.
-  - E2E: yeni built-in'leri silinmiş tarayıcıda PDF, İstanbul saat dilimi + UTC sunucu (`TZ=UTC`),
+  - Aynı hata Safari'de devam etti (PR #11 sonrası, 2026-11-25): legacy derleme de
+    `ReadableStream` async iterasyonunu (metin katmanı `getTextContent`, Safari'de yok) ve
+    `Promise.withResolvers`'ı (Safari < 17.4) polyfill etmiyor; react-pdf 10 hatayı en yakın error
+    boundary'ye fırlattığı için tüm sayfa düşüyordu. `lib/pdf/polyfills.js` viewer'da pdf.js'ten
+    önce yükleniyor ve worker'ın başına ekleniyor; `ViewerBoundary` artık bir PDF hatasında
+    sadece viewer'ı "Doküman yüklenemedi + indir" ile değiştiriyor. Prod'da tek tek built-in
+    silerek doğrulandı (yalnızca bu ikisi çökertiyor).
+  - E2E: yeni built-in'leri silinmiş tarayıcıda PDF (metin katmanı ve README linkinden geçiş dahil), İstanbul saat dilimi + UTC sunucu (`TZ=UTC`),
     seed'lerde UUID ve projeyi en son yayımlama (paralel prefetch yarışı). İki regresyon testi
     düzeltme olmadan başarısız oldu, düzeltmeyle geçti.
-- **Testler (kapanış):** unit 417, integration 187, E2E 45; 3x tekrarlı yük çalıştırmalarında 270
+- **Testler (kapanış):** unit 422, integration 187, E2E 45; 3x tekrarlı yük çalıştırmalarında 270
   testten yalnızca `admin-media` deneyim logosu testi bir kez 15 sn sınırını aştı (Faz 4'ten beri
   bilinen yük kaynaklı zaman aşımı).
 
