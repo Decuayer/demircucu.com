@@ -33,7 +33,8 @@
     "save": "Kaydet",
     "name": "Ad Soyad",
     "email": "E-posta",
-    "switchLanguage": "Switch to English"
+    "switchLanguage": "Switch to English",
+    "privacy": "Gizlilik"
   },
   "home": {
     "heroTitle": "Merhaba, Ben",
@@ -445,7 +446,10 @@
       "moveUp": "Yukarı taşı",
       "moveDown": "Aşağı taşı",
       "overrideHint": "Bu proje {repo} reposundan senkronize ediliyor. Boş bırakılan başlık ve özet alanlarında GitHub'daki ad ve açıklama gösterilir; doldurduğunuz alanlar senkronizasyonda değişmez."
-    }
+    },
+    "analytics": "Analitik",
+    "unread": "Okunmadı",
+    "markUnread": "Okunmadı yap"
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -620,5 +624,166 @@
     "upload": "Yeni görsel yükle",
     "empty": "Görsel bulunamadı.",
     "insert": "{name} görselini ekle"
+  },
+  "analytics": {
+    "title": "Analitik",
+    "rangeSummary": "{from} – {to} (UTC günleri)",
+    "range": {
+      "today": "Bugün",
+      "7d": "7 gün",
+      "30d": "30 gün",
+      "90d": "90 gün",
+      "12m": "12 ay",
+      "custom": "Özel",
+      "from": "Başlangıç",
+      "to": "Bitiş",
+      "apply": "Uygula"
+    },
+    "comparedToPrevious": "Önceki döneme göre",
+    "noComparison": "yeni",
+    "noData": "Bu aralıkta veri yok.",
+    "visitorsShort": "{count} ziy.",
+    "views": "Görüntülenme",
+    "visitors": "Tekil ziyaretçi",
+    "previousViews": "Önceki dönem",
+    "previousValue": "Önceki dönem: {value}",
+    "visitorsApprox": "Günlük tekillerin toplamı (yaklaşık)",
+    "avgSession": "Ort. oturum süresi",
+    "avgEngaged": "Ort. sayfada kalma",
+    "avgReading": "Ort. okuma süresi",
+    "avgScroll": "Ort. kaydırma derinliği",
+    "outboundClicks": "Dış link tıklaması",
+    "direct": "Doğrudan / dahili",
+    "unknown": "Bilinmiyor",
+    "entry": "Giriş sayfası (oturumun ilk sayfası)",
+    "device": {
+      "DESKTOP": "Masaüstü",
+      "MOBILE": "Mobil",
+      "TABLET": "Tablet",
+      "OTHER": "Diğer"
+    },
+    "language": {
+      "tr": "Türkçe",
+      "en": "İngilizce"
+    },
+    "outbound": {
+      "title": "Dış link tıklamaları",
+      "GITHUB": "GitHub",
+      "LIVE": "Canlı site",
+      "DOCUMENT": "Doküman",
+      "OTHER": "Diğer"
+    },
+    "types": {
+      "HOME": "Ana sayfa",
+      "PAGE": "Sayfalar",
+      "PROJECT": "Projeler",
+      "BLOG": "Blog",
+      "EXPERIENCE": "Deneyimler",
+      "SKILL": "Skill'ler"
+    },
+    "referrers": "Yönlendiren siteler",
+    "countries": "Ülkeler",
+    "devices": "Cihazlar",
+    "browsers": "Tarayıcılar",
+    "systems": "İşletim sistemleri",
+    "languages": "Dil",
+    "campaigns": "Kampanyalar (utm_source)",
+    "viewsOverTime": "Günlük görüntülenme",
+    "byType": "İçerik türüne göre",
+    "topContent": "En çok görüntülenenler",
+    "allContent": "Tüm içerikler",
+    "allAnalytics": "Tüm analitik",
+    "traffic": "Trafik",
+    "contentSummary": "İçerik",
+    "publishedProjects": "Yayındaki proje",
+    "publishedPosts": "Yayındaki yazı",
+    "publishedExperiences": "Yayındaki deneyim",
+    "skills": "Skill",
+    "comments": "Yorum",
+    "likes": "Beğeni",
+    "unreadMessages": "Okunmamış mesaj",
+    "lastSync": "Son GitHub senkronu",
+    "never": "Henüz yok",
+    "syncLog": "Senkron kayıtları",
+    "sync": {
+      "OK": "Başarılı",
+      "PARTIAL": "Kısmi",
+      "ERROR": "Hata",
+      "RUNNING": "Çalışıyor",
+      "allRepos": "Tüm repolar",
+      "trigger": {
+        "CRON": "Zamanlanmış",
+        "WEBHOOK": "Webhook",
+        "MANUAL": "Elle"
+      }
+    },
+    "noMessages": "Henüz mesaj yok.",
+    "noComments": "Henüz yorum yok.",
+    "unread": "Okunmadı",
+    "hidden": "Gizli",
+    "exportCsv": "CSV indir",
+    "likesInRange": "Bu aralıkta beğeni",
+    "commentsInRange": "Bu aralıkta yorum",
+    "allTime": "Toplam: {value}",
+    "cameFrom": "Önceki sayfa",
+    "fromSkills": "Skill sayfalarından gelen",
+    "contentSkills": "İçeriğin skill'leri",
+    "footnote": "Günler UTC'dir. Ziyaretçi kimliği her gün değiştiği için birden fazla günü kapsayan aralıklarda tekil ziyaretçi, günlük tekillerin toplamıdır. Do Not Track / Global Privacy Control gönderen ziyaretçiler, botlar ve admin oturumları sayılmaz."
+  },
+  "privacy": {
+    "title": "Gizlilik Politikası",
+    "description": "demircucu.com'un hangi verileri neden topladığı ve ne kadar sakladığı.",
+    "updated": "Son güncelleme: 26 Kasım 2026",
+    "intro": "Bu sayfa, demircucu.com'u ziyaret ettiğinizde hangi verilerin işlendiğini açıklar. Site kişisel bir portfolyo ve blogdur; reklam göstermez, verileri satmaz ve üçüncü taraf analitik ya da takip servisi kullanmaz.",
+    "controller": {
+      "title": "Veri sorumlusu",
+      "body": "Bu sitedeki kişisel verilerin veri sorumlusu Demir Cücü'dür. Bu politika veya verileriniz hakkındaki sorularınız için iletişim sayfasındaki formu kullanabilirsiniz.",
+      "items": []
+    },
+    "analytics": {
+      "title": "Ziyaret istatistikleri",
+      "body": "Hangi sayfaların okunduğunu görmek için kendi sunucumuzda çerezsiz bir sayım yapılır. Tarayıcınıza çerez veya benzeri bir tanımlayıcı yazılmaz. Bir sayfayı açtığınızda şu bilgiler kaydedilir:",
+      "items": [
+        "Açılan sayfanın adresi ve sitenin dili (Türkçe / İngilizce)",
+        "Sizi yönlendiren sitenin alan adı (örneğin google.com; tam adres değil) ve bağlantıda varsa utm kampanya parametreleri",
+        "Ülke (barındırma sağlayıcısının IP adresinden çıkardığı ülke kodu; IP adresinin kendisi saklanmaz)",
+        "Cihaz türü, tarayıcı ve işletim sisteminin adı (tarayıcının gönderdiği User-Agent bilgisinden)",
+        "Sayfada geçirilen süre, sayfanın ne kadarının kaydırıldığı ve proje sayfalarındaki dış bağlantı tıklamaları",
+        "Günlük ziyaretçi kodu: IP adresi ve User-Agent, o güne özel rastgele bir değerle birlikte tek yönlü olarak özetlenir (SHA-256). Bu rastgele değer gün bitince silinir; böylece kod sizi tanımlamaz ve farklı günlerdeki ziyaretler birbirine bağlanamaz."
+      ]
+    },
+    "notCollected": {
+      "title": "Kaydedilmeyenler",
+      "body": "Tarayıcınız Do Not Track (DNT) veya Global Privacy Control (GPC) sinyali gönderiyorsa ziyaretiniz hiç kaydedilmez. Arama motoru botları ve benzeri otomatik istemciler de sayılmaz.",
+      "items": []
+    },
+    "cookies": {
+      "title": "Çerezler",
+      "body": "Ziyaret istatistikleri çerez kullanmaz. Site yalnızca sitenin çalışması için zorunlu olan şu çerezleri kullanır:",
+      "items": [
+        "NEXT_LOCALE: yalnızca dil tercihinizi (\"tr\" veya \"en\") hatırlamak için kullanılan zorunlu bir çerezdir; başka bilgi taşımaz ve takip amacıyla kullanılmaz.",
+        "Oturum çerezleri: yalnızca giriş yaptıysanız, oturumunuzu açık tutmak için kullanılır."
+      ]
+    },
+    "retention": {
+      "title": "Saklama süresi",
+      "body": "Tek tek sayfa görüntülemeleri 90 gün saklanır ve sonra silinir. Bunlardan üretilen günlük toplamlar (örneğin bir yazının bir günde kaç kez okunduğu) süresiz saklanır; bu toplamlar kişiye ait bilgi içermez.",
+      "items": []
+    },
+    "accounts": {
+      "title": "Hesap, yorum ve iletişim formu",
+      "body": "Hesap açarsanız e-posta adresiniz ve adınız, yorumlarınız ve beğenileriniz saklanır. İletişim formuyla gönderdiğiniz ad, e-posta ve mesaj, size cevap verebilmek için saklanır.",
+      "items": []
+    },
+    "processors": {
+      "title": "Hizmet sağlayıcılar ve yurt dışına aktarım",
+      "body": "Verileriniz Türkiye dışında işlenir ve saklanır. Site, merkezi Amerika Birleşik Devletleri'nde bulunan Vercel Inc. altyapısında çalışır; veritabanı, oturum yönetimi ve dosyalar Supabase'te, Güney Kore'nin Seul bölgesinde tutulur. Bu sağlayıcılar verileri yalnızca hizmeti sunmak için işler.",
+      "items": []
+    },
+    "rights": {
+      "title": "Haklarınız",
+      "body": "KVKK ve GDPR kapsamındaki haklarınızı (verilerinize erişim, düzeltme, silme) kullanmak veya bu politika hakkında soru sormak için iletişim sayfasındaki formu kullanabilirsiniz. Ziyaret istatistikleri sizi tanımlamadığı için tek bir kişiye ait olarak bulunamaz; hesap ve mesaj verileriniz talebiniz üzerine silinir.",
+      "items": []
+    }
   }
 }

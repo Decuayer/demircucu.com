@@ -119,6 +119,7 @@ export default function ProjectDetailClient({
                 href={attachmentHref(file) ?? undefined}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-track="document"
               >
                 <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
                   <CardContent className="flex items-center gap-3 overflow-hidden p-4">
@@ -188,7 +189,12 @@ export default function ProjectDetailClient({
 
           <div className="mb-8 flex flex-wrap gap-3">
             {project.githubUrl && (
-              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track="github"
+              >
                 <Button variant="outline" className="border-border/50">
                   <GithubIcon className="mr-2 h-4 w-4" />
                   {t("viewGithub")}
@@ -196,7 +202,7 @@ export default function ProjectDetailClient({
               </a>
             )}
             {project.liveUrl && (
-              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-track="live">
                 <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   {t("liveSite")}

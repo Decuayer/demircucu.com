@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-25 (Faz 6 kapandı; Faz 7 onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 7 PR #16 açık; gizlilik metni onaylandı, merge bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -16,8 +16,9 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod      | `feat/phase-3-*`                                                                |
 | Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da             | `feat/phase-4-tags`, PR #8                                                      |
 | Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
-| Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14 merge, backfill prod'da, ölçüldü    | `feat/phase-6-images-perf`, PR #14                                              |
-| Faz 7–10                         | Başlamadı                                                            | —                                                                               |
+| Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14, #15 merge; prod'da doğrulandı      | `feat/phase-6-images-perf`, PR #14; `docs/phase-6-close`, PR #15                |
+| Faz 7: Analitik ve dashboard     | PR #16 açık, merge bekliyor (gizlilik metni onaylı)                  | `feat/phase-7-analytics`                                                        |
+| Faz 8–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
 
@@ -204,10 +205,38 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
   düzeltildi; `.env.local` olmadan yerelde doğrulandı.
 - **Devreye alma (2026-11-25, kullanıcı):** prod `check-media` kırık yok; `backfill-media-meta`
   dry-run sonra `--apply` (8 görsel). Merge sonrası prod Lighthouse 99–100 (önce 55–90), 107 sayfada
-  kırık görsel yok, sitemap `https`.
+  kırık görsel yok, sitemap `https`. Vercel Production `NEXT_PUBLIC_APP_URL` `https://` yapıldı;
+  admin'den imzalı upload denendi, geçti (2026-11-26, kullanıcı).
 - **Testler:** unit 440, integration 187, E2E 49 (yeni: tüm sitemap'te kırık/optimize edilmemiş
   görsel yok; README görseli AVIF/WebP + srcset; imzalı upload yetkisi; admin logo akışları imzalı
   upload üzerinden).
+
+### Faz 7 (`feat/phase-7-analytics`)
+
+Kararlar (kullanıcı, 2026-11-26): DNT/GPC gönderen ziyaretçi hiç kaydedilmez; `/privacy` iki dilde,
+footer'da link, metin yayından önce onaylanacak; grafikler shadcn chart (recharts); `isbot` ve
+`ua-parser-js`; özet cron'u 00:15 UTC, mevcut `CRON_SECRET`. Şema değişikliği yok (Faz 3 tabloları
+yeterli), yeni env yok. Ayrıntı: `docs/analytics.md`.
+
+- **Toplama:** `<Analytics />` (layout, Suspense içinde) → `POST /api/track` (view, engagement,
+  outbound). Aynı köken, zod, 4 KB; DNT/GPC, bot (HeadlessChrome dahil), prefetch, admin → 204 ve
+  yazma yok; `after()` içinde rate limit (`track-ip` 60/dk) ve kayıt. Yalnızca yayımlanmış içerik
+  ve bilinen sayfalar sayılır. Ziyaretçi = günlük tuz + IP + UA SHA-256; 30 dk tekilleştirme (dil
+  fark etmez), 30 dk oturum. Proje/canlı/doküman linkleri `data-track` ile.
+- **Özet:** `/api/cron/analytics` (00:15 UTC): biten her gün tek transaction'da `DailyStat`'a
+  (boş gün için de işaret satırı), kaçan günleri tamamlar, idempotent; `BlogPost.viewCount` eski
+  değerinin üzerine günlük artar; 90 günden eski ham satırlar (yalnızca özetlenmiş günler) ve
+  geçmiş günlerin tuzları silinir. Dashboard aynı saf `aggregate()`'i özetlenmemiş günlere uygular.
+- **Dashboard:** `/admin` (tarih aralığı + önceki dönem, KPI'lar, içerik sayıları, son
+  senkron, grafikler, en çok görüntülenenler, kırılımlar, son mesaj/yorum/senkron),
+  `/admin/analytics`, `/admin/analytics/[tür]/[id]`, `/admin/analytics/pages?path=`, CSV
+  (`/api/admin/analytics/export`). Okumalar 1 dk cache, hepsi `requireAdmin`. Mesajlar sayfası:
+  tıklayınca açılır ve okundu olur, dashboard linki mesaja gider (`setContactMessageRead`).
+- **Gizlilik:** `/privacy` (TR/EN, `privacy.*` mesajları), footer linki, sitemap. Metni kullanıcı
+  onayladı (2026-11-26): veri sorumlusu Demir Cücü, yurt dışında işleme (Vercel ABD, Supabase Seul),
+  NEXT_LOCALE yalnızca dil tercihi için zorunlu çerez. `ua-parser-js` 1.x onaylı.
+- **Testler:** unit 530, integration 222, E2E 54 (yeni `e2e/analytics.spec.ts` 6 test).
+  Coverage eşikleri yükseldi.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
@@ -238,6 +267,11 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
 | Kaydırmaya bağlı animasyon Firefox'ta yok                               | Scroll-driven animations desteklenmiyorsa içerik doğrudan görünür                  |
 | `@next/bundle-analyzer` yerine Lighthouse script baytları               | Turbopack'te analizör `next analyze`; yeni bağımlılık gerekmedi                    |
 | `priority` yerine `preload`                                             | Next 16'da `priority` deprecated                                                   |
+| `ua-parser-js` 2.x yerine 1.x (Faz 7)                                   | 2.x AGPL-3.0 lisanslı; 1.x MIT                                                     |
+| `PageView.isBot` yok; botlar hiç yazılmıyor                             | Bot trafiği istenmiyor; Faz 3 şeması bu alanı içermiyor                            |
+| Gün sınırları UTC                                                       | Günlük tuz ve cron UTC; dashboard'da belirtiliyor                                  |
+| Çok günlü tekil ziyaretçi = günlük tekillerin toplamı                   | Ziyaretçi kodu her gün değişiyor (gizlilik); arayüzde "yaklaşık"                   |
+| `viewCount` sıfırlanmıyor, günlük artıyor                               | Analitik öncesi sayaçlar korunuyor                                                 |
 
 ## 4. Ortamlar
 
@@ -333,9 +367,6 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Kullanıcının bekleyen manuel adımları
 
-- **Faz 6 (isteğe bağlı):** Vercel Production `NEXT_PUBLIC_APP_URL` değerini `https://` yapın (kod
-  zaten yükseltiyor, sitemap `https`); admin'den bir görsel yükleyip imzalı upload'u deneyin.
-
 - Admin "Etiketler"de taşıma sonrası düzeltmeler (isteğe bağlı): `swfit` → "Swift"; `git-github`
   → `git`'e birleştir; Numpy / Tensorflow'u AI altına taşı ve yazımını düzelt; gerrit, linux
   (kernel), matter, ocpp, qt creator adları küçük harfli ve kategorisiz.
@@ -359,7 +390,8 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
+- **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; admin paneli mobilde
+  menüsüz (kenar menüsü `md` altında gizli, mobil gezinme yok; Faz 7'de fark edildi); **Faz 9:** coverage.
 
 ### Bilinen riskler
 

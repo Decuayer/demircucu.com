@@ -28,6 +28,7 @@ async function sitemapPaths(): Promise<string[]> {
     "/blog",
     "/skills",
     "/contact",
+    "/privacy",
     ...projects.map((slug) => `/projects/${slug}`),
     ...experiences.map((id) => `/experience/${id}`),
     ...posts.map((slug) => `/blog/${slug}`),

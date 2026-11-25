@@ -155,6 +155,7 @@ export default function PdfViewer({ url, title }: { url: string; title: string }
           <a
             href={url}
             download
+            data-track="document"
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t("download")}

@@ -66,6 +66,7 @@ export function ProjectDocuments({
               {doc.url ? (
                 <Link
                   href={`/projects/${slug}/docs/${doc.id}`}
+                  data-track="document"
                   className="text-xs text-muted-foreground hover:text-foreground"
                 >
                   {t("openPage")}

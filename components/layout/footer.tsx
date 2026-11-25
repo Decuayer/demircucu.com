@@ -121,6 +121,9 @@ export default function Footer({ settings, year }: FooterProps) {
           <p>
             © {year} demircucu.com. {t("copyright") || "Tüm hakları saklıdır."}
           </p>
+          <Link href="/privacy" className="transition-colors hover:text-foreground">
+            {t("privacy")}
+          </Link>
         </div>
       </div>
     </footer>

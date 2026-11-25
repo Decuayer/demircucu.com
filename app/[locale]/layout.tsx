@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import "../globals.css";
@@ -9,6 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { Analytics } from "@/components/analytics/tracker";
 import { getCurrentYear, getSiteSettings } from "@/lib/data/settings";
 import { getAppUrl } from "@/lib/env/app-url";
 
@@ -77,6 +79,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
             <main className="flex-1">{children}</main>
             <Footer settings={settings} year={year} />
             <Toaster />
+            {/* usePathname suspends on routes with params unknown at build time. */}
+            <Suspense fallback={null}>
+              <Analytics />
+            </Suspense>
           </TooltipProvider>
         </NextIntlClientProvider>
       </body>
