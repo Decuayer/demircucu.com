@@ -28,6 +28,8 @@ export async function getSiteSettings() {
     aboutPhotoUrl: mediaUrl(settings.aboutPhotoPath),
     aboutPhotoBlur: aboutPhotoMedia?.blurDataUrl ?? null,
     faviconUrl: mediaUrl(settings.faviconPath),
+    cvUrlTr: mediaUrl(settings.cvPathTr),
+    cvUrlEn: mediaUrl(settings.cvPathEn),
     ...(await optimizeImagesIn({
       aboutBioTr: sanitizeOptionalHtml(settings.aboutBioTr),
       aboutBioEn: sanitizeOptionalHtml(settings.aboutBioEn),

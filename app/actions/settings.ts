@@ -4,7 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth/guards";
 import { invalidate } from "@/lib/cache/tags";
-import { ok, toActionFailure, type ActionResult } from "@/lib/actions/result";
+import { fail, ok, toActionFailure, type ActionResult } from "@/lib/actions/result";
 import { siteSettingsSchema, type SiteSettingsInput } from "@/lib/validation/content";
 import { mediaPathsInHtml } from "@/lib/media/url";
 import { syncMediaUsage } from "@/lib/media/usage";
@@ -14,6 +14,13 @@ export async function updateSiteSettings(input: SiteSettingsInput): Promise<Acti
   try {
     await requireAdmin();
     const { skills, hobbies, ...fields } = siteSettingsSchema.parse(input);
+    const cvPaths = [fields.cvPathTr, fields.cvPathEn].filter((path): path is string => !!path);
+    if (cvPaths.length > 0) {
+      const pdfs = await prisma.mediaFile.count({
+        where: { path: { in: cvPaths }, type: "application/pdf" },
+      });
+      if (pdfs !== new Set(cvPaths).size) return fail("unsupportedType");
+    }
     const data = {
       ...fields,
       ...(skills ? { skills: skills as Prisma.InputJsonValue } : {}),

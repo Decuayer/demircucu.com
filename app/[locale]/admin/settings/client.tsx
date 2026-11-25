@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { updateSiteSettings } from "@/app/actions/settings";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { PdfUpload } from "@/components/admin/pdf-upload";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
@@ -210,6 +211,8 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
   const [aboutBioTr, setAboutBioTr] = useState(initialSettings?.aboutBioTr || "");
   const [aboutBioEn, setAboutBioEn] = useState(initialSettings?.aboutBioEn || "");
   const [aboutPhoto, setAboutPhoto] = useState(initialSettings?.aboutPhotoPath || "");
+  const [cvPathTr, setCvPathTr] = useState(initialSettings?.cvPathTr || "");
+  const [cvPathEn, setCvPathEn] = useState(initialSettings?.cvPathEn || "");
   const [aboutLocationTr, setAboutLocationTr] = useState(initialSettings?.aboutLocationTr || "");
   const [aboutLocationEn, setAboutLocationEn] = useState(initialSettings?.aboutLocationEn || "");
   const [aboutExperienceTr, setAboutExperienceTr] = useState(
@@ -274,6 +277,8 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         aboutBioEn,
         aboutPhotoPath: aboutPhoto,
         aboutLocationTr,
+        cvPathTr,
+        cvPathEn,
         aboutLocationEn,
         aboutExperienceTr,
         aboutExperienceEn,
@@ -522,6 +527,15 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   <div className="space-y-2">
                     <Label>{t("profilePhoto")}</Label>
                     <ImageUpload value={aboutPhoto} onChange={setAboutPhoto} folder="settings" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="settings-cv-tr">{t("cv")} (TR)</Label>
+                    <PdfUpload id="settings-cv-tr" value={cvPathTr} onChange={setCvPathTr} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="settings-cv-en">{t("cv")} (EN)</Label>
+                    <PdfUpload id="settings-cv-en" value={cvPathEn} onChange={setCvPathEn} />
+                    <p className="text-xs text-muted-foreground">{t("cvHint")}</p>
                   </div>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
