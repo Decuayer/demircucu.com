@@ -151,6 +151,9 @@ model Experience {
   /// Array of { name, path } (own media) or { name, url } (external link); see lib/media/attachments.
   files         Json?
   githubUrl     String?
+  /// Free text, e.g. "İzmir, Türkiye" / "Izmir, Türkiye"; optional.
+  locationTr    String?
+  locationEn    String?
   order         Int       @default(0)
   published     Boolean   @default(true)
   createdAt     DateTime  @default(now())
@@ -415,6 +418,8 @@ model MediaFile {
   blogPostCovers     BlogPost[]        @relation("BlogPostCover")
   settingsAboutPhoto SiteSettings[]    @relation("SettingsAboutPhoto")
   settingsFavicon    SiteSettings[]    @relation("SettingsFavicon")
+  settingsCvTr       SiteSettings[]    @relation("SettingsCvTr")
+  settingsCvEn       SiteSettings[]    @relation("SettingsCvEn")
 
   @@index([source, repoFullName])
 }
@@ -491,11 +496,17 @@ model SiteSettings {
   siteDescriptionEn   String?  @db.Text
   /// Storage path in the `media` bucket.
   faviconPath         String?
+  /// Storage paths of the downloadable CV (PDF) per language; the English page falls back to the
+  /// Turkish file.
+  cvPathTr            String?
+  cvPathEn            String?
   // Meta
   updatedAt           DateTime @updatedAt
 
   aboutPhotoMedia MediaFile? @relation("SettingsAboutPhoto", fields: [aboutPhotoPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
   faviconMedia    MediaFile? @relation("SettingsFavicon", fields: [faviconPath], references: [path], onDelete: Restrict, onUpdate: Cascade)
+  cvTrMedia       MediaFile? @relation("SettingsCvTr", fields: [cvPathTr], references: [path], onDelete: Restrict, onUpdate: Cascade)
+  cvEnMedia       MediaFile? @relation("SettingsCvEn", fields: [cvPathEn], references: [path], onDelete: Restrict, onUpdate: Cascade)
 }
 
 /// Fixed-window rate limit counters (lib/rate-limit). `key` is `<bucket>:<sha256(identifier)>`;
