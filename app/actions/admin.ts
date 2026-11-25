@@ -292,6 +292,22 @@ export async function deleteComment(idInput: string): Promise<ActionResult> {
 
 // --- CONTACT MESSAGES -----------------------------------------------------------------------
 
+const readSchema = z.object({ id: idSchema, read: z.boolean() });
+
+export async function setContactMessageRead(
+  input: z.input<typeof readSchema>,
+): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    const { id, read } = readSchema.parse(input);
+    await prisma.contactMessage.update({ where: { id }, data: { read } });
+    invalidate({ entity: "contactMessage" });
+    return ok();
+  } catch (error) {
+    return toActionFailure(error, "setContactMessageRead");
+  }
+}
+
 export async function deleteContactMessage(idInput: string): Promise<ActionResult> {
   try {
     await requireAdmin();

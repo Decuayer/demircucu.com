@@ -14,10 +14,12 @@ import {
   Image as ImageIcon,
   MessageSquare,
   Tags,
+  BarChart3,
 } from "lucide-react";
 
 const adminNavItems = [
   { href: "/admin", key: "dashboard", icon: LayoutDashboard },
+  { href: "/admin/analytics", key: "analytics", icon: BarChart3 },
   { href: "/admin/experiences", key: "experiences", icon: Briefcase },
   { href: "/admin/projects", key: "projects", icon: Code2 },
   { href: "/admin/blog", key: "blog", icon: Newspaper },
