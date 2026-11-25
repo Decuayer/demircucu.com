@@ -66,3 +66,27 @@ export async function deleteMediaFile(idInput: string): Promise<ActionResult> {
     return toActionFailure(error, "deleteMediaFile");
   }
 }
+
+export interface LibraryImage {
+  id: string;
+  name: string;
+  path: string;
+  width: number | null;
+  height: number | null;
+}
+
+/** Images of the media library for the rich text editor's picker (newest first). */
+export async function listLibraryImages(): Promise<ActionResult<{ images: LibraryImage[] }>> {
+  try {
+    await requireAdmin();
+    const images = await prisma.mediaFile.findMany({
+      where: { type: { startsWith: "image/" }, NOT: { type: "image/x-icon" } },
+      orderBy: { createdAt: "desc" },
+      take: 200,
+      select: { id: true, name: true, path: true, width: true, height: true },
+    });
+    return ok({ images });
+  } catch (error) {
+    return toActionFailure(error, "listLibraryImages");
+  }
+}

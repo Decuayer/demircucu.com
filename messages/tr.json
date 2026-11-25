@@ -604,5 +604,21 @@
     "posts": "Blog yazıları",
     "breadcrumb": "Üst kategoriler",
     "metaDescription": "{name}: {projects} proje, {experiences} deneyim ve {posts} blog yazısında kullanıldı."
+  },
+  "editor": {
+    "placeholder": "İçeriğinizi buraya yazın...",
+    "paragraph": "Paragraf",
+    "link": "Bağlantı",
+    "linkUrl": "Bağlantı adresi",
+    "linkHint": "Boş bırakırsanız bağlantı kaldırılır.",
+    "apply": "Uygula",
+    "image": "Medya kütüphanesinden görsel ekle"
+  },
+  "mediaPicker": {
+    "title": "Görsel seç",
+    "search": "Ada göre ara",
+    "upload": "Yeni görsel yükle",
+    "empty": "Görsel bulunamadı.",
+    "insert": "{name} görselini ekle"
   }
 }

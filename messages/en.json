@@ -604,5 +604,21 @@
     "posts": "Blog posts",
     "breadcrumb": "Parent categories",
     "metaDescription": "{name}: used in {projects} projects, {experiences} experiences and {posts} blog posts."
+  },
+  "editor": {
+    "placeholder": "Write your content here...",
+    "paragraph": "Paragraph",
+    "link": "Link",
+    "linkUrl": "Link address",
+    "linkHint": "Leave empty to remove the link.",
+    "apply": "Apply",
+    "image": "Insert an image from the media library"
+  },
+  "mediaPicker": {
+    "title": "Choose an image",
+    "search": "Search by name",
+    "upload": "Upload a new image",
+    "empty": "No images found.",
+    "insert": "Insert {name}"
   }
 }

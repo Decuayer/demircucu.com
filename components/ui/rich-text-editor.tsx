@@ -5,7 +5,12 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
+import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { MediaPickerDialog } from "@/components/admin/media-picker-dialog";
 import {
   Bold,
   Italic,
@@ -29,6 +34,9 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ content, onChange, placeholder }: RichTextEditorProps) {
+  const t = useTranslations("editor");
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState<string | null>(null);
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -44,7 +52,7 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
         },
       }),
       Placeholder.configure({
-        placeholder: placeholder || "İçeriğinizi buraya yazın...",
+        placeholder: placeholder || t("placeholder"),
       }),
     ],
     content: content,
@@ -56,23 +64,18 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
 
   if (!editor) return null;
 
-  const addLink = () => {
-    const previousUrl = editor.getAttributes("link").href;
-    const url = window.prompt("URL girin", previousUrl);
+  const openLinkDialog = () => {
+    setLinkUrl((editor.getAttributes("link").href as string | undefined) ?? "");
+  };
 
-    if (url === null) return;
-    if (url === "") {
+  const applyLink = () => {
+    const url = (linkUrl ?? "").trim();
+    setLinkUrl(null);
+    if (!url) {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
       return;
     }
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
-  };
-
-  const addImage = () => {
-    const url = window.prompt("Görsel URL si girin");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
   };
 
   return (
@@ -113,7 +116,7 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
           size="icon"
           onClick={() => editor.chain().focus().setParagraph().run()}
           className={editor.isActive("paragraph") ? "bg-accent text-accent-foreground" : ""}
-          title="Paragraf"
+          title={t("paragraph")}
         >
           <Pilcrow className="h-4 w-4" />
         </Button>
@@ -174,12 +177,21 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
           type="button"
           variant="ghost"
           size="icon"
-          onClick={addLink}
+          onClick={openLinkDialog}
           className={editor.isActive("link") ? "bg-accent text-accent-foreground" : ""}
+          title={t("link")}
+          aria-label={t("link")}
         >
           <LinkIcon className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="icon" onClick={addImage}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => setPickerOpen(true)}
+          title={t("image")}
+          aria-label={t("image")}
+        >
           <ImageIcon className="h-4 w-4" />
         </Button>
         <div className="mx-1 h-6 w-px bg-border" />
@@ -202,6 +214,37 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
           <Redo className="h-4 w-4" />
         </Button>
       </div>
+
+      <MediaPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onPick={(image) => editor.chain().focus().setImage(image).run()}
+      />
+      <Dialog open={linkUrl !== null} onOpenChange={(open) => !open && setLinkUrl(null)}>
+        <DialogContent className="border-border/50 bg-background sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("link")}</DialogTitle>
+          </DialogHeader>
+          <form
+            className="flex gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              applyLink();
+            }}
+          >
+            <Input
+              type="url"
+              value={linkUrl ?? ""}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder="https://"
+              aria-label={t("linkUrl")}
+              autoFocus
+            />
+            <Button type="submit">{t("apply")}</Button>
+          </form>
+          <p className="text-xs text-muted-foreground">{t("linkHint")}</p>
+        </DialogContent>
+      </Dialog>
 
       {/* Editor Content Area */}
       <div className="prose min-h-[300px] max-w-none cursor-text p-4 focus:outline-none dark:prose-invert">
