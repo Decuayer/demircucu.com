@@ -103,53 +103,71 @@ interface HeaderClientProps {
 }
 
 export default function HeaderClient({ desktopAuth, mobileAuth }: HeaderClientProps) {
+  const t = useTranslations("nav");
   const [mobileOpen, setMobileOpen] = useState(false);
   const close = () => setMobileOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-          <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
-            demircucu
-          </span>
-          <span className="text-sm font-normal text-muted-foreground">.com</span>
-        </Link>
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:ring-2 focus:ring-ring"
+      >
+        {t("skipToContent")}
+      </a>
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
+            <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
+              demircucu
+            </span>
+            <span className="text-sm font-normal text-muted-foreground">.com</span>
+          </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
-          <Nav variant="desktop" />
-        </nav>
+          <nav aria-label={t("mainNav")} className="hidden items-center gap-1 md:flex">
+            <Nav variant="desktop" />
+          </nav>
 
-        <div className="flex items-center gap-2">
-          <Suspense fallback={<LocaleSwitchButton />}>
-            <ActiveLocaleSwitch />
-          </Suspense>
+          <div className="flex items-center gap-2">
+            <Suspense fallback={<LocaleSwitchButton />}>
+              <ActiveLocaleSwitch />
+            </Suspense>
 
-          {desktopAuth}
+            {desktopAuth}
 
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden" />}>
-              <Menu className="h-5 w-5" />
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] p-0">
-              <div className="flex h-full flex-col">
-                <div className="border-b border-border p-6">
-                  <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-lg font-bold text-transparent">
-                    demircucu.com
-                  </span>
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    aria-label={t("openMenu")}
+                  />
+                }
+              >
+                <Menu className="h-5 w-5" />
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] p-0">
+                <div className="flex h-full flex-col">
+                  <div className="border-b border-border p-6">
+                    <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-lg font-bold text-transparent">
+                      demircucu.com
+                    </span>
+                  </div>
+                  <nav aria-label={t("mainNav")} className="flex flex-1 flex-col gap-1 p-4">
+                    <Nav variant="mobile" onNavigate={close} />
+                  </nav>
+                  {/* Any click in the auth area (login link, sign out) closes the menu. */}
+                  <div className="border-t border-border p-4" onClickCapture={close}>
+                    {mobileAuth}
+                  </div>
                 </div>
-                <nav className="flex flex-1 flex-col gap-1 p-4">
-                  <Nav variant="mobile" onNavigate={close} />
-                </nav>
-                {/* Any click in the auth area (login link, sign out) closes the menu. */}
-                <div className="border-t border-border p-4" onClickCapture={close}>
-                  {mobileAuth}
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

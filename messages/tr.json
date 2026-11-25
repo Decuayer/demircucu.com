@@ -34,7 +34,10 @@
     "name": "Ad Soyad",
     "email": "E-posta",
     "switchLanguage": "Switch to English",
-    "privacy": "Gizlilik"
+    "privacy": "Gizlilik",
+    "openMenu": "Menüyü aç",
+    "mainNav": "Ana gezinme",
+    "skipToContent": "İçeriğe geç"
   },
   "home": {
     "heroTitle": "Merhaba, Ben",
@@ -449,7 +452,11 @@
     },
     "analytics": "Analitik",
     "unread": "Okunmadı",
-    "markUnread": "Okunmadı yap"
+    "markUnread": "Okunmadı yap",
+    "adminNav": "Admin menüsü",
+    "copyUrl": "URL'yi kopyala",
+    "openFile": "Dosyayı yeni sekmede aç",
+    "removeHobby": "Hobiyi kaldır"
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -616,7 +623,17 @@
     "linkUrl": "Bağlantı adresi",
     "linkHint": "Boş bırakırsanız bağlantı kaldırılır.",
     "apply": "Uygula",
-    "image": "Medya kütüphanesinden görsel ekle"
+    "image": "Medya kütüphanesinden görsel ekle",
+    "toolbar": "Biçimlendirme",
+    "bold": "Kalın",
+    "italic": "İtalik",
+    "strike": "Üstü çizili",
+    "heading": "Başlık {level}",
+    "bulletList": "Madde işaretli liste",
+    "orderedList": "Numaralı liste",
+    "undo": "Geri al",
+    "redo": "Yinele",
+    "content": "İçerik"
   },
   "mediaPicker": {
     "title": "Görsel seç",
@@ -785,5 +802,16 @@
       "body": "KVKK ve GDPR kapsamındaki haklarınızı (verilerinize erişim, düzeltme, silme) kullanmak veya bu politika hakkında soru sormak için iletişim sayfasındaki formu kullanabilirsiniz. Ziyaret istatistikleri sizi tanımlamadığı için tek bir kişiye ait olarak bulunamaz; hesap ve mesaj verileriniz talebiniz üzerine silinir.",
       "items": []
     }
+  },
+  "errorPages": {
+    "notFoundTitle": "Sayfa bulunamadı",
+    "notFoundText": "Aradığınız sayfa taşınmış, kaldırılmış ya da hiç var olmamış olabilir.",
+    "home": "Ana sayfa",
+    "projects": "Projeler",
+    "blog": "Blog",
+    "errorTitle": "Bir şeyler ters gitti",
+    "errorText": "Sayfa yüklenirken beklenmeyen bir hata oluştu. Tekrar deneyebilirsiniz.",
+    "reference": "Hata kodu: {digest}",
+    "retry": "Tekrar dene"
   }
 }

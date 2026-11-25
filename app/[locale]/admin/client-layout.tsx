@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
         </div>
-        <nav className="flex-1 space-y-1 p-4">
+        <nav aria-label={t("adminNav")} className="flex-1 space-y-1 p-4">
           {adminNavItems.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));

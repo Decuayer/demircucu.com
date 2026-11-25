@@ -1,3 +1,4 @@
+import { SITE_TIME_ZONE } from "@/lib/format-date";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -53,7 +54,11 @@ export default async function SkillPage({ params }: PageProps<"/[locale]/skills/
   const t = await getTranslations({ locale, namespace: "skills" });
   const { tag, ancestors, children, related, projects, experiences, posts } = result.skill;
   const description = locale === "tr" ? tag.descriptionTr : tag.descriptionEn;
-  const month = new Intl.DateTimeFormat(locale, { month: "short", year: "numeric" });
+  const month = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    year: "numeric",
+    timeZone: SITE_TIME_ZONE,
+  });
   const { firstUsed, lastUsed, ongoing } = result.skill;
 
   return (

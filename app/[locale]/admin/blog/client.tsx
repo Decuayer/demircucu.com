@@ -2,11 +2,12 @@
 
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, Newspaper, Eye } from "lucide-react";
 import { getTranslated } from "@/lib/i18n-utils";
+import { formatDate } from "@/lib/format-date";
 import { useParams } from "next/navigation";
 
 import { useState, useTransition } from "react";
@@ -77,7 +78,7 @@ export default function AdminBlogClient({ initialPosts }: AdminBlogClientProps) 
                 <div className="flex-1">
                   <p className="font-medium">{getTranslated(post, "title", locale)}</p>
                   <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-                    <time>{new Date(post.createdAt).toLocaleDateString()}</time>
+                    <time>{formatDate(post.createdAt, locale)}</time>
                     <div className="flex items-center gap-1">
                       <Eye className="h-3 w-3" />
                       {post.viewCount}
@@ -88,15 +89,18 @@ export default function AdminBlogClient({ initialPosts }: AdminBlogClientProps) 
                   <Badge variant={post.published ? "default" : "secondary"} className="text-xs">
                     {post.published ? t("published") : t("unpublished")}
                   </Badge>
-                  <Link href={`/admin/blog/${post.id}/edit`}>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                  <Link
+                    href={`/admin/blog/${post.id}/edit`}
+                    className={buttonVariants({ variant: "ghost", size: "icon" })}
+                    aria-label={t("edit")}
+                  >
+                    <Pencil className="h-4 w-4" />
                   </Link>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="text-destructive"
+                    aria-label={t("delete")}
                     onClick={() => setDeleteId(post.id)}
                   >
                     <Trash2 className="h-4 w-4" />

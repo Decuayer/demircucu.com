@@ -60,6 +60,7 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
                           className="rounded-lg p-2 transition-colors hover:bg-accent"
+                          aria-label={`${t("viewGithub")}: ${getTranslated(project, "title", locale)}`}
                         >
                           <GithubIcon className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                         </a>
@@ -72,6 +73,7 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
                           className="rounded-lg p-2 transition-colors hover:bg-accent"
+                          aria-label={`${t("liveSite")}: ${getTranslated(project, "title", locale)}`}
                         >
                           <ExternalLink className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                         </a>

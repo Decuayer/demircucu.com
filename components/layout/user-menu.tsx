@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Heart, LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -94,10 +94,13 @@ export function MobileAuthButton({ user }: { user: SessionUser | null }) {
     );
   }
   return (
-    <Link href="/auth/login">
-      <Button className="w-full border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
-        {t("login")}
-      </Button>
+    <Link
+      href="/auth/login"
+      className={buttonVariants({
+        className: "w-full border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white",
+      })}
+    >
+      {t("login")}
     </Link>
   );
 }
@@ -105,14 +108,17 @@ export function MobileAuthButton({ user }: { user: SessionUser | null }) {
 export function LoginButton() {
   const t = useTranslations("nav");
   return (
-    <Link href="/auth/login">
-      <Button
-        variant="default"
-        size="sm"
-        className="hidden border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700 md:inline-flex"
-      >
-        {t("login")}
-      </Button>
+    // Hidden on small screens (the mobile menu has its own sign-in link), so the link itself is
+    // hidden, not only its content.
+    <Link
+      href="/auth/login"
+      className={buttonVariants({
+        size: "sm",
+        className:
+          "hidden border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700 md:inline-flex",
+      })}
+    >
+      {t("login")}
     </Link>
   );
 }

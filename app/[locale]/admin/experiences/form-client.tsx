@@ -133,8 +133,9 @@ export default function ExperienceFormClient({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>{t("companyName")} *</Label>
+                <Label htmlFor="experience-field-1">{t("companyName")} *</Label>
                 <Input
+                  id="experience-field-1"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   required
@@ -144,8 +145,9 @@ export default function ExperienceFormClient({
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("position")} (TR) *</Label>
+                  <Label htmlFor="experience-field-2">{t("position")} (TR) *</Label>
                   <Input
+                    id="experience-field-2"
                     value={positionTr}
                     onChange={(e) => setPositionTr(e.target.value)}
                     required
@@ -153,8 +155,9 @@ export default function ExperienceFormClient({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("position")} (EN) *</Label>
+                  <Label htmlFor="experience-field-3">{t("position")} (EN) *</Label>
                   <Input
+                    id="experience-field-3"
                     value={positionEn}
                     onChange={(e) => setPositionEn(e.target.value)}
                     required
@@ -172,8 +175,9 @@ export default function ExperienceFormClient({
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("summary")} (TR) *</Label>
+                  <Label htmlFor="experience-field-4">{t("summary")} (TR) *</Label>
                   <Textarea
+                    id="experience-field-4"
                     value={descriptionTr}
                     onChange={(e) => setDescriptionTr(e.target.value)}
                     required
@@ -182,8 +186,9 @@ export default function ExperienceFormClient({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("summary")} (EN) *</Label>
+                  <Label htmlFor="experience-field-5">{t("summary")} (EN) *</Label>
                   <Textarea
+                    id="experience-field-5"
                     value={descriptionEn}
                     onChange={(e) => setDescriptionEn(e.target.value)}
                     required
@@ -202,6 +207,7 @@ export default function ExperienceFormClient({
             <CardContent>
               <RichTextEditor
                 content={detailsTr}
+                label={`${t("details")} (TR)`}
                 onChange={setDetailsTr}
                 placeholder={t("duties")}
               />
@@ -215,6 +221,7 @@ export default function ExperienceFormClient({
             <CardContent>
               <RichTextEditor
                 content={detailsEn}
+                label={`${t("details")} (EN)`}
                 onChange={setDetailsEn}
                 placeholder={t("duties")}
               />
@@ -239,8 +246,9 @@ export default function ExperienceFormClient({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>{t("startDate")} *</Label>
+                <Label htmlFor="experience-field-6">{t("startDate")} *</Label>
                 <Input
+                  id="experience-field-6"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -249,10 +257,11 @@ export default function ExperienceFormClient({
                 />
               </div>
               <div className="space-y-2">
-                <Label>
+                <Label htmlFor="experience-field-51">
                   {t("endDate")} ({t("currentJob")})
                 </Label>
                 <Input
+                  id="experience-field-51"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
@@ -260,8 +269,12 @@ export default function ExperienceFormClient({
                 />
               </div>
               <div className="flex items-center space-x-2 border-t border-border/50 pt-4">
-                <Switch checked={published} onCheckedChange={setPublished} />
-                <Label>{t("published")}</Label>
+                <Switch
+                  id="experience-field-7"
+                  checked={published}
+                  onCheckedChange={setPublished}
+                />
+                <Label htmlFor="experience-field-7">{t("published")}</Label>
               </div>
             </CardContent>
           </Card>

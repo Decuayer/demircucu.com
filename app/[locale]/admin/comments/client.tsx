@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
+import { formatDate } from "@/lib/format-date";
 import { deleteComment, setCommentHidden } from "@/app/actions/admin";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 
@@ -30,7 +31,6 @@ export default function AdminCommentsClient({
   const errorMessage = useActionErrorMessage();
   const [comments, setComments] = useState(initialComments);
   const [isPending, startTransition] = useTransition();
-  const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
 
   const toggleHidden = (comment: ModeratedComment) =>
     startTransition(async () => {
@@ -68,7 +68,10 @@ export default function AdminCommentsClient({
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-medium">{comment.author.name ?? comment.author.email}</span>
                   <span className="text-muted-foreground">
-                    {dateFormat.format(new Date(comment.createdAt))}
+                    {formatDate(comment.createdAt, locale, {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
                   </span>
                   {comment.hidden && <Badge variant="secondary">{t("hiddenBadge")}</Badge>}
                 </div>

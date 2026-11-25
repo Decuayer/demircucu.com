@@ -3,8 +3,9 @@
 import Image from "next/image";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useState, useRef, useTransition } from "react";
-import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { useLocale, useTranslations } from "next-intl";
+import { formatDate } from "@/lib/format-date";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -44,6 +45,7 @@ interface AdminMediaClientProps {
 
 export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps) {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const errorMessage = useActionErrorMessage();
   const [files, setFiles] = useState<AdminMediaItem[]>(initialFiles);
   const [searchTerm, setSearchTerm] = useState("");
@@ -311,7 +313,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                       {formatSize(file.size)}
                     </span>
                     <span className="text-[10px] text-muted-foreground">
-                      {new Date(file.createdAt).toLocaleDateString()}
+                      {formatDate(file.createdAt, locale)}
                     </span>
                   </div>
                 </CardContent>
@@ -398,6 +400,8 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                       variant="secondary"
                       className="h-8 w-8 shrink-0"
                       onClick={() => copyToClipboard(mediaUrl(selectedFile.path) ?? "")}
+                      aria-label={t("copyUrl")}
+                      title={t("copyUrl")}
                     >
                       <Copy className="h-3.5 w-3.5" />
                     </Button>
@@ -405,17 +409,27 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                       href={mediaUrl(selectedFile.path) ?? undefined}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className={buttonVariants({
+                        variant: "outline",
+                        size: "icon",
+                        className: "h-8 w-8 shrink-0",
+                      })}
+                      aria-label={t("openFile")}
+                      title={t("openFile")}
                     >
-                      <Button size="icon" variant="outline" className="h-8 w-8 shrink-0">
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </Button>
+                      <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">{t("uploadDate")}</Label>
-                  <p className="text-sm">{new Date(selectedFile.createdAt).toLocaleString()}</p>
+                  <p className="text-sm">
+                    {formatDate(selectedFile.createdAt, locale, {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </p>
                 </div>
 
                 <div className="space-y-2">

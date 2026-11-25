@@ -76,7 +76,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <NextIntlClientProvider locale={locale} messages={messages}>
           <TooltipProvider>
             <Header />
-            <main className="flex-1">{children}</main>
+            <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+              {children}
+            </main>
             <Footer settings={settings} year={year} />
             <Toaster />
             {/* usePathname suspends on routes with params unknown at build time. */}

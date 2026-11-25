@@ -361,8 +361,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               </h2>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("mainTitle")} (TR)</Label>
+                  <Label htmlFor="settings-field-1">{t("mainTitle")} (TR)</Label>
                   <Input
+                    id="settings-field-1"
                     value={heroTitleTr}
                     onChange={(e) => setHeroTitleTr(e.target.value)}
                     className="bg-accent/30"
@@ -370,8 +371,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("mainTitle")} (EN)</Label>
+                  <Label htmlFor="settings-field-2">{t("mainTitle")} (EN)</Label>
                   <Input
+                    id="settings-field-2"
                     value={heroTitleEn}
                     onChange={(e) => setHeroTitleEn(e.target.value)}
                     className="bg-accent/30"
@@ -381,8 +383,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               </div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("subTitle")} (TR)</Label>
+                  <Label htmlFor="settings-field-3">{t("subTitle")} (TR)</Label>
                   <Input
+                    id="settings-field-3"
                     value={heroSubTr}
                     onChange={(e) => setHeroSubTr(e.target.value)}
                     className="bg-accent/30"
@@ -390,8 +393,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("subTitle")} (EN)</Label>
+                  <Label htmlFor="settings-field-4">{t("subTitle")} (EN)</Label>
                   <Input
+                    id="settings-field-4"
                     value={heroSubEn}
                     onChange={(e) => setHeroSubEn(e.target.value)}
                     className="bg-accent/30"
@@ -409,8 +413,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               </h2>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("ctaTitle")} (TR)</Label>
+                  <Label htmlFor="settings-field-5">{t("ctaTitle")} (TR)</Label>
                   <Input
+                    id="settings-field-5"
                     value={ctaTitleTr}
                     onChange={(e) => setCtaTitleTr(e.target.value)}
                     className="bg-accent/30"
@@ -418,8 +423,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("ctaTitle")} (EN)</Label>
+                  <Label htmlFor="settings-field-6">{t("ctaTitle")} (EN)</Label>
                   <Input
+                    id="settings-field-6"
                     value={ctaTitleEn}
                     onChange={(e) => setCtaTitleEn(e.target.value)}
                     className="bg-accent/30"
@@ -429,8 +435,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               </div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("ctaDescription")} (TR)</Label>
+                  <Label htmlFor="settings-field-7">{t("ctaDescription")} (TR)</Label>
                   <Textarea
+                    id="settings-field-7"
                     value={ctaDescriptionTr}
                     onChange={(e) => setCtaDescriptionTr(e.target.value)}
                     className="bg-accent/30"
@@ -438,8 +445,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("ctaDescription")} (EN)</Label>
+                  <Label htmlFor="settings-field-8">{t("ctaDescription")} (EN)</Label>
                   <Textarea
+                    id="settings-field-8"
                     value={ctaDescriptionEn}
                     onChange={(e) => setCtaDescriptionEn(e.target.value)}
                     className="bg-accent/30"
@@ -455,8 +463,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               <h2 className="text-lg font-semibold">{t("footerSection")}</h2>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("footerTitle")} (TR)</Label>
+                  <Label htmlFor="settings-field-9">{t("footerTitle")} (TR)</Label>
                   <Input
+                    id="settings-field-9"
                     value={footerTitleTr}
                     onChange={(e) => setFooterTitleTr(e.target.value)}
                     className="bg-accent/30"
@@ -464,8 +473,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("footerTitle")} (EN)</Label>
+                  <Label htmlFor="settings-field-10">{t("footerTitle")} (EN)</Label>
                   <Input
+                    id="settings-field-10"
                     value={footerTitleEn}
                     onChange={(e) => setFooterTitleEn(e.target.value)}
                     className="bg-accent/30"
@@ -475,8 +485,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               </div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("footerDescription")} (TR)</Label>
+                  <Label htmlFor="settings-field-11">{t("footerDescription")} (TR)</Label>
                   <Textarea
+                    id="settings-field-11"
                     value={footerDescriptionTr}
                     onChange={(e) => setFooterDescriptionTr(e.target.value)}
                     className="bg-accent/30"
@@ -485,8 +496,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("footerDescription")} (EN)</Label>
+                  <Label htmlFor="settings-field-12">{t("footerDescription")} (EN)</Label>
                   <Textarea
+                    id="settings-field-12"
                     value={footerDescriptionEn}
                     onChange={(e) => setFooterDescriptionEn(e.target.value)}
                     className="bg-accent/30"
@@ -513,8 +525,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   </div>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label>{t("location")} (TR)</Label>
+                      <Label htmlFor="settings-field-13">{t("location")} (TR)</Label>
                       <Input
+                        id="settings-field-13"
                         value={aboutLocationTr}
                         onChange={(e) => setAboutLocationTr(e.target.value)}
                         className="bg-accent/30"
@@ -522,8 +535,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>{t("location")} (EN)</Label>
+                      <Label htmlFor="settings-field-14">{t("location")} (EN)</Label>
                       <Input
+                        id="settings-field-14"
                         value={aboutLocationEn}
                         onChange={(e) => setAboutLocationEn(e.target.value)}
                         className="bg-accent/30"
@@ -533,8 +547,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   </div>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label>{t("experience")} (TR)</Label>
+                      <Label htmlFor="settings-field-15">{t("experience")} (TR)</Label>
                       <Input
+                        id="settings-field-15"
                         value={aboutExperienceTr}
                         onChange={(e) => setAboutExperienceTr(e.target.value)}
                         className="bg-accent/30"
@@ -542,8 +557,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>{t("experience")} (EN)</Label>
+                      <Label htmlFor="settings-field-16">{t("experience")} (EN)</Label>
                       <Input
+                        id="settings-field-16"
                         value={aboutExperienceEn}
                         onChange={(e) => setAboutExperienceEn(e.target.value)}
                         className="bg-accent/30"
@@ -558,6 +574,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                     <Label>{t("detailedBiography")} (TR)</Label>
                     <RichTextEditor
                       content={aboutBioTr}
+                      label={`${t("detailedBiography")} (TR)`}
                       onChange={setAboutBioTr}
                       placeholder="Kendinizden bahsedin..."
                     />
@@ -566,6 +583,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                     <Label>{t("detailedBiography")} (EN)</Label>
                     <RichTextEditor
                       content={aboutBioEn}
+                      label={`${t("detailedBiography")} (EN)`}
                       onChange={setAboutBioEn}
                       placeholder="Tell us about yourself..."
                     />
@@ -583,8 +601,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               <h2 className="text-lg font-semibold">{t("contact")}</h2>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("email")}</Label>
+                  <Label htmlFor="settings-field-17">{t("email")}</Label>
                   <Input
+                    id="settings-field-17"
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                     className="bg-accent/30"
@@ -592,8 +611,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("phone")}</Label>
+                  <Label htmlFor="settings-field-18">{t("phone")}</Label>
                   <Input
+                    id="settings-field-18"
                     value={contactPhone}
                     onChange={(e) => setContactPhone(e.target.value)}
                     className="bg-accent/30"
@@ -602,8 +622,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>{t("address")}</Label>
+                <Label htmlFor="settings-field-19">{t("address")}</Label>
                 <Textarea
+                  id="settings-field-19"
                   value={contactAddress}
                   onChange={(e) => setContactAddress(e.target.value)}
                   className="resize-none bg-accent/30"
@@ -618,8 +639,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               <h2 className="text-lg font-semibold">{t("socialMedia")}</h2>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>GitHub URL</Label>
+                  <Label htmlFor="settings-field-20">GitHub URL</Label>
                   <Input
+                    id="settings-field-20"
                     value={socialGithub}
                     onChange={(e) => setSocialGithub(e.target.value)}
                     className="bg-accent/30"
@@ -627,8 +649,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>LinkedIn URL</Label>
+                  <Label htmlFor="settings-field-21">LinkedIn URL</Label>
                   <Input
+                    id="settings-field-21"
                     value={socialLinkedin}
                     onChange={(e) => setSocialLinkedin(e.target.value)}
                     className="bg-accent/30"
@@ -636,8 +659,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Twitter / X URL</Label>
+                  <Label htmlFor="settings-field-22">Twitter / X URL</Label>
                   <Input
+                    id="settings-field-22"
                     value={socialTwitter}
                     onChange={(e) => setSocialTwitter(e.target.value)}
                     className="bg-accent/30"
@@ -645,8 +669,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Instagram URL</Label>
+                  <Label htmlFor="settings-field-23">Instagram URL</Label>
                   <Input
+                    id="settings-field-23"
                     value={socialInstagram}
                     onChange={(e) => setSocialInstagram(e.target.value)}
                     className="bg-accent/30"
@@ -654,8 +679,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>YouTube URL</Label>
+                  <Label htmlFor="settings-field-24">YouTube URL</Label>
                   <Input
+                    id="settings-field-24"
                     value={socialYoutube}
                     onChange={(e) => setSocialYoutube(e.target.value)}
                     className="bg-accent/30"
@@ -663,8 +689,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Medium URL</Label>
+                  <Label htmlFor="settings-field-25">Medium URL</Label>
                   <Input
+                    id="settings-field-25"
                     value={socialMedium}
                     onChange={(e) => setSocialMedium(e.target.value)}
                     className="bg-accent/30"
@@ -672,8 +699,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>StackOverflow URL</Label>
+                  <Label htmlFor="settings-field-26">StackOverflow URL</Label>
                   <Input
+                    id="settings-field-26"
                     value={socialStackoverflow}
                     onChange={(e) => setSocialStackoverflow(e.target.value)}
                     className="bg-accent/30"
@@ -827,6 +855,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                           size="icon"
                           className="mt-5 text-destructive"
                           onClick={() => removeHobby(index)}
+                          aria-label={t("removeHobby")}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -846,8 +875,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               <h2 className="text-lg font-semibold">{t("seoOpt")} (SEO)</h2>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("siteTitle")} (TR)</Label>
+                  <Label htmlFor="settings-field-27">{t("siteTitle")} (TR)</Label>
                   <Input
+                    id="settings-field-27"
                     value={siteTitleTr}
                     onChange={(e) => setSiteTitleTr(e.target.value)}
                     className="bg-accent/30"
@@ -855,8 +885,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("siteTitle")} (EN)</Label>
+                  <Label htmlFor="settings-field-28">{t("siteTitle")} (EN)</Label>
                   <Input
+                    id="settings-field-28"
                     value={siteTitleEn}
                     onChange={(e) => setSiteTitleEn(e.target.value)}
                     className="bg-accent/30"
@@ -866,8 +897,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               </div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("siteDescription")} (TR)</Label>
+                  <Label htmlFor="settings-field-29">{t("siteDescription")} (TR)</Label>
                   <Textarea
+                    id="settings-field-29"
                     value={siteDescriptionTr}
                     onChange={(e) => setSiteDescriptionTr(e.target.value)}
                     className="bg-accent/30"
@@ -876,8 +908,9 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("siteDescription")} (EN)</Label>
+                  <Label htmlFor="settings-field-30">{t("siteDescription")} (EN)</Label>
                   <Textarea
+                    id="settings-field-30"
                     value={siteDescriptionEn}
                     onChange={(e) => setSiteDescriptionEn(e.target.value)}
                     className="bg-accent/30"

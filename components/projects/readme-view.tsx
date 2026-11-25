@@ -33,6 +33,8 @@ export function ReadmeView({ html, locale }: { html: string; locale: string }) {
       wrapper.className = "code-block";
       pre.replaceWith(wrapper);
       wrapper.append(pre);
+      // Wide code scrolls horizontally; keyboard users need to be able to focus it to scroll.
+      pre.tabIndex = 0;
       const button = document.createElement("button");
       button.type = "button";
       button.className = "code-copy";
