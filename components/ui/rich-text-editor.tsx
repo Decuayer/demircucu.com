@@ -31,15 +31,18 @@ interface RichTextEditorProps {
   content: string;
   onChange: (html: string) => void;
   placeholder?: string;
+  /** Accessible name of the editing area, usually the visible field label. */
+  label?: string;
 }
 
-export function RichTextEditor({ content, onChange, placeholder }: RichTextEditorProps) {
+export function RichTextEditor({ content, onChange, placeholder, label }: RichTextEditorProps) {
   const t = useTranslations("editor");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState<string | null>(null);
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      // The link extension is configured below; StarterKit would register a second one.
+      StarterKit.configure({ link: false }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -57,6 +60,13 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
     ],
     content: content,
     immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        "aria-label": label ?? t("content"),
+        "aria-multiline": "true",
+        role: "textbox",
+      },
+    },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
@@ -67,6 +77,82 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
   const openLinkDialog = () => {
     setLinkUrl((editor.getAttributes("link").href as string | undefined) ?? "");
   };
+
+  const chain = () => editor.chain().focus();
+  const groups: {
+    label: string;
+    icon: typeof Bold;
+    run: () => void;
+    active?: boolean;
+    disabled?: boolean;
+  }[][] = [
+    [
+      {
+        label: t("bold"),
+        icon: Bold,
+        run: () => chain().toggleBold().run(),
+        active: editor.isActive("bold"),
+      },
+      {
+        label: t("italic"),
+        icon: Italic,
+        run: () => chain().toggleItalic().run(),
+        active: editor.isActive("italic"),
+      },
+      {
+        label: t("strike"),
+        icon: Strikethrough,
+        run: () => chain().toggleStrike().run(),
+        active: editor.isActive("strike"),
+      },
+    ],
+    [
+      {
+        label: t("paragraph"),
+        icon: Pilcrow,
+        run: () => chain().setParagraph().run(),
+        active: editor.isActive("paragraph"),
+      },
+      ...([1, 2, 3] as const).map((level) => ({
+        label: t("heading", { level }),
+        icon: [Heading1, Heading2, Heading3][level - 1]!,
+        run: () => chain().toggleHeading({ level }).run(),
+        active: editor.isActive("heading", { level }),
+      })),
+    ],
+    [
+      {
+        label: t("bulletList"),
+        icon: List,
+        run: () => chain().toggleBulletList().run(),
+        active: editor.isActive("bulletList"),
+      },
+      {
+        label: t("orderedList"),
+        icon: ListOrdered,
+        run: () => chain().toggleOrderedList().run(),
+        active: editor.isActive("orderedList"),
+      },
+    ],
+    [
+      { label: t("link"), icon: LinkIcon, run: openLinkDialog, active: editor.isActive("link") },
+      { label: t("image"), icon: ImageIcon, run: () => setPickerOpen(true) },
+    ],
+    [
+      {
+        label: t("undo"),
+        icon: Undo,
+        run: () => chain().undo().run(),
+        disabled: !editor.can().undo(),
+      },
+      {
+        label: t("redo"),
+        icon: Redo,
+        run: () => chain().redo().run(),
+        disabled: !editor.can().redo(),
+      },
+    ],
+  ];
 
   const applyLink = () => {
     const url = (linkUrl ?? "").trim();
@@ -81,138 +167,32 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-border/50 bg-background/50">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 border-b border-border/50 bg-muted/20 p-2">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={editor.isActive("bold") ? "bg-accent text-accent-foreground" : ""}
-        >
-          <Bold className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={editor.isActive("italic") ? "bg-accent text-accent-foreground" : ""}
-        >
-          <Italic className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={editor.isActive("strike") ? "bg-accent text-accent-foreground" : ""}
-        >
-          <Strikethrough className="h-4 w-4" />
-        </Button>
-        <div className="mx-1 h-6 w-px bg-border" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().setParagraph().run()}
-          className={editor.isActive("paragraph") ? "bg-accent text-accent-foreground" : ""}
-          title={t("paragraph")}
-        >
-          <Pilcrow className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={
-            editor.isActive("heading", { level: 1 }) ? "bg-accent text-accent-foreground" : ""
-          }
-        >
-          <Heading1 className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={
-            editor.isActive("heading", { level: 2 }) ? "bg-accent text-accent-foreground" : ""
-          }
-        >
-          <Heading2 className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={
-            editor.isActive("heading", { level: 3 }) ? "bg-accent text-accent-foreground" : ""
-          }
-        >
-          <Heading3 className="h-4 w-4" />
-        </Button>
-        <div className="mx-1 h-6 w-px bg-border" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive("bulletList") ? "bg-accent text-accent-foreground" : ""}
-        >
-          <List className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={editor.isActive("orderedList") ? "bg-accent text-accent-foreground" : ""}
-        >
-          <ListOrdered className="h-4 w-4" />
-        </Button>
-        <div className="mx-1 h-6 w-px bg-border" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={openLinkDialog}
-          className={editor.isActive("link") ? "bg-accent text-accent-foreground" : ""}
-          title={t("link")}
-          aria-label={t("link")}
-        >
-          <LinkIcon className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => setPickerOpen(true)}
-          title={t("image")}
-          aria-label={t("image")}
-        >
-          <ImageIcon className="h-4 w-4" />
-        </Button>
-        <div className="mx-1 h-6 w-px bg-border" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().undo()}
-        >
-          <Undo className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().redo()}
-        >
-          <Redo className="h-4 w-4" />
-        </Button>
+      <div
+        role="toolbar"
+        aria-label={t("toolbar")}
+        className="flex flex-wrap items-center gap-1 border-b border-border/50 bg-muted/20 p-2"
+      >
+        {groups.map((group, i) => (
+          <div key={i} className="flex items-center gap-1">
+            {i > 0 && <div aria-hidden className="mx-1 h-6 w-px bg-border" />}
+            {group.map((tool) => (
+              <Button
+                key={tool.label}
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={tool.run}
+                disabled={tool.disabled}
+                aria-label={tool.label}
+                title={tool.label}
+                aria-pressed={tool.active === undefined ? undefined : tool.active}
+                className={tool.active ? "bg-accent text-accent-foreground" : ""}
+              >
+                <tool.icon className="h-4 w-4" />
+              </Button>
+            ))}
+          </div>
+        ))}
       </div>
 
       <MediaPickerDialog

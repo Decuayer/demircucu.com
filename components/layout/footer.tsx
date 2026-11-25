@@ -80,7 +80,7 @@ export default function Footer({ settings, year }: FooterProps) {
             <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
               {t("fastlinks")}
             </h3>
-            <nav className="flex flex-col gap-2">
+            <nav aria-label={t("fastlinks")} className="flex flex-col gap-2">
               {footerLinks.map((link) => (
                 <Link
                   key={link.key}

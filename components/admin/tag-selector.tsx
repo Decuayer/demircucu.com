@@ -112,8 +112,9 @@ export function TagSelector({ options, onOptionsChange, value, onChange }: TagSe
           placeholder={t("searchPlaceholder")}
           aria-label={t("searchPlaceholder")}
         />
-        {(results.length > 0 || offerCreate) && (
-          <CommandList>
+        {/* Always rendered: the input's aria-controls points at the list. */}
+        <CommandList hidden={results.length === 0 && !offerCreate}>
+          {(results.length > 0 || offerCreate) && (
             <CommandGroup>
               {results.map((option) => (
                 <CommandItem key={option.id} value={option.id} onSelect={() => add(option.id)}>
@@ -130,8 +131,8 @@ export function TagSelector({ options, onOptionsChange, value, onChange }: TagSe
                 </CommandItem>
               )}
             </CommandGroup>
-          </CommandList>
-        )}
+          )}
+        </CommandList>
       </Command>
 
       {creating !== null && (

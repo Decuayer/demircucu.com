@@ -128,8 +128,9 @@ export default function BlogFormClient({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("blogTitle")} (TR) *</Label>
+                  <Label htmlFor="blog-field-1">{t("blogTitle")} (TR) *</Label>
                   <Input
+                    id="blog-field-1"
                     value={titleTr}
                     onChange={(e) => setTitleTr(e.target.value)}
                     required
@@ -137,8 +138,9 @@ export default function BlogFormClient({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("blogTitle")} (EN) *</Label>
+                  <Label htmlFor="blog-field-2">{t("blogTitle")} (EN) *</Label>
                   <Input
+                    id="blog-field-2"
                     value={titleEn}
                     onChange={(e) => setTitleEn(e.target.value)}
                     required
@@ -148,8 +150,9 @@ export default function BlogFormClient({
               </div>
 
               <div className="space-y-2">
-                <Label>URL Slug *</Label>
+                <Label htmlFor="blog-field-3">URL Slug *</Label>
                 <Input
+                  id="blog-field-3"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   required
@@ -159,8 +162,9 @@ export default function BlogFormClient({
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("summary")} (TR) *</Label>
+                  <Label htmlFor="blog-field-4">{t("summary")} (TR) *</Label>
                   <Textarea
+                    id="blog-field-4"
                     value={excerptTr}
                     onChange={(e) => setExcerptTr(e.target.value)}
                     required
@@ -169,8 +173,9 @@ export default function BlogFormClient({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("summary")} (EN) *</Label>
+                  <Label htmlFor="blog-field-5">{t("summary")} (EN) *</Label>
                   <Textarea
+                    id="blog-field-5"
                     value={excerptEn}
                     onChange={(e) => setExcerptEn(e.target.value)}
                     required
@@ -196,6 +201,7 @@ export default function BlogFormClient({
             <CardContent>
               <RichTextEditor
                 content={contentTr}
+                label={`${t("contentBlog")} (TR)`}
                 onChange={setContentTr}
                 placeholder={t("blogContentPlaceholder")}
               />
@@ -209,6 +215,7 @@ export default function BlogFormClient({
             <CardContent>
               <RichTextEditor
                 content={contentEn}
+                label={`${t("contentBlog")} (EN)`}
                 onChange={setContentEn}
                 placeholder={t("blogContentPlaceholder")}
               />
@@ -235,12 +242,12 @@ export default function BlogFormClient({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Switch checked={published} onCheckedChange={setPublished} />
-                <Label>{t("published")}</Label>
+                <Switch id="blog-field-6" checked={published} onCheckedChange={setPublished} />
+                <Label htmlFor="blog-field-6">{t("published")}</Label>
               </div>
               <div className="flex items-center space-x-2 pt-2">
-                <Switch checked={featured} onCheckedChange={setFeatured} />
-                <Label>{t("featured")}</Label>
+                <Switch id="blog-field-7" checked={featured} onCheckedChange={setFeatured} />
+                <Label htmlFor="blog-field-7">{t("featured")}</Label>
               </div>
             </CardContent>
           </Card>

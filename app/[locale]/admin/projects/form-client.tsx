@@ -171,8 +171,9 @@ export default function ProjectFormClient({
               </div>
 
               <div className="space-y-2">
-                <Label>{t("slug")} *</Label>
+                <Label htmlFor="project-field-1">{t("slug")} *</Label>
                 <Input
+                  id="project-field-1"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   required
@@ -182,10 +183,11 @@ export default function ProjectFormClient({
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>
+                  <Label htmlFor="project-field-51">
                     {t("summary")} (TR){mark}
                   </Label>
                   <Textarea
+                    id="project-field-51"
                     value={summaryTr}
                     onChange={(e) => setSummaryTr(e.target.value)}
                     required={!isGithub}
@@ -195,10 +197,11 @@ export default function ProjectFormClient({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>
+                  <Label htmlFor="project-field-52">
                     {t("summary")} (EN){mark}
                   </Label>
                   <Textarea
+                    id="project-field-52"
                     value={summaryEn}
                     onChange={(e) => setSummaryEn(e.target.value)}
                     required={!isGithub}
@@ -211,16 +214,18 @@ export default function ProjectFormClient({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>GitHub URL</Label>
+                  <Label htmlFor="project-field-2">GitHub URL</Label>
                   <Input
+                    id="project-field-2"
                     value={githubUrl}
                     onChange={(e) => setGithubUrl(e.target.value)}
                     className="bg-accent/30"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Live URL ({t("liveSite")})</Label>
+                  <Label htmlFor="project-field-3">Live URL ({t("liveSite")})</Label>
                   <Input
+                    id="project-field-3"
                     value={liveUrl}
                     onChange={(e) => setLiveUrl(e.target.value)}
                     className="bg-accent/30"
@@ -242,6 +247,7 @@ export default function ProjectFormClient({
             <CardContent>
               <RichTextEditor
                 content={descriptionTr}
+                label={`${t("description")} (TR)`}
                 onChange={setDescriptionTr}
                 placeholder="Projenizin tüm detaylarını buraya yazabilirsiniz..."
               />
@@ -255,6 +261,7 @@ export default function ProjectFormClient({
             <CardContent>
               <RichTextEditor
                 content={descriptionEn}
+                label={`${t("description")} (EN)`}
                 onChange={setDescriptionEn}
                 placeholder="You can write all project details here..."
               />
@@ -281,12 +288,12 @@ export default function ProjectFormClient({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Switch checked={published} onCheckedChange={setPublished} />
-                <Label>{t("published")}</Label>
+                <Switch id="project-field-4" checked={published} onCheckedChange={setPublished} />
+                <Label htmlFor="project-field-4">{t("published")}</Label>
               </div>
               <div className="flex items-center space-x-2 pt-2">
-                <Switch checked={featured} onCheckedChange={setFeatured} />
-                <Label>{t("featured")}</Label>
+                <Switch id="project-field-5" checked={featured} onCheckedChange={setFeatured} />
+                <Label htmlFor="project-field-5">{t("featured")}</Label>
               </div>
             </CardContent>
           </Card>

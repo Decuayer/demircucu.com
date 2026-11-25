@@ -83,8 +83,7 @@ export function buildSecurityHeaders(
     { key: "X-Frame-Options", value: "DENY" },
     {
       key: "Permissions-Policy",
-      value:
-        "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=(), interest-cohort=()",
+      value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
     },
     { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   ];

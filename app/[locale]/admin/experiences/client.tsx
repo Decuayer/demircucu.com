@@ -2,7 +2,7 @@
 
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, GripVertical, Briefcase } from "lucide-react";
@@ -90,15 +90,18 @@ export default function AdminExperiencesClient({
                   <Badge variant={exp.published ? "default" : "secondary"} className="text-xs">
                     {exp.published ? t("published") : t("unpublished")}
                   </Badge>
-                  <Link href={`/admin/experiences/${exp.id}/edit`}>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                  <Link
+                    href={`/admin/experiences/${exp.id}/edit`}
+                    className={buttonVariants({ variant: "ghost", size: "icon" })}
+                    aria-label={t("edit")}
+                  >
+                    <Pencil className="h-4 w-4" />
                   </Link>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="text-destructive"
+                    aria-label={t("delete")}
                     onClick={() => setDeleteId(exp.id)}
                   >
                     <Trash2 className="h-4 w-4" />

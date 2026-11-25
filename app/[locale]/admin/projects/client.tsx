@@ -21,7 +21,7 @@ import {
   Trash2,
   Wand2,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -37,6 +37,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { GithubIcon } from "@/components/icons";
+import { formatDate } from "@/lib/format-date";
 import { Link } from "@/i18n/navigation";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { deleteProject } from "@/app/actions/admin";
@@ -179,7 +180,7 @@ export default function AdminProjectsClient({ initialProjects, github }: AdminPr
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            {g("policy", { date: new Date(settings.autoPublishAfter).toLocaleDateString(locale) })}
+            {g("policy", { date: formatDate(settings.autoPublishAfter, locale) })}
           </p>
           {github.runs.length > 0 && (
             <details className="text-sm">
@@ -375,10 +376,16 @@ export default function AdminProjectsClient({ initialProjects, github }: AdminPr
                       </Button>
                     </>
                   )}
-                  <Link href={`/admin/projects/${project.id}/edit`}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t("edit")}>
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
+                  <Link
+                    href={`/admin/projects/${project.id}/edit`}
+                    className={buttonVariants({
+                      variant: "ghost",
+                      size: "icon",
+                      className: "h-8 w-8",
+                    })}
+                    aria-label={t("edit")}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
                   </Link>
                   {/* GitHub projects come back on the next sync; they are unpublished instead. */}
                   {!isGithub && (

@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { formatDate } from "@/lib/format-date";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
@@ -28,6 +29,7 @@ interface AdminContactsClientProps {
 
 export default function AdminContactsClient({ initialMessages }: AdminContactsClientProps) {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const errorMessage = useActionErrorMessage();
   const [messages, setMessages] = useState(initialMessages);
   const [isPending, startTransition] = useTransition();
@@ -122,7 +124,12 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
                     </p>
                   </button>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <time>{new Date(msg.createdAt).toLocaleDateString()}</time>
+                    <time>
+                      {formatDate(msg.createdAt, locale, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </time>
                     {msg.read && (
                       <Button
                         variant="ghost"
@@ -138,6 +145,7 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
                       size="icon"
                       className="h-8 w-8 text-destructive"
                       onClick={() => setDeleteId(msg.id)}
+                      aria-label={t("delete")}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
