@@ -6,11 +6,11 @@ Code: `lib/github/*`; routes: `app/api/webhooks/github`, `app/api/cron/github-sy
 
 ## Triggers
 
-| Trigger                    | When                                                                                                                                           | Scope            |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| GitHub App webhook         | push to the default branch, repository created / renamed / archived / made public or private / deleted, repositories added to the installation | that repository  |
-| Admin "Sync now"           | button on `/admin/projects` (all, one repository, or "reprocess README")                                                                       | all or one       |
-| Vercel Cron (Hobby: daily) | `0 3 * * *` UTC, `GET /api/cron/github-sync` with `Authorization: Bearer $CRON_SECRET`                                                         | all (safety net) |
+| Trigger                                      | When                                                                                                                                           | Scope            |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| GitHub App webhook                           | push to the default branch, repository created / renamed / archived / made public or private / deleted, repositories added to the installation | that repository  |
+| Admin "Sync now"                             | button on `/admin/projects` (all, one repository, or "reprocess README")                                                                       | all or one       |
+| Vercel Schedule `github-sync` (Hobby: daily) | `0 3 * * *` UTC (Hobby adds up to 15 min jitter), `GET /api/cron/github-sync` with `Authorization: Bearer $CRON_SECRET`                        | all (safety net) |
 
 The webhook answers immediately (202) and syncs in `after()`. Each run is recorded in
 `GithubSyncRun` (admin "Recent runs"). Only one full run at a time; a run still marked RUNNING
@@ -127,16 +127,16 @@ automatically; the sync reads public repositories only).
 
 Vercel → Project → Settings → Environment Variables, **Production**:
 
-| Variable                     | Value                                                       |
-| ---------------------------- | ----------------------------------------------------------- |
-| `GITHUB_APP_ID`              | App ID                                                      |
-| `GITHUB_APP_PRIVATE_KEY`     | content of the `.pem` (multi-line is fine)                  |
-| `GITHUB_WEBHOOK_SECRET`      | the webhook secret                                          |
-| `CRON_SECRET`                | random value (`openssl rand -hex 32`); Vercel Cron sends it |
-| `GITHUB_APP_INSTALLATION_ID` | optional (looked up from the owner)                         |
+| Variable                     | Value                                                           |
+| ---------------------------- | --------------------------------------------------------------- |
+| `GITHUB_APP_ID`              | App ID                                                          |
+| `GITHUB_APP_PRIVATE_KEY`     | content of the `.pem` (multi-line is fine)                      |
+| `GITHUB_WEBHOOK_SECRET`      | the webhook secret                                              |
+| `CRON_SECRET`                | random value (`openssl rand -hex 32`); Vercel Schedules send it |
+| `GITHUB_APP_INSTALLATION_ID` | optional (looked up from the owner)                             |
 
-Preview / staging: the same App credentials are enough for "Sync now" (no webhook, no cron:
-Vercel runs crons on Production only). Without credentials the sync is anonymous (60 requests per
+Preview / staging: the same App credentials are enough for "Sync now" (no webhook, no schedule:
+static schedules in `vercel.json` start active in Production only). Without credentials the sync is anonymous (60 requests per
 hour), which is enough for a manual run with few changes. Redeploy after adding the variables.
 
 ### 3. First import

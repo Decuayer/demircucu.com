@@ -12,7 +12,7 @@ browser                         server                                   databas
 <Analytics /> ── POST /api/track ──> validate, filter ──> after(): record ──> PageView
    (view, engagement, outbound)       (204 always)                          OutboundClick
                                                                             AnalyticsSalt
-Vercel Cron 00:15 UTC ── GET /api/cron/analytics ──> aggregate finished days ──> DailyStat
+Vercel Schedule 00:15 UTC ── GET /api/cron/analytics ──> aggregate finished days ──> DailyStat
                                                     delete raw > 90 days, old salts
                                                     BlogPost.viewCount += day's views
 /admin, /admin/analytics/* ──> DailyStat (aggregated days) + same aggregation over raw rows
@@ -87,7 +87,7 @@ both paths give identical numbers.
 | `engagement`                                   | `scroll`                                        | measured views / sum of depths (0-100) |
 | `session`                                      | `""` (site only)                                | sessions / total engaged seconds       |
 
-The job (Vercel Cron, `15 0 * * *`):
+The job (Vercel Schedule `analytics`, `15 0 * * *` UTC; on Hobby it starts within 15 minutes):
 
 - Aggregates every finished UTC day after the last aggregated one, in one transaction per day
   behind an advisory lock. Every aggregated day gets a site `total` row, even with zero views, so
