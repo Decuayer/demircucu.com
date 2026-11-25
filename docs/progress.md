@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-26 (Faz 6 kapandı, prod'da doğrulandı; Faz 7 planı onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 7 PR'ı açık, gizlilik metni onayı ve merge bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -17,7 +17,7 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da             | `feat/phase-4-tags`, PR #8                                                      |
 | Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
 | Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14, #15 merge; prod'da doğrulandı      | `feat/phase-6-images-perf`, PR #14; `docs/phase-6-close`, PR #15                |
-| Faz 7: Analitik ve dashboard     | Plan onay bekliyor                                                   | `feat/phase-7-analytics`                                                        |
+| Faz 7: Analitik ve dashboard     | PR açık: gizlilik metni onayı + merge bekliyor                       | `feat/phase-7-analytics`                                                        |
 | Faz 8–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
@@ -211,6 +211,31 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
   görsel yok; README görseli AVIF/WebP + srcset; imzalı upload yetkisi; admin logo akışları imzalı
   upload üzerinden).
 
+### Faz 7 (`feat/phase-7-analytics`)
+
+Kararlar (kullanıcı, 2026-11-26): DNT/GPC gönderen ziyaretçi hiç kaydedilmez; `/privacy` iki dilde,
+footer'da link, metin yayından önce onaylanacak; grafikler shadcn chart (recharts); `isbot` ve
+`ua-parser-js`; özet cron'u 00:15 UTC, mevcut `CRON_SECRET`. Şema değişikliği yok (Faz 3 tabloları
+yeterli), yeni env yok. Ayrıntı: `docs/analytics.md`.
+
+- **Toplama:** `<Analytics />` (layout, Suspense içinde) → `POST /api/track` (view, engagement,
+  outbound). Aynı köken, zod, 4 KB; DNT/GPC, bot (HeadlessChrome dahil), prefetch, admin → 204 ve
+  yazma yok; `after()` içinde rate limit (`track-ip` 60/dk) ve kayıt. Yalnızca yayımlanmış içerik
+  ve bilinen sayfalar sayılır. Ziyaretçi = günlük tuz + IP + UA SHA-256; 30 dk tekilleştirme (dil
+  fark etmez), 30 dk oturum. Proje/canlı/doküman linkleri `data-track` ile.
+- **Özet:** `/api/cron/analytics` (00:15 UTC): biten her gün tek transaction'da `DailyStat`'a
+  (boş gün için de işaret satırı), kaçan günleri tamamlar, idempotent; `BlogPost.viewCount` eski
+  değerinin üzerine günlük artar; 90 günden eski ham satırlar (yalnızca özetlenmiş günler) ve
+  geçmiş günlerin tuzları silinir. Dashboard aynı saf `aggregate()`'i özetlenmemiş günlere uygular.
+- **Dashboard:** `/admin` (tarih aralığı + önceki dönem, KPI'lar, içerik sayıları, son
+  senkron, grafikler, en çok görüntülenenler, kırılımlar, son mesaj/yorum/senkron),
+  `/admin/analytics`, `/admin/analytics/[tür]/[id]`, `/admin/analytics/pages?path=`, CSV
+  (`/api/admin/analytics/export`). Okumalar 1 dk cache, hepsi `requireAdmin`. Mesajlar sayfası:
+  tıklayınca açılır ve okundu olur, dashboard linki mesaja gider (`setContactMessageRead`).
+- **Gizlilik:** `/privacy` (TR/EN, `privacy.*` mesajları), footer linki, sitemap.
+- **Testler:** unit 530, integration 222, E2E 54 (yeni `e2e/analytics.spec.ts` 6 test).
+  Coverage eşikleri yükseldi.
+
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
 | Sapma                                                                   | Gerekçe                                                                            |
@@ -240,6 +265,11 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
 | Kaydırmaya bağlı animasyon Firefox'ta yok                               | Scroll-driven animations desteklenmiyorsa içerik doğrudan görünür                  |
 | `@next/bundle-analyzer` yerine Lighthouse script baytları               | Turbopack'te analizör `next analyze`; yeni bağımlılık gerekmedi                    |
 | `priority` yerine `preload`                                             | Next 16'da `priority` deprecated                                                   |
+| `ua-parser-js` 2.x yerine 1.x (Faz 7)                                   | 2.x AGPL-3.0 lisanslı; 1.x MIT                                                     |
+| `PageView.isBot` yok; botlar hiç yazılmıyor                             | Bot trafiği istenmiyor; Faz 3 şeması bu alanı içermiyor                            |
+| Gün sınırları UTC                                                       | Günlük tuz ve cron UTC; dashboard'da belirtiliyor                                  |
+| Çok günlü tekil ziyaretçi = günlük tekillerin toplamı                   | Ziyaretçi kodu her gün değişiyor (gizlilik); arayüzde "yaklaşık"                   |
+| `viewCount` sıfırlanmıyor, günlük artıyor                               | Analitik öncesi sayaçlar korunuyor                                                 |
 
 ## 4. Ortamlar
 
