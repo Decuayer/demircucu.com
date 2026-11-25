@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { assertPreviewIsolation } from "./lib/env/preview-guard";
 import { buildSecurityHeaders } from "./lib/security/headers";
+import { buildImagesConfig } from "./lib/media/image-config";
 
 // A Preview build configured with production Supabase credentials fails here, before it can
 // prerender pages from (or deploy against) production data.
@@ -35,19 +36,7 @@ const nextConfig: NextConfig = {
       "pdfjs-dist/web/pdf_viewer.mjs": "pdfjs-dist/legacy/web/pdf_viewer.mjs",
     },
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-        pathname: "/storage/v1/object/public/**",
-      },
-      {
-        protocol: "https",
-        hostname: "avatars.githubusercontent.com",
-      },
-    ],
-  },
+  images: buildImagesConfig(process.env.NEXT_PUBLIC_SUPABASE_URL),
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

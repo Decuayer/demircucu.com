@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { attachmentHref, type Attachment } from "@/lib/media/attachments";
 import { uploadToMediaLibrary, type UploadFolder } from "@/lib/media/upload-client";
-import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
 
 interface FileUploaderProps {
   files: Attachment[];
@@ -37,10 +36,6 @@ export function FileUploader({ files, onChange, folder = "general" }: FileUpload
   };
 
   const handleUpload = async (file: File) => {
-    if (file.size > MAX_UPLOAD_BYTES) {
-      toast.error(errorMessage("tooLarge"));
-      return;
-    }
     setIsUploading(true);
     const result = await uploadToMediaLibrary(file, folder);
     setIsUploading(false);

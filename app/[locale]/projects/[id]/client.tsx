@@ -1,8 +1,6 @@
-"use client";
-
+import Image from "next/image";
 import { formatDate } from "@/lib/format-date";
 import { useLocale, useTranslations } from "next-intl";
-import { motion } from "framer-motion";
 import {
   Archive,
   ArrowLeft,
@@ -146,7 +144,7 @@ export default function ProjectDetailClient({
   return (
     <div className="py-16 md:py-24">
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="enter">
           <Link href="/projects">
             <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -158,10 +156,12 @@ export default function ProjectDetailClient({
             <div className="mb-4 flex items-center gap-4">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20">
                 {project.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={project.logoUrl}
                     alt={title}
+                    width={40}
+                    height={40}
+                    loading="eager"
                     className="h-10 w-10 rounded object-contain"
                   />
                 ) : (
@@ -262,7 +262,7 @@ export default function ProjectDetailClient({
           ) : (
             sections[0] && content[sections[0].id]
           )}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

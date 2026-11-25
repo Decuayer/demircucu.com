@@ -1,7 +1,5 @@
-"use client";
-
-import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -101,7 +99,6 @@ import {
   StackOverflowIcon,
 } from "@/components/icons";
 import { getTranslated } from "@/lib/i18n-utils";
-import { useParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import type { PublicSiteSettings } from "@/lib/types/content";
 import type { HobbySetting } from "@/lib/types/content";
@@ -201,8 +198,7 @@ interface AboutClientProps {
 
 export default function AboutClient({ settings, skillForest }: AboutClientProps) {
   const t = useTranslations("about");
-  const params = useParams();
-  const locale = params.locale as string;
+  const locale = useLocale();
 
   const hobbies =
     Array.isArray(settings?.hobbies) && settings.hobbies.length > 0
@@ -224,11 +220,7 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
     <div className="py-16 md:py-24">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
         {/* Page Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-16 text-center"
-        >
+        <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
             className="mb-4 border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-violet-400"
@@ -251,26 +243,26 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
             {getTranslated(settings, "heroSub", locale) ||
               "Yazılım mühendisi olarak modern web teknolojileri ile çalışıyorum."}
           </p>
-        </motion.div>
+        </div>
 
         {/* Bio Section */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-20"
-        >
+        <section className="reveal mb-20">
           <div className="block">
             {/* Photo */}
             <div className="mb-10 flex justify-center md:float-left md:mr-10 md:mb-8 md:block">
               <div className="relative">
-                <div className="flex h-64 w-64 items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20 shadow-2xl md:h-72 md:w-72">
+                <div className="relative flex h-64 w-64 items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20 shadow-2xl md:h-72 md:w-72">
                   {settings?.aboutPhotoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={settings.aboutPhotoUrl}
-                      alt="Profile"
-                      className="h-full w-full object-cover"
+                      alt={t("photoAlt")}
+                      fill
+                      sizes="(min-width: 768px) 288px, 256px"
+                      preload
+                      {...(settings.aboutPhotoBlur
+                        ? { placeholder: "blur" as const, blurDataURL: settings.aboutPhotoBlur }
+                        : {})}
+                      className="object-cover"
                     />
                   ) : (
                     <span className="text-6xl">👨‍💻</span>
@@ -384,15 +376,10 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
               </div>
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* Skills */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-20"
-        >
+        <section className="reveal mb-20">
           <h2 className="mb-8 flex items-center gap-3 text-2xl font-bold">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10">
               <Code2 className="h-5 w-5 text-cyan-400" />
@@ -406,14 +393,10 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
           >
             {t("allSkills")}
           </Link>
-        </motion.section>
+        </section>
 
         {/* Hobbies */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
+        <section className="reveal">
           <h2 className="mb-8 flex items-center gap-3 text-2xl font-bold">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
               <Gamepad2 className="h-5 w-5 text-violet-400" />
@@ -421,17 +404,11 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
             {t("hobbies")}
           </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-            {hobbies.map((hobby, i) => {
+            {hobbies.map((hobby) => {
               const IconComponent = hobby.icon ? ICONS[hobby.icon] : undefined;
 
               return (
-                <motion.div
-                  key={hobby.name}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                >
+                <div key={hobby.name} className="reveal enter-scale">
                   <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card">
                     <CardContent className="flex h-full flex-col items-center justify-center space-y-3 p-6 text-center">
                       <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10 transition-transform group-hover:scale-110">
@@ -445,11 +422,11 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                       <p className="line-clamp-2 text-xs text-muted-foreground">{hobby.desc}</p>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               );
             })}
           </div>
-        </motion.section>
+        </section>
       </div>
     </div>
   );

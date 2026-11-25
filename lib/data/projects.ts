@@ -1,6 +1,7 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { optimizeImagesIn } from "@/lib/data/html-images";
 import { CacheTags } from "@/lib/cache/tags";
 import { sanitizeOptionalHtml } from "@/lib/sanitize/html";
 import { presentProject, publicProjectQuery } from "@/lib/data/present";
@@ -44,6 +45,7 @@ export interface GalleryImage {
   src: string;
   width: number | null;
   height: number | null;
+  blurDataUrl: string | null;
   alt: string;
 }
 
@@ -75,7 +77,14 @@ async function loadProjectPage(where: { slug: string }) {
   const files = paths.length
     ? await prisma.mediaFile.findMany({
         where: { path: { in: paths } },
-        select: { path: true, width: true, height: true, altEn: true, name: true },
+        select: {
+          path: true,
+          width: true,
+          height: true,
+          blurDataUrl: true,
+          altEn: true,
+          name: true,
+        },
       })
     : [];
   const byPath = new Map(files.map((f) => [f.path, f]));
@@ -83,16 +92,26 @@ async function loadProjectPage(where: { slug: string }) {
     const file = byPath.get(path);
     const src = mediaUrl(path);
     return file && src
-      ? [{ src, width: file.width, height: file.height, alt: file.altEn ?? file.name }]
+      ? [
+          {
+            src,
+            width: file.width,
+            height: file.height,
+            blurDataUrl: file.blurDataUrl,
+            alt: file.altEn ?? file.name,
+          },
+        ]
       : [];
   });
 
   const project = presentProject(rest);
   return {
     ...project,
-    descriptionTr: sanitizeOptionalHtml(project.descriptionTr),
-    descriptionEn: sanitizeOptionalHtml(project.descriptionEn),
-    readmeHtml,
+    ...(await optimizeImagesIn({
+      descriptionTr: sanitizeOptionalHtml(project.descriptionTr),
+      descriptionEn: sanitizeOptionalHtml(project.descriptionEn),
+      readmeHtml,
+    })),
     documents: documents.map((d): ProjectDocumentView => ({
       id: d.id,
       title: d.title,

@@ -3,6 +3,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { CacheTags } from "@/lib/cache/tags";
 import { sanitizeOptionalHtml } from "@/lib/sanitize/html";
+import { optimizeImagesIn } from "@/lib/data/html-images";
 import { presentExperience, publicExperienceQuery } from "@/lib/data/present";
 
 export async function getPublishedExperiences() {
@@ -26,13 +27,14 @@ export async function getPublishedExperience(id: string) {
     where: { id, published: true },
   });
   const experience = row && presentExperience(row);
-  return (
-    experience && {
-      ...experience,
+  if (!experience) return null;
+  return {
+    ...experience,
+    ...(await optimizeImagesIn({
       detailsTr: sanitizeOptionalHtml(experience.detailsTr),
       detailsEn: sanitizeOptionalHtml(experience.detailsEn),
-    }
-  );
+    })),
+  };
 }
 
 export async function getPublishedExperienceIds(): Promise<string[]> {

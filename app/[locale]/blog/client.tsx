@@ -3,7 +3,6 @@
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,17 +15,12 @@ import { TagChips } from "@/components/tags/tag-chips";
 
 type BlogPostWithTags = PublicPost;
 
-function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
+function PostCard({ post }: { post: BlogPostWithTags }) {
   const params = useParams();
   const locale = params.locale as string;
   const content = getTranslated(post, "content", locale);
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.1 }}
-    >
+    <div className="reveal">
       <Card className="group relative h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
         <CardContent className="space-y-4 p-6">
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -58,7 +52,7 @@ function PostCard({ post, index }: { post: BlogPostWithTags; index: number }) {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 
@@ -79,11 +73,7 @@ export default function BlogClient({ posts, filter }: BlogClientProps) {
     <div className="py-16 md:py-24">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
         {/* Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-16 text-center"
-        >
+        <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
             className="mb-4 border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-cyan-400"
@@ -92,7 +82,7 @@ export default function BlogClient({ posts, filter }: BlogClientProps) {
             {t("title")}
           </Badge>
           <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
-        </motion.div>
+        </div>
 
         {filter}
 
@@ -111,16 +101,16 @@ export default function BlogClient({ posts, filter }: BlogClientProps) {
 
           <TabsContent value="latest">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {latest.map((post, i) => (
-                <PostCard key={post.id} post={post} index={i} />
+              {latest.map((post) => (
+                <PostCard key={post.id} post={post} />
               ))}
             </div>
           </TabsContent>
 
           <TabsContent value="popular">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {mostRead.map((post, i) => (
-                <PostCard key={post.id} post={post} index={i} />
+              {mostRead.map((post) => (
+                <PostCard key={post.id} post={post} />
               ))}
             </div>
           </TabsContent>

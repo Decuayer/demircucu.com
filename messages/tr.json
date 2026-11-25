@@ -46,6 +46,7 @@
     "readMore": "Devamını Oku"
   },
   "about": {
+    "photoAlt": "Profil fotoğrafı",
     "title": "Hakkımda",
     "bio": "Biyografi",
     "hobbies": "Hobiler",
@@ -299,7 +300,6 @@
     "deleting": "Siliniyor...",
     "deleteConfirmation": "Bu proje veritabanından kalıcı olarak silinecektir. Bu işlem geri alınamaz.",
     "confirmDelete": "Emin misiniz?",
-    "fileSizeLimit": "Dosya boyutu 4MB'dan küçük olmalıdır.",
     "fileUploaded": "Dosya başarıyla yüklendi.",
     "uploadFailed": "Yükleme başarısız.",
     "fileDeleted": "Dosya başarıyla silindi.",
@@ -499,9 +499,9 @@
     "imageUploaded": "Görsel yüklendi.",
     "fileUploaded": "Dosya yüklendi.",
     "imageDropHint": "Görsel yüklemek için tıklayın veya sürükleyin",
-    "imageTypes": "PNG, JPG, GIF, WEBP, AVIF (en fazla 4 MB)",
+    "imageTypes": "PNG, JPG, GIF, WEBP, AVIF (en fazla 10 MB)",
     "fileDropHint": "Dosya seçmek için tıklayın",
-    "fileTypes": "PNG, JPG, GIF, WEBP, AVIF, ICO, PDF (en fazla 4 MB)",
+    "fileTypes": "PNG, JPG, GIF, WEBP, AVIF, ICO (en fazla 10 MB), PDF (en fazla 25 MB)",
     "previewAlt": "Yüklenen görselin önizlemesi",
     "remove": "Kaldır",
     "uploadTab": "Dosya yükle",
@@ -604,5 +604,21 @@
     "posts": "Blog yazıları",
     "breadcrumb": "Üst kategoriler",
     "metaDescription": "{name}: {projects} proje, {experiences} deneyim ve {posts} blog yazısında kullanıldı."
+  },
+  "editor": {
+    "placeholder": "İçeriğinizi buraya yazın...",
+    "paragraph": "Paragraf",
+    "link": "Bağlantı",
+    "linkUrl": "Bağlantı adresi",
+    "linkHint": "Boş bırakırsanız bağlantı kaldırılır.",
+    "apply": "Uygula",
+    "image": "Medya kütüphanesinden görsel ekle"
+  },
+  "mediaPicker": {
+    "title": "Görsel seç",
+    "search": "Ada göre ara",
+    "upload": "Yeni görsel yükle",
+    "empty": "Görsel bulunamadı.",
+    "insert": "{name} görselini ekle"
   }
 }

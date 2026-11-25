@@ -8,8 +8,11 @@ import { ADMIN, adminClient, clearRateLimits, sql } from "./helpers/supabase";
  * refuses to delete the file while the project uses it.
  */
 
-/** Smallest valid 1x1 PNG, generated so no binary fixture is committed. */
-function onePixelPng(): Buffer {
+/**
+ * Smallest valid 1x1 PNG, generated so no binary fixture is committed. Each test passes its own
+ * colour: uploads are deduplicated by content, and the tests must not share one file.
+ */
+function onePixelPng(rgb: [number, number, number]): Buffer {
   const crcTable = Array.from({ length: 256 }, (_, n) => {
     let c = n;
     for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
@@ -35,7 +38,7 @@ function onePixelPng(): Buffer {
   return Buffer.concat([
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
     chunk("IHDR", header),
-    chunk("IDAT", deflateSync(Buffer.from([0, 0x7c, 0x3a, 0xed, 0xff]))),
+    chunk("IDAT", deflateSync(Buffer.from([0, ...rgb, 0xff]))),
     chunk("IEND", Buffer.alloc(0)),
   ]);
 }
@@ -69,9 +72,11 @@ test("uploaded logo is stored as a path, rendered publicly and protected from de
     // Wait for hydration: a change event on the server-rendered input would be lost.
     await page.waitForLoadState("networkidle");
     const upload = page.waitForResponse((r) => r.url().endsWith("/api/upload"));
-    await page
-      .locator('input[type=file][accept="image/*"]')
-      .setInputFiles({ name: "logo.png", mimeType: "image/png", buffer: onePixelPng() });
+    await page.locator('input[type=file][accept="image/*"]').setInputFiles({
+      name: "logo.png",
+      mimeType: "image/png",
+      buffer: onePixelPng([0x7c, 0x3a, 0xed]),
+    });
     expect((await upload).status()).toBe(200);
     await expect(page.getByRole("img", { name: "Yüklenen görselin önizlemesi" })).toBeVisible();
     await page.locator("form button[type=submit]").click();
@@ -82,14 +87,14 @@ test("uploaded logo is stored as a path, rendered publicly and protected from de
       [project!.id],
     );
     uploadedPath = row?.logoPath ?? undefined;
-    expect(uploadedPath).toMatch(/^projects\/[0-9a-f-]{36}\.png$/);
+    expect(uploadedPath).toMatch(/^projects\/[0-9a-f]{64}\.png$/);
 
     await expect
       .poll(
         async () => {
           await page.goto(`/tr/projects/${slug}`);
           return page
-            .locator(`main img[src$="${uploadedPath}"]`)
+            .locator(`main img[src*="${encodeURIComponent(uploadedPath!)}"]`)
             .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)
             .catch(() => false);
         },
@@ -144,9 +149,11 @@ test("experience logo uploaded in admin is shown on the list and detail pages", 
     await page.goto(`/tr/admin/experiences/${experience!.id}/edit`);
     await page.waitForLoadState("networkidle");
     const upload = page.waitForResponse((r) => r.url().endsWith("/api/upload"));
-    await page
-      .locator('input[type=file][accept="image/*"]')
-      .setInputFiles({ name: "logo.png", mimeType: "image/png", buffer: onePixelPng() });
+    await page.locator('input[type=file][accept="image/*"]').setInputFiles({
+      name: "logo.png",
+      mimeType: "image/png",
+      buffer: onePixelPng([0x22, 0xc5, 0x5e]),
+    });
     expect((await upload).status()).toBe(200);
     await expect(page.getByRole("img", { name: "Yüklenen görselin önizlemesi" })).toBeVisible();
     await page.locator("form button[type=submit]").click();
@@ -157,7 +164,7 @@ test("experience logo uploaded in admin is shown on the list and detail pages", 
       [experience!.id],
     );
     uploadedPath = row?.logoPath ?? undefined;
-    expect(uploadedPath).toMatch(/^experiences\/[0-9a-f-]{36}\.png$/);
+    expect(uploadedPath).toMatch(/^experiences\/[0-9a-f]{64}\.png$/);
 
     for (const path of ["/tr/experience", `/tr/experience/${experience!.id}`]) {
       await expect
@@ -165,7 +172,7 @@ test("experience logo uploaded in admin is shown on the list and detail pages", 
           async () => {
             await page.goto(path);
             return page
-              .locator(`main img[src$="${uploadedPath}"]`)
+              .locator(`main img[src*="${encodeURIComponent(uploadedPath!)}"]`)
               .first()
               .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)
               .catch(() => false);

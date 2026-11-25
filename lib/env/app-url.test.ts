@@ -38,6 +38,12 @@ describe("getAppUrl", () => {
     ).toBe("https://www.demircucu.com");
   });
 
+  it("upgrades an http NEXT_PUBLIC_APP_URL to https on Vercel", () => {
+    const env = { NEXT_PUBLIC_APP_URL: "http://www.example.com", VERCEL_ENV: "production" };
+    expect(getAppUrl(env).toString()).toBe("https://www.example.com/");
+    expect(getAppUrl({ NEXT_PUBLIC_APP_URL: "http://localhost:3000" }).protocol).toBe("http:");
+  });
+
   it("ignores a blank NEXT_PUBLIC_APP_URL", () => {
     expect(getAppUrl({ NEXT_PUBLIC_APP_URL: "  ", VERCEL_URL: "x.vercel.app" }).origin).toBe(
       "https://x.vercel.app",

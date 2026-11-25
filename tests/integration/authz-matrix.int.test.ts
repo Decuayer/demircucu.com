@@ -14,7 +14,6 @@ const settings = await import("@/app/actions/settings");
 const media = await import("@/app/actions/media");
 const tags = await import("@/app/actions/tags");
 const adminData = await import("@/lib/data/admin");
-const mediaData = await import("@/lib/data/media");
 
 type Role = "anonymous" | "USER" | "ADMIN";
 
@@ -196,18 +195,6 @@ const ADMIN_ACTIONS: ActionCase[] = [
     run: async () => tags.deleteTag(await tagId("unused")),
     state: () => prisma.tag.count(),
   },
-  {
-    name: "saveMediaFile (upload route)",
-    run: () =>
-      mediaData.saveMediaFile({
-        name: "x.png",
-        type: "image/png",
-        size: 1,
-        bucket: "media",
-        path: "general/y.png",
-      }),
-    state: () => prisma.mediaFile.count(),
-  },
 ];
 
 /** Admin reads must reject non-admins too (drafts and messages are private). */
@@ -292,6 +279,15 @@ describe("error responses", () => {
   beforeEach(async () => {
     await resetDatabase();
     await seed(prisma);
+  });
+
+  it("lists library images only for admins", async () => {
+    await setRole("anonymous");
+    expect(await media.listLibraryImages()).toEqual({ error: "unauthenticated" });
+    await setRole("USER");
+    expect(await media.listLibraryImages()).toEqual({ error: "forbidden" });
+    await setRole("ADMIN");
+    expect(await media.listLibraryImages()).toMatchObject({ success: true, images: [] });
   });
 
   it("returns codes, never internal messages", async () => {

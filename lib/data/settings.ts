@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { CacheTags } from "@/lib/cache/tags";
 import { sanitizeOptionalHtml } from "@/lib/sanitize/html";
 import { mediaUrl } from "@/lib/media/url";
+import { optimizeImagesIn } from "@/lib/data/html-images";
 
 /**
  * Site settings for public pages. Cached across requests and invalidated by
@@ -16,16 +17,22 @@ export async function getSiteSettings() {
   "use cache: remote";
   cacheTag(CacheTags.settings);
   cacheLife("hours");
-  const settings = await prisma.siteSettings.findUnique({ where: { id: "main" } });
-  return (
-    settings && {
-      ...settings,
-      aboutPhotoUrl: mediaUrl(settings.aboutPhotoPath),
-      faviconUrl: mediaUrl(settings.faviconPath),
+  const row = await prisma.siteSettings.findUnique({
+    where: { id: "main" },
+    include: { aboutPhotoMedia: { select: { blurDataUrl: true } } },
+  });
+  if (!row) return null;
+  const { aboutPhotoMedia, ...settings } = row;
+  return {
+    ...settings,
+    aboutPhotoUrl: mediaUrl(settings.aboutPhotoPath),
+    aboutPhotoBlur: aboutPhotoMedia?.blurDataUrl ?? null,
+    faviconUrl: mediaUrl(settings.faviconPath),
+    ...(await optimizeImagesIn({
       aboutBioTr: sanitizeOptionalHtml(settings.aboutBioTr),
       aboutBioEn: sanitizeOptionalHtml(settings.aboutBioEn),
-    }
-  );
+    })),
+  };
 }
 
 export type PublicSiteSettings = NonNullable<Awaited<ReturnType<typeof getSiteSettings>>>;

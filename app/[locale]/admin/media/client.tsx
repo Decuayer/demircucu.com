@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import { useState, useRef, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,10 +21,9 @@ import {
   Eraser,
 } from "lucide-react";
 import { toast } from "sonner";
-import { getErrorMessage } from "@/lib/errors";
 import type { AdminMediaItem } from "@/lib/data/admin";
 import { mediaUrl } from "@/lib/media/url";
-import { MAX_UPLOAD_BYTES } from "@/lib/upload/policy";
+import { uploadToMediaLibrary } from "@/lib/media/upload-client";
 import { deleteMediaFile } from "@/app/actions/media";
 import { deleteUnusedGithubMedia } from "@/app/actions/github";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -81,48 +80,27 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
   const handleUpload = async (file: File) => {
     if (!file) return;
 
-    if (file.size > MAX_UPLOAD_BYTES) {
-      toast.error(t("fileSizeLimit"));
+    setIsUploading(true);
+    const result = await uploadToMediaLibrary(file, "media-library");
+    setIsUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (!result.ok) {
+      toast.error(errorMessage(result.error));
       return;
     }
-
-    try {
-      setIsUploading(true);
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", "media-library");
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setFiles((prev) => [
-          {
-            ...data.file,
-            source: "UPLOAD",
-            repoFullName: null,
-            originUrl: null,
-            width: null,
-            height: null,
-            usageCount: 0,
-            usedIn: [],
-          },
-          ...prev,
-        ]);
-        toast.success(t("fileUploaded"));
-      } else {
-        throw new Error(data.error ? errorMessage(data.error) : t("uploadFailed"));
-      }
-    } catch (error) {
-      toast.error(getErrorMessage(error));
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+    setFiles((prev) => [
+      {
+        ...result.file,
+        createdAt: new Date(result.file.createdAt),
+        source: "UPLOAD",
+        repoFullName: null,
+        originUrl: null,
+        usageCount: 0,
+        usedIn: [],
+      },
+      ...prev.filter((f) => f.id !== result.file.id),
+    ]);
+    toast.success(t("fileUploaded"));
   };
 
   // Handle file deletion
@@ -173,14 +151,10 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
     <div className="space-y-6">
       {/* Header & Controls */}
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 text-2xl font-bold"
-        >
+        <h1 className="enter flex items-center gap-3 text-2xl font-bold">
           <ImageIcon className="h-6 w-6 text-violet-400" />
           {t("mediaLibrary")}
-        </motion.h1>
+        </h1>
 
         <div className="flex w-full items-center gap-3 md:w-auto">
           <div className="relative flex-1 md:w-64">
@@ -296,11 +270,10 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       ) : (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {filteredFiles.map((file, i) => (
-            <motion.div
+            <div
               key={file.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.05 }}
+              className="enter enter-scale"
+              style={{ "--enter-delay": `${i * 50}ms` } as React.CSSProperties}
             >
               <Card
                 className="group cursor-pointer overflow-hidden border-border/50 bg-card/50 transition-colors hover:border-violet-500/50"
@@ -308,12 +281,16 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
               >
                 <div className="relative flex aspect-square items-center justify-center bg-accent/20 p-2">
                   {file.type.startsWith("image/") ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={mediaUrl(file.path) ?? undefined}
-                      alt={file.name}
-                      className="h-full w-full rounded-md object-cover"
-                    />
+                    <span className="relative block h-full w-full">
+                      <Image
+                        src={mediaUrl(file.path) ?? ""}
+                        alt={file.name}
+                        fill
+                        sizes="(min-width: 1024px) 200px, 45vw"
+                        unoptimized={file.path.endsWith(".ico")}
+                        className="rounded-md object-cover"
+                      />
+                    </span>
                   ) : (
                     <FileIcon className="h-12 w-12 text-cyan-400 opacity-80" />
                   )}
@@ -339,7 +316,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}
@@ -354,12 +331,16 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
             <div className="grid grid-cols-1 gap-6 py-4 md:grid-cols-2">
               <div className="flex min-h-[200px] items-center justify-center rounded-xl border border-border/50 bg-accent/20 p-4">
                 {selectedFile.type.startsWith("image/") ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={mediaUrl(selectedFile.path) ?? undefined}
-                    alt={selectedFile.name}
-                    className="max-h-[300px] max-w-full rounded-md object-contain"
-                  />
+                  <span className="relative block h-[300px] w-full">
+                    <Image
+                      src={mediaUrl(selectedFile.path) ?? ""}
+                      alt={selectedFile.name}
+                      fill
+                      sizes="320px"
+                      unoptimized={selectedFile.path.endsWith(".ico")}
+                      className="rounded-md object-contain"
+                    />
+                  </span>
                 ) : (
                   <FileIcon className="h-24 w-24 text-cyan-400" />
                 )}

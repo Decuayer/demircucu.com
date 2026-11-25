@@ -3,7 +3,6 @@
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import type { PublicSiteSettings } from "@/lib/types/content";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -101,11 +100,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
     <div className="py-16 md:py-24">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
         {/* Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-16 text-center"
-        >
+        <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
             className="mb-4 border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-violet-400"
@@ -114,16 +109,11 @@ export default function ContactClient({ settings }: ContactClientProps) {
             {t("title")}
           </Badge>
           <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
           {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="lg:col-span-3"
-          >
+          <div className="reveal enter-from-left lg:col-span-3">
             <Card className="border-border/50 bg-card/50">
               <CardContent className="p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -201,15 +191,10 @@ export default function ContactClient({ settings }: ContactClientProps) {
                 </form>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
           {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="space-y-6 lg:col-span-2"
-          >
+          <div className="reveal enter-from-right space-y-6 lg:col-span-2">
             {/* Info Cards */}
             <Card className="border-border/50 bg-card/50">
               <CardContent className="space-y-6 p-6">
@@ -261,7 +246,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                 </CardContent>
               </Card>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

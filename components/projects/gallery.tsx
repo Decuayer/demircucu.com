@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,17 +27,18 @@ export function ProjectGallery({ images }: { images: GalleryImage[] }) {
             className="group overflow-hidden rounded-lg border border-border/50 bg-muted/30"
             aria-label={t("open", { name: image.alt })}
           >
-            {/* Mirrored files in our bucket; sizes come from the sync. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={image.src}
-              alt={image.alt}
-              width={image.width ?? undefined}
-              height={image.height ?? undefined}
-              loading="lazy"
-              decoding="async"
-              className="aspect-video h-auto w-full object-cover transition-transform group-hover:scale-105"
-            />
+            <span className="relative block aspect-video">
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                sizes="(min-width: 640px) 33vw, 50vw"
+                {...(image.blurDataUrl
+                  ? { placeholder: "blur" as const, blurDataURL: image.blurDataUrl }
+                  : {})}
+                className="object-cover transition-transform group-hover:scale-105"
+              />
+            </span>
           </button>
         ))}
       </div>
@@ -51,12 +53,26 @@ export function ProjectGallery({ images }: { images: GalleryImage[] }) {
           <DialogTitle className="sr-only">{current?.alt ?? t("title")}</DialogTitle>
           {current && (
             <div className="relative flex items-center justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={current.src}
-                alt={current.alt}
-                className="max-h-[85vh] w-auto object-contain"
-              />
+              {current.width && current.height ? (
+                <Image
+                  src={current.src}
+                  alt={current.alt}
+                  width={current.width}
+                  height={current.height}
+                  sizes="(min-width: 1024px) 1024px, 95vw"
+                  className="max-h-[85vh] w-auto object-contain"
+                />
+              ) : (
+                <span className="relative block aspect-video w-[90vw] max-w-5xl">
+                  <Image
+                    src={current.src}
+                    alt={current.alt}
+                    fill
+                    sizes="95vw"
+                    className="object-contain"
+                  />
+                </span>
+              )}
               {images.length > 1 && (
                 <>
                   <Button

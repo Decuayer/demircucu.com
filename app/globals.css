@@ -382,3 +382,47 @@
   max-width: 100%;
   height: auto;
 }
+
+/*
+ * Entrance animations without JavaScript (replaces framer-motion on public pages).
+ * `.enter`: plays once on load, staggered with `--enter-delay`. `.reveal`: plays as the element
+ * scrolls into view (scroll-driven animations); browsers without them show it immediately.
+ * Content is fully visible with reduced motion or when animations are unsupported.
+ */
+@keyframes enter {
+  from {
+    opacity: 0;
+    translate: var(--enter-x, 0) var(--enter-y, 20px);
+    scale: var(--enter-scale, 1);
+  }
+}
+
+.enter-from-left {
+  --enter-x: -30px;
+  --enter-y: 0;
+}
+
+.enter-from-right {
+  --enter-x: 30px;
+  --enter-y: 0;
+}
+
+.enter-scale {
+  --enter-scale: 0.9;
+  --enter-y: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .enter {
+    animation: enter 0.5s ease-out both;
+    animation-delay: var(--enter-delay, 0ms);
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: enter linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}

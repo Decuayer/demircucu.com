@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-25 (Faz 5 kapandı; Faz 6 onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-25 (Faz 6 PR'ı açık; merge sonrası manuel adımlar bölüm 8'de). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -16,7 +16,8 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod      | `feat/phase-3-*`                                                                |
 | Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da             | `feat/phase-4-tags`, PR #8                                                      |
 | Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
-| Faz 6–10                         | Başlamadı                                                            | —                                                                               |
+| Faz 6: Görsel ve performans      | **PR açık**: merge, backfill ve prod ölçümü bekliyor                 | `feat/phase-6-images-perf`                                                      |
+| Faz 7–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
 
@@ -171,6 +172,36 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
   testten yalnızca `admin-media` deneyim logosu testi bir kez 15 sn sınırını aştı (Faz 4'ten beri
   bilinen yük kaynaklı zaman aşımı).
 
+### Faz 6 (görsel ve performans)
+
+Ölçüm ve önce/sonra tablosu: `docs/performance-report.md`.
+
+- **Ölçüm (önce, prod):** en kötü sayfalar Hakkımda 66 (3,9 MB ham foto, LCP 24 sn), Deneyim 62
+  ve proje detay 55 (framer-motion `opacity: 0` → render gecikmesi 16–18 sn). Kırık görsel: yalnızca
+  CSP'ye takılan GitHub workflow badge'i. Ek bulgu: sitemap `http://` basıyor (Vercel
+  `NEXT_PUBLIC_APP_URL`).
+- **Upload:** imzalı doğrudan yükleme (`/api/upload/sign` → tarayıcı `incoming/<uuid>`'e koyar →
+  `/api/upload` doğrular). `lib/media/ingest.ts`: sharp (EXIF/GPS her zaman silinir, en uzun kenar
+  2400 px), `width/height/blurDataUrl`, `<folder>/<sha256>.<ext>`, aynı içerik aynı `MediaFile`.
+  Limit görsel 10 MB, PDF 25 MB. Görsel işleme mirror ile ortak (`lib/media/image.ts`).
+- **next/image:** `lib/media/image-config.ts` (yalnızca proje bucket path'i + GitHub avatar, AVIF/WebP,
+  `qualities: [75]`, 31 gün TTL, yerel Supabase için `dangerouslyAllowLocalIP`). Logolar, profil
+  fotoğrafı (`preload`, blur), galeri, admin medya ve önizlemeler. HTML içi görseller (README, blog,
+  bio, açıklamalar) `lib/media/html-images.ts` ile `width/height` + optimizer `srcset` + lazy.
+- **Editör:** `window.prompt` yerine medya kütüphanesi seçici (ara, yeni yükle) ve link diyaloğu;
+  metinler i18n.
+- **Render / bundle:** framer-motion kaldırıldı, CSS `.enter` / `.reveal` (scroll-driven), reduced
+  motion'da kapalı. Ana sayfa, Hakkımda, deneyim ve proje detay server component. Font `swap`, mono
+  preload yok.
+- **Diğer:** CSP `img-src` `https://github.com` (workflow badge); `getAppUrl` Vercel'de `http`
+  değerini `https`'e yükseltir.
+- **Script'ler:** `scripts/check-media.ts` (salt okunur rapor, kırıkta çıkış 1),
+  `scripts/backfill-media-meta.ts` (Faz 6 öncesi yüklemelere boyut + blur; varsayılan dry-run,
+  `--apply`, idempotent; dosyalara dokunmaz). Yerelde dry-run → apply → tekrar 0 doğrulandı.
+- **Testler:** unit 440, integration 187, E2E 49 (yeni: tüm sitemap'te kırık/optimize edilmemiş
+  görsel yok; README görseli AVIF/WebP + srcset; imzalı upload yetkisi; admin logo akışları imzalı
+  upload üzerinden).
+
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
 | Sapma                                                                   | Gerekçe                                                                            |
@@ -182,7 +213,7 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
 | `npm audit` bulguları kabul edildi                                      | Sadece dev/build zamanı; `docs/security-review.md`                                 |
 | Vercel bölgesi `icn1` (kalıcı)                                          | Production DB Seul'de kalıyor; Frankfurt taşıması iptal                            |
 | CSP nonce'suz (`'unsafe-inline'` script), SRI kısmi                     | PPR ile nonce mümkün değil; Next 16.4.6 SRI bazı chunk'larda `integrity` eklemiyor |
-| Upload limiti 5 MB yerine 4 MB                                          | Vercel fonksiyon gövde limiti 4,5 MB                                               |
+| Upload limiti 5 MB yerine görsel 10 MB, PDF 25 MB (Faz 6)               | İmzalı doğrudan upload; limitler onaylı mirror limitleriyle aynı                   |
 | Bilinmeyen slug'da ilk istek soft 404 (200 + noindex)                   | Partial Prefetching'in fallback shell'i; kullanıcı kabul etti, testli              |
 | `aliases String[]` yerine `TagAlias` tablosu                            | Alias benzersizliği DB'de garanti                                                  |
 | `githubRepoId` `BigInt`                                                 | GitHub repo id'leri int32 sınırına yaklaşıyor                                      |
@@ -194,6 +225,12 @@ yoksa GitHub açıklaması; `UnmappedTopic` silindi; eşlemeyi kullanıcı çal�
 | `revalidateTag("skills")` yerine `tags`                                 | Faz 4'te etiket cache tag'i `tags` olarak adlandırıldı                             |
 | SVG mirror'da PNG'ye çevriliyor                                         | Public bucket'tan SVG servis etmek script riski taşır                              |
 | README'deki tek başına `user-attachments` URL'i link olarak kalıyor     | GitHub bunu video gömmesi olarak gösterir; video oynatıcı yok                      |
+| WebP/AVIF varyantı saklanmıyor                                          | `next/image` optimizer istek başına üretir ve önbelleğe alır; tek orijinal yeter   |
+| En uzun kenar 2560 yerine 2400 px                                       | Mirror ile aynı sabit (`MAX_IMAGE_EDGE`)                                           |
+| `LazyMotion`/`m` yerine framer-motion tamamen kaldırıldı                | Kullanım yalnızca giriş animasyonuydu; CSS ile JS'siz                              |
+| Kaydırmaya bağlı animasyon Firefox'ta yok                               | Scroll-driven animations desteklenmiyorsa içerik doğrudan görünür                  |
+| `@next/bundle-analyzer` yerine Lighthouse script baytları               | Turbopack'te analizör `next analyze`; yeni bağımlılık gerekmedi                    |
+| `priority` yerine `preload`                                             | Next 16'da `priority` deprecated                                                   |
 
 ## 4. Ortamlar
 
@@ -289,6 +326,11 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Kullanıcının bekleyen manuel adımları
 
+- **Faz 6:** Vercel Production `NEXT_PUBLIC_APP_URL` → `https://www.demircucu.com` (şu an `http://`);
+  merge sonrası prod'da `check-media.ts` (salt okunur) ve `backfill-media-meta.ts` dry-run, çıktı
+  onayından sonra `--apply` (yalnızca `MediaFile.width/height/blurDataUrl`); admin'den bir görsel
+  yükleyip imzalı upload'u doğrulama.
+
 - Admin "Etiketler"de taşıma sonrası düzeltmeler (isteğe bağlı): `swfit` → "Swift"; `git-github`
   → `git`'e birleştir; Numpy / Tensorflow'u AI altına taşı ve yazımını düzelt; gerrit, linux
   (kernel), matter, ocpp, qt creator adları küçük harfli ve kategorisiz.
@@ -312,11 +354,13 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 6:** imzalı doğrudan storage upload (4 MB sınırını kaldırmak için); README görselleri
-  için `next/image` / blur placeholder kullanımı (`MediaFile.blurDataUrl` hazır).
+- **Faz 6 sonrası:** prod "sonra" Lighthouse ölçümü `docs/performance-report.md` bölüm 4'e.
 - **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
 
 ### Bilinen riskler
+
+- Vercel Hobby'de görsel optimizasyonunun aylık kotası var. Path'ler değişmediği ve TTL 31 gün
+  olduğu için kullanım düşük; Vercel Usage sayfasından izlenmeli.
 
 - `next start` altında `updateTag` sonrası ilk istek build-time prerender'ı dönebiliyor (yalnızca
   yerel). Vercel'de tag yayılımı ~2–3 sn; `"use cache: remote"` + 5 sn sonra ikinci geçersizleştirme

@@ -46,7 +46,11 @@ const BADGE_HOSTS = new Set([
 ]);
 
 /** Origins the CSP `img-src` allows for badges (lib/security/headers.ts). */
-export const BADGE_IMAGE_ORIGINS = [...BADGE_HOSTS].map((host) => `https://${host}`);
+export const BADGE_IMAGE_ORIGINS = [
+  ...[...BADGE_HOSTS].map((host) => `https://${host}`),
+  // Workflow status badges (isBadge below) are served by github.com itself.
+  "https://github.com",
+];
 
 const ATTACHMENT_HOSTS = new Set([
   "user-images.githubusercontent.com",
