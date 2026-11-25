@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-26 (Faz 7 kapandı, prod'da doğrulandı; Faz 8 planı onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 8A denetim raporu hazır; rapor ve tasarım yönü onay bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -18,7 +18,7 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
 | Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14, #15 merge; prod'da doğrulandı      | `feat/phase-6-images-perf`, PR #14; `docs/phase-6-close`, PR #15                |
 | Faz 7: Analitik ve dashboard     | **Kapandı** (2026-11-26): PR #16, #17 merge; prod'da doğrulandı      | `feat/phase-7-analytics`, `chore/vercel-schedules`                              |
-| Faz 8: Tasarım denetimi          | Plan onay bekliyor                                                   | `feat/phase-8-design`                                                           |
+| Faz 8: Tasarım denetimi          | 8A rapor hazır (`docs/design-audit.md`), onay bekliyor               | `feat/phase-8-design`                                                           |
 | Faz 9–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
@@ -246,6 +246,18 @@ yeterli), yeni env yok. Ayrıntı: `docs/analytics.md`.
   dashboard'a geliyor; Schedules'ta `github-sync` ve `analytics` active.
 - **Testler:** unit 530, integration 222, E2E 54 (yeni `e2e/analytics.spec.ts` 6 test).
   Coverage eşikleri yükseldi.
+
+### Faz 8A (`feat/phase-8-design`)
+
+Kararlar (kullanıcı, 2026-11-26): public sayfalar prod'dan, admin/auth/profil yerel E2E
+build'inden; `@axe-core/playwright` dev bağımlılığı; ekran görüntüleri gitignore'daki
+`audit-screenshots/` (+ yerel `index.html` galeri), kritik birkaç görsel `docs/design-audit/`.
+
+- **Araç:** `playwright.audit.config.ts` + `audit/` (54 sayfa × 1440/768/375; axe WCAG 2.2 AA,
+  konsol, taşma, görsel, başlık, klavye focus, EN'de Türkçe metin, küçük dokunma hedefi),
+  `scripts/design-audit-gallery.ts`. Sitenin koduna dokunulmadı.
+- **Rapor:** `docs/design-audit.md` (12 öne çıkan bulgu, site geneli, sayfa bazında, 2.3 durumu,
+  içerik notları, tasarım yönü önerisi, 10 karar sorusu).
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
