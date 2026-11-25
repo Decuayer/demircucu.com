@@ -12,14 +12,19 @@ import Footer from "@/components/layout/footer";
 import { getCurrentYear, getSiteSettings } from "@/lib/data/settings";
 import { getAppUrl } from "@/lib/env/app-url";
 
+// latin-ext carries the Turkish letters (ğ, ş, ı, İ). Swap: text shows in the fallback font
+// until Geist arrives. Mono appears only in code blocks, so it is not preloaded.
 const geistSans = Geist({
   variable: "--font-sans",
   subsets: ["latin", "latin-ext"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin", "latin-ext"],
+  display: "swap",
+  preload: false,
 });
 
 export function generateStaticParams() {

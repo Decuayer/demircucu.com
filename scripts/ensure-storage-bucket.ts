@@ -1,7 +1,7 @@
 /**
  * Aligns the public `media` bucket with the upload policy as a second layer: Storage itself
- * rejects other MIME types and files above 25 MB (the GitHub PDF mirror limit; admin uploads
- * stay at 4 MB in the upload route).
+ * rejects other MIME types and files above 25 MB (PDF limit of uploads and the GitHub mirror;
+ * images are capped at 10 MB by app/api/upload).
  *   (set -a; . ./.env.staging.local; set +a; npx tsx scripts/ensure-storage-bucket.ts)
  *
  * Dry-run by default: reports the bucket settings, the planned change and every existing object
