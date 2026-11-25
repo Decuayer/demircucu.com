@@ -14,6 +14,9 @@ const settings = await import("@/app/actions/settings");
 const media = await import("@/app/actions/media");
 const tags = await import("@/app/actions/tags");
 const adminData = await import("@/lib/data/admin");
+const analytics = await import("@/lib/analytics/queries");
+const { parseRange } = await import("@/lib/analytics/range");
+const range = parseRange({ range: "7d" }, new Date());
 
 type Role = "anonymous" | "USER" | "ADMIN";
 
@@ -137,6 +140,20 @@ const ADMIN_ACTIONS: ActionCase[] = [
     state: () => prisma.contactMessage.count(),
   },
   {
+    name: "setContactMessageRead",
+    prepare: async () => {
+      await prisma.contactMessage.create({
+        data: { name: "a", email: "a@example.test", message: "m" },
+      });
+    },
+    run: async () =>
+      admin.setContactMessageRead({
+        id: (await prisma.contactMessage.findFirstOrThrow()).id,
+        read: true,
+      }),
+    state: () => prisma.contactMessage.findFirst(),
+  },
+  {
     name: "updateSiteSettings",
     run: () => settings.updateSiteSettings({ heroTitleEn: "Hacked" }),
     state: () => prisma.siteSettings.findUnique({ where: { id: "main" } }),
@@ -213,6 +230,13 @@ const ADMIN_READS: { name: string; run: () => Promise<unknown> }[] = [
   { name: "adminGetSiteSettings", run: () => adminData.adminGetSiteSettings() },
   { name: "adminListTags", run: () => adminData.adminListTags() },
   { name: "adminListTagOptions", run: () => adminData.adminListTagOptions() },
+  { name: "getDashboard", run: () => analytics.getDashboard(range, "tr") },
+  { name: "getAnalyticsOverview", run: () => analytics.getAnalyticsOverview(range, "tr") },
+  {
+    name: "getEntityAnalytics",
+    run: async () =>
+      analytics.getEntityAnalytics("PROJECT", (await sampleProject()).id, range, "tr"),
+  },
 ];
 
 async function setRole(role: Role): Promise<void> {
