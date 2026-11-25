@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-26 (Faz 7 PR'ı açık, gizlilik metni onayı ve merge bekliyor). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 7 PR #16 açık; gizlilik metni onaylandı, merge bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -17,7 +17,7 @@ dosyada veya ortamda olduklarını belirtir.
 | Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da             | `feat/phase-4-tags`, PR #8                                                      |
 | Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
 | Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14, #15 merge; prod'da doğrulandı      | `feat/phase-6-images-perf`, PR #14; `docs/phase-6-close`, PR #15                |
-| Faz 7: Analitik ve dashboard     | PR açık: gizlilik metni onayı + merge bekliyor                       | `feat/phase-7-analytics`                                                        |
+| Faz 7: Analitik ve dashboard     | PR #16 açık, merge bekliyor (gizlilik metni onaylı)                  | `feat/phase-7-analytics`                                                        |
 | Faz 8–10                         | Başlamadı                                                            | —                                                                               |
 
 ## 2. Tamamlanan işler
@@ -232,7 +232,9 @@ yeterli), yeni env yok. Ayrıntı: `docs/analytics.md`.
   `/admin/analytics`, `/admin/analytics/[tür]/[id]`, `/admin/analytics/pages?path=`, CSV
   (`/api/admin/analytics/export`). Okumalar 1 dk cache, hepsi `requireAdmin`. Mesajlar sayfası:
   tıklayınca açılır ve okundu olur, dashboard linki mesaja gider (`setContactMessageRead`).
-- **Gizlilik:** `/privacy` (TR/EN, `privacy.*` mesajları), footer linki, sitemap.
+- **Gizlilik:** `/privacy` (TR/EN, `privacy.*` mesajları), footer linki, sitemap. Metni kullanıcı
+  onayladı (2026-11-26): veri sorumlusu Demir Cücü, yurt dışında işleme (Vercel ABD, Supabase Seul),
+  NEXT_LOCALE yalnızca dil tercihi için zorunlu çerez. `ua-parser-js` 1.x onaylı.
 - **Testler:** unit 530, integration 222, E2E 54 (yeni `e2e/analytics.spec.ts` 6 test).
   Coverage eşikleri yükseldi.
 
@@ -388,7 +390,8 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; **Faz 9:** coverage.
+- **Faz 8:** hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i; admin paneli mobilde
+  menüsüz (kenar menüsü `md` altında gizli, mobil gezinme yok; Faz 7'de fark edildi); **Faz 9:** coverage.
 
 ### Bilinen riskler
 

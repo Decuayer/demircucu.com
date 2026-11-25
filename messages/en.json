@@ -735,6 +735,11 @@
     "description": "What data demircucu.com collects, why, and for how long.",
     "updated": "Last updated: 26 November 2026",
     "intro": "This page explains which data is processed when you visit demircucu.com. The site is a personal portfolio and blog; it shows no ads, sells no data and uses no third-party analytics or tracking services.",
+    "controller": {
+      "title": "Data controller",
+      "body": "The data controller for personal data on this site is Demir Cücü. For questions about this policy or your data, use the form on the contact page.",
+      "items": []
+    },
     "analytics": {
       "title": "Visit statistics",
       "body": "To see which pages are read, visits are counted on our own server without cookies. No cookie or similar identifier is stored in your browser. When you open a page, the following is recorded:",
@@ -754,8 +759,11 @@
     },
     "cookies": {
       "title": "Cookies",
-      "body": "Visit statistics use no cookies. The site uses only these necessary cookies: NEXT_LOCALE, which remembers the language you chose (it holds only \"tr\" or \"en\"), and, if you sign in, the session cookies that keep you signed in.",
-      "items": []
+      "body": "Visit statistics use no cookies. The site uses only these cookies, which are necessary for it to work:",
+      "items": [
+        "NEXT_LOCALE: a necessary cookie used only to remember your language preference (\"tr\" or \"en\"); it holds nothing else and is not used for tracking.",
+        "Session cookies: only if you sign in, to keep you signed in."
+      ]
     },
     "retention": {
       "title": "Retention",
@@ -768,8 +776,8 @@
       "items": []
     },
     "processors": {
-      "title": "Service providers",
-      "body": "The site runs on Vercel; the database, sign-in and files are stored with Supabase in the South Korea (Seoul) region. These providers process the data only to provide the service.",
+      "title": "Service providers and international transfer",
+      "body": "Your data is processed and stored outside Türkiye. The site runs on the infrastructure of Vercel Inc., based in the United States; the database, sign-in and files are stored with Supabase in the Seoul region of South Korea. These providers process the data only to provide the service.",
       "items": []
     },
     "rights": {

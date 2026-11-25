@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { getPathname } from "@/i18n/navigation";
 
 const SECTIONS = [
+  "controller",
   "analytics",
   "notCollected",
   "cookies",

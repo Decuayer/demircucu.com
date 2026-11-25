@@ -152,4 +152,6 @@ test("the privacy policy is linked from the footer in both languages", async ({ 
   await page.goto("/en/privacy");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Privacy Policy");
   await expect(page.getByText("Do Not Track (DNT)")).toBeVisible();
+  await expect(page.getByText(/data controller .* is Demir Cücü/)).toBeVisible();
+  await expect(page.getByText(/outside Türkiye/)).toBeVisible();
 });

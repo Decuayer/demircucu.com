@@ -735,6 +735,11 @@
     "description": "demircucu.com'un hangi verileri neden topladığı ve ne kadar sakladığı.",
     "updated": "Son güncelleme: 26 Kasım 2026",
     "intro": "Bu sayfa, demircucu.com'u ziyaret ettiğinizde hangi verilerin işlendiğini açıklar. Site kişisel bir portfolyo ve blogdur; reklam göstermez, verileri satmaz ve üçüncü taraf analitik ya da takip servisi kullanmaz.",
+    "controller": {
+      "title": "Veri sorumlusu",
+      "body": "Bu sitedeki kişisel verilerin veri sorumlusu Demir Cücü'dür. Bu politika veya verileriniz hakkındaki sorularınız için iletişim sayfasındaki formu kullanabilirsiniz.",
+      "items": []
+    },
     "analytics": {
       "title": "Ziyaret istatistikleri",
       "body": "Hangi sayfaların okunduğunu görmek için kendi sunucumuzda çerezsiz bir sayım yapılır. Tarayıcınıza çerez veya benzeri bir tanımlayıcı yazılmaz. Bir sayfayı açtığınızda şu bilgiler kaydedilir:",
@@ -754,8 +759,11 @@
     },
     "cookies": {
       "title": "Çerezler",
-      "body": "Ziyaret istatistikleri çerez kullanmaz. Site yalnızca şu zorunlu çerezleri kullanır: seçtiğiniz dili hatırlayan NEXT_LOCALE (yalnızca \"tr\" veya \"en\" değerini taşır) ve giriş yaptıysanız oturumunuzu açık tutan oturum çerezleri.",
-      "items": []
+      "body": "Ziyaret istatistikleri çerez kullanmaz. Site yalnızca sitenin çalışması için zorunlu olan şu çerezleri kullanır:",
+      "items": [
+        "NEXT_LOCALE: yalnızca dil tercihinizi (\"tr\" veya \"en\") hatırlamak için kullanılan zorunlu bir çerezdir; başka bilgi taşımaz ve takip amacıyla kullanılmaz.",
+        "Oturum çerezleri: yalnızca giriş yaptıysanız, oturumunuzu açık tutmak için kullanılır."
+      ]
     },
     "retention": {
       "title": "Saklama süresi",
@@ -768,8 +776,8 @@
       "items": []
     },
     "processors": {
-      "title": "Hizmet sağlayıcılar",
-      "body": "Site Vercel üzerinde çalışır; veritabanı, oturum yönetimi ve dosyalar Supabase'te, Güney Kore (Seul) bölgesinde tutulur. Bu sağlayıcılar verileri yalnızca hizmeti sunmak için işler.",
+      "title": "Hizmet sağlayıcılar ve yurt dışına aktarım",
+      "body": "Verileriniz Türkiye dışında işlenir ve saklanır. Site, merkezi Amerika Birleşik Devletleri'nde bulunan Vercel Inc. altyapısında çalışır; veritabanı, oturum yönetimi ve dosyalar Supabase'te, Güney Kore'nin Seul bölgesinde tutulur. Bu sağlayıcılar verileri yalnızca hizmeti sunmak için işler.",
       "items": []
     },
     "rights": {
