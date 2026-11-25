@@ -33,7 +33,8 @@
     "save": "Save",
     "name": "Full Name",
     "email": "E-mail",
-    "switchLanguage": "Türkçe'ye geç"
+    "switchLanguage": "Türkçe'ye geç",
+    "privacy": "Privacy"
   },
   "home": {
     "heroTitle": "Hello, I am",
@@ -445,7 +446,10 @@
       "moveUp": "Move up",
       "moveDown": "Move down",
       "overrideHint": "This project is synced from {repo}. Empty title and summary fields show the repository name and description; fields you fill in are never changed by the sync."
-    }
+    },
+    "analytics": "Analytics",
+    "unread": "Unread",
+    "markUnread": "Mark as unread"
   },
   "common": {
     "loading": "Loading...",
@@ -620,5 +624,158 @@
     "upload": "Upload a new image",
     "empty": "No images found.",
     "insert": "Insert {name}"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "rangeSummary": "{from} – {to} (UTC days)",
+    "range": {
+      "today": "Today",
+      "7d": "7 days",
+      "30d": "30 days",
+      "90d": "90 days",
+      "12m": "12 months",
+      "custom": "Custom",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply"
+    },
+    "comparedToPrevious": "Compared to the previous period",
+    "noComparison": "new",
+    "noData": "No data in this range.",
+    "visitorsShort": "{count} vis.",
+    "views": "Views",
+    "visitors": "Unique visitors",
+    "previousViews": "Previous period",
+    "previousValue": "Previous period: {value}",
+    "visitorsApprox": "Sum of daily uniques (approximate)",
+    "avgSession": "Avg. session duration",
+    "avgEngaged": "Avg. time on page",
+    "avgReading": "Avg. reading time",
+    "avgScroll": "Avg. scroll depth",
+    "outboundClicks": "Outbound clicks",
+    "direct": "Direct / internal",
+    "unknown": "Unknown",
+    "entry": "Entry page (first page of the session)",
+    "device": {
+      "DESKTOP": "Desktop",
+      "MOBILE": "Mobile",
+      "TABLET": "Tablet",
+      "OTHER": "Other"
+    },
+    "language": {
+      "tr": "Turkish",
+      "en": "English"
+    },
+    "outbound": {
+      "title": "Outbound link clicks",
+      "GITHUB": "GitHub",
+      "LIVE": "Live site",
+      "DOCUMENT": "Document",
+      "OTHER": "Other"
+    },
+    "types": {
+      "HOME": "Home page",
+      "PAGE": "Pages",
+      "PROJECT": "Projects",
+      "BLOG": "Blog",
+      "EXPERIENCE": "Experience",
+      "SKILL": "Skills"
+    },
+    "referrers": "Referrers",
+    "countries": "Countries",
+    "devices": "Devices",
+    "browsers": "Browsers",
+    "systems": "Operating systems",
+    "languages": "Language",
+    "campaigns": "Campaigns (utm_source)",
+    "viewsOverTime": "Daily views",
+    "byType": "By content type",
+    "topContent": "Most viewed",
+    "allContent": "All content",
+    "allAnalytics": "All analytics",
+    "traffic": "Traffic",
+    "contentSummary": "Content",
+    "publishedProjects": "Published projects",
+    "publishedPosts": "Published posts",
+    "publishedExperiences": "Published experience",
+    "skills": "Skills",
+    "comments": "Comments",
+    "likes": "Likes",
+    "unreadMessages": "Unread messages",
+    "lastSync": "Last GitHub sync",
+    "never": "None yet",
+    "syncLog": "Sync log",
+    "sync": {
+      "OK": "Succeeded",
+      "PARTIAL": "Partial",
+      "ERROR": "Failed",
+      "RUNNING": "Running",
+      "allRepos": "All repositories",
+      "trigger": {
+        "CRON": "Scheduled",
+        "WEBHOOK": "Webhook",
+        "MANUAL": "Manual"
+      }
+    },
+    "noMessages": "No messages yet.",
+    "noComments": "No comments yet.",
+    "unread": "Unread",
+    "hidden": "Hidden",
+    "exportCsv": "Download CSV",
+    "likesInRange": "Likes in range",
+    "commentsInRange": "Comments in range",
+    "allTime": "All time: {value}",
+    "cameFrom": "Previous page",
+    "fromSkills": "From skill pages",
+    "contentSkills": "Skills of this content",
+    "footnote": "Days are UTC. Visitor ids change every day, so over several days unique visitors is the sum of daily uniques. Visitors sending Do Not Track / Global Privacy Control, bots and admin sessions are not counted."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "description": "What data demircucu.com collects, why, and for how long.",
+    "updated": "Last updated: 26 November 2026",
+    "intro": "This page explains which data is processed when you visit demircucu.com. The site is a personal portfolio and blog; it shows no ads, sells no data and uses no third-party analytics or tracking services.",
+    "analytics": {
+      "title": "Visit statistics",
+      "body": "To see which pages are read, visits are counted on our own server without cookies. No cookie or similar identifier is stored in your browser. When you open a page, the following is recorded:",
+      "items": [
+        "The address of the page and the site language (Turkish / English)",
+        "The domain of the site that referred you (for example google.com, not the full address) and utm campaign parameters if the link has them",
+        "Country (a country code the hosting provider derives from your IP address; the IP address itself is not stored)",
+        "Device type and the names of your browser and operating system (from the User-Agent your browser sends)",
+        "Time spent on the page, how far it was scrolled, and clicks on external links on project pages",
+        "A daily visitor code: your IP address and User-Agent are hashed one way (SHA-256) together with a random value that exists for that day only. The random value is deleted when the day ends, so the code does not identify you and visits on different days cannot be linked."
+      ]
+    },
+    "notCollected": {
+      "title": "What is not recorded",
+      "body": "If your browser sends a Do Not Track (DNT) or Global Privacy Control (GPC) signal, your visit is not recorded at all. Search engine bots and similar automated clients are not counted either.",
+      "items": []
+    },
+    "cookies": {
+      "title": "Cookies",
+      "body": "Visit statistics use no cookies. The site uses only these necessary cookies: NEXT_LOCALE, which remembers the language you chose (it holds only \"tr\" or \"en\"), and, if you sign in, the session cookies that keep you signed in.",
+      "items": []
+    },
+    "retention": {
+      "title": "Retention",
+      "body": "Individual page views are kept for 90 days and then deleted. Daily totals derived from them (for example how often a post was read on a day) are kept indefinitely; these totals contain no personal information.",
+      "items": []
+    },
+    "accounts": {
+      "title": "Accounts, comments and the contact form",
+      "body": "If you create an account, your e-mail address and name, your comments and your likes are stored. The name, e-mail address and message you send through the contact form are stored so that you can be answered.",
+      "items": []
+    },
+    "processors": {
+      "title": "Service providers",
+      "body": "The site runs on Vercel; the database, sign-in and files are stored with Supabase in the South Korea (Seoul) region. These providers process the data only to provide the service.",
+      "items": []
+    },
+    "rights": {
+      "title": "Your rights",
+      "body": "To exercise your rights under the KVKK and the GDPR (access, correction, deletion of your data) or to ask about this policy, use the form on the contact page. Visit statistics do not identify you and therefore cannot be traced to one person; account and message data is deleted on request.",
+      "items": []
+    }
   }
 }
