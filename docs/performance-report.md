@@ -33,8 +33,13 @@ Sitemap'teki 107 sayfa (TR + EN) Playwright ile sonuna kadar kaydırılarak tara
 | Sitemap, canonical ve e-posta linkleri `http://` (Vercel'de `NEXT_PUBLIC_APP_URL`)                     | Kodda `https`'e yükseltiliyor; env de düzeltilmeli |
 | 4xx/5xx görsel yanıtı                                                                                  | Yok                                                |
 
-DB tarafı: `scripts/check-media.ts` (salt okunur). Production çıktısı kullanıcı çalıştırınca
-buraya eklenecek.
+DB tarafı (`scripts/check-media.ts`, salt okunur, 2026-11-25): 21 medya dosyası, 4 referans,
+HTML'de 28 görsel (21 dış badge); kırık yok. 8 eski yüklemede boyut/blur yoktu,
+`backfill-media-meta.ts --apply` ile dolduruldu (dry-run sonrası, kullanıcı çalıştırdı). İki büyük
+orijinal (3,9 MB profil fotoğrafı, 1,4 MB README görseli) yerinde; optimizer küçültülmüş kopya
+servis ediyor.
+
+Sonra (prod, merge sonrası): 107 sayfa, 28 görsel; kırık görsel, 4xx yanıt ve konsol hatası yok.
 
 ## 3. Önce / sonra: aynı yerel veri, production build
 
@@ -58,9 +63,18 @@ Bundle: Lighthouse'un ölçtüğü script aktarımı sayfa başına 28–59 KB a
 dört sayfa server component). Turbopack'te `@next/bundle-analyzer` yerine `npx next analyze
 --output` kullanılır (Next 16.1+); ayrıntılı modül grafiği gerekirse oradan alınır.
 
-## 4. Sonra: production
+## 4. Sonra: production (2026-11-25, `main` @ 04854ed, backfill sonrası)
 
-Merge ve `backfill-media-meta --apply` sonrası aynı sayfalar ölçülecek ve bu bölüme yazılacak.
+| Sayfa                         | Perf     | LCP           | SI            | JS     | Görsel         | Toplam          |
+| ----------------------------- | -------- | ------------- | ------------- | ------ | -------------- | --------------- |
+| `/tr`                         | 87 → 99  | 3,9 → 1,3 sn  | 2,8 → 3,0 sn  | 298 KB | 0              | 498 → 454 KB    |
+| `/tr/about`                   | 66 → 100 | 24,1 → 1,7 sn | 8,2 → 1,6 sn  | 268 KB | 3,9 MB → 30 KB | 4,4 MB → 420 KB |
+| `/tr/projects`                | 90 → 100 | 3,5 → 1,2 sn  | 2,4 → 1,4 sn  | 291 KB | 0              | 498 → 448 KB    |
+| `/tr/experience`              | 62 → 99  | 9,1 → 1,7 sn  | 22,6 → 2,2 sn | 278 KB | 2 KB           | 552 → 425 KB    |
+| `/tr/blog`                    | 85 → 100 | 4,2 → 1,3 sn  | 3,1 → 1,3 sn  | 280 KB | 0              | 498 → 404 KB    |
+| `/tr/projects/aegis-dispatch` | 55 → 99  | 10,9 → 1,6 sn | 22,0 → 1,9 sn | 290 KB | 371 KB → 16 KB | 939 → 517 KB    |
+
+TBT 0 ms, CLS ~0,001 (önce de iyiydi). A11y 87–91 ve SEO 100 değişmedi; a11y Faz 8/9 kapsamında.
 
 ## 5. Yapılanlar (özet)
 
