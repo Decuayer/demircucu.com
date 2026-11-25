@@ -1,5 +1,7 @@
 "use client";
 
+// Before pdf.js: built-ins it calls without polyfilling (Safari lacks async-iterable streams).
+import "@/lib/pdf/polyfills.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Document, Page, pdfjs } from "react-pdf";
@@ -16,6 +18,7 @@ import {
   ZoomOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ViewerBoundary } from "./viewer-boundary";
 
 // Same origin (scripts/copy-pdfjs-assets.mjs): CSP allows workers and fetches from 'self' only.
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.mjs";
@@ -78,6 +81,15 @@ export default function PdfViewer({ url, title }: { url: string; title: string }
   const go = (delta: number) => setPage((p) => Math.min(Math.max(1, p + delta), pages || 1));
   const zoom = (factor: number) =>
     setScale((s) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.round(s * factor * 100) / 100)));
+
+  const failure = (
+    <p className="p-6 text-center text-sm text-muted-foreground">
+      {t("failed")}{" "}
+      <a href={url} className="underline" target="_blank" rel="noopener noreferrer">
+        {t("download")}
+      </a>
+    </p>
+  );
 
   return (
     <div
@@ -159,30 +171,27 @@ export default function PdfViewer({ url, title }: { url: string; title: string }
         aria-label={title}
       >
         {failed ? (
-          <p className="p-6 text-center text-sm text-muted-foreground">
-            {t("failed")}{" "}
-            <a href={url} className="underline" target="_blank" rel="noopener noreferrer">
-              {t("download")}
-            </a>
-          </p>
+          failure
         ) : (
-          <Document
-            file={url}
-            options={options}
-            onLoadSuccess={({ numPages }) => {
-              setPages(numPages);
-              setPage(1);
-            }}
-            onLoadError={() => setFailed(true)}
-            loading={
-              <div className="flex justify-center p-10">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            }
-            className="flex justify-center"
-          >
-            <Page pageNumber={page} width={width} scale={scale} className="shadow-md" />
-          </Document>
+          <ViewerBoundary key={url} fallback={failure}>
+            <Document
+              file={url}
+              options={options}
+              onLoadSuccess={({ numPages }) => {
+                setPages(numPages);
+                setPage(1);
+              }}
+              onLoadError={() => setFailed(true)}
+              loading={
+                <div className="flex justify-center p-10">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              }
+              className="flex justify-center"
+            >
+              <Page pageNumber={page} width={width} scale={scale} className="shadow-md" />
+            </Document>
+          </ViewerBoundary>
         )}
       </div>
     </div>
