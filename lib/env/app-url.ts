@@ -18,7 +18,15 @@ function withHttps(host: string): string {
  */
 export function getAppUrl(env: Record<string, string | undefined> = process.env): URL {
   const explicit = env.NEXT_PUBLIC_APP_URL?.trim();
-  if (explicit) return new URL(explicit);
+  if (explicit) {
+    const url = new URL(explicit);
+    // Vercel serves only HTTPS; an "http://" value would put insecure URLs into the sitemap,
+    // canonical links and auth e-mails.
+    if (env.VERCEL_ENV && url.protocol === "http:" && url.hostname !== "localhost") {
+      url.protocol = "https:";
+    }
+    return url;
+  }
 
   if (env.VERCEL_ENV === "preview") {
     const host = env.VERCEL_BRANCH_URL || env.VERCEL_URL;
