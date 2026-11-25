@@ -8,19 +8,29 @@ const E2E_DATABASE_URL =
   process.env.E2E_DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 
 /**
- * Secret key of the local Supabase stack for the server's Storage uploads. `next start` reads
- * server-only variables at runtime, so the value used for the build is not enough.
+ * Local Supabase stack for the server started below. `next start` reads server-only variables
+ * and `next.config.ts` (the image optimizer's allowed Storage host) at runtime, so the values used
+ * for the build are not enough. Without the URL, `/_next/image` rejects every media image (400)
+ * wherever no `.env.local` provides it, as in CI.
  */
-function localSecretKey(): string | undefined {
-  if (process.env.E2E_BASE_URL) return undefined;
-  if (process.env.SUPABASE_TEST_SECRET_KEY) return process.env.SUPABASE_TEST_SECRET_KEY;
+function localSupabase(): { url?: string; secretKey?: string } {
+  if (process.env.E2E_BASE_URL) return {};
+  if (process.env.SUPABASE_TEST_SECRET_KEY) {
+    return {
+      url: process.env.SUPABASE_TEST_URL ?? "http://127.0.0.1:54321",
+      secretKey: process.env.SUPABASE_TEST_SECRET_KEY,
+    };
+  }
   try {
     const out = execFileSync("npx", ["supabase", "status", "-o", "json"], { encoding: "utf8" });
-    return (JSON.parse(out.slice(out.indexOf("{"))) as Record<string, string>).SECRET_KEY;
+    const status = JSON.parse(out.slice(out.indexOf("{"))) as Record<string, string>;
+    return { url: status.API_URL, secretKey: status.SECRET_KEY };
   } catch {
-    return undefined;
+    return {};
   }
 }
+
+const supabase = localSupabase();
 
 /**
  * Expects the local Supabase stack (`npm run supabase:start`, migrated and seeded) and a
@@ -62,7 +72,8 @@ export default defineConfig({
           NEXT_PUBLIC_APP_URL: BASE_URL,
           // Like Vercel: the server renders in UTC while browsers use their own time zone.
           TZ: "UTC",
-          SUPABASE_SERVICE_ROLE_KEY: localSecretKey() ?? "",
+          NEXT_PUBLIC_SUPABASE_URL: supabase.url ?? "",
+          SUPABASE_SERVICE_ROLE_KEY: supabase.secretKey ?? "",
         },
       },
 });
