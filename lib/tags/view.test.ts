@@ -16,6 +16,7 @@ const tag = (over: Partial<Tag>): Tag => ({
   descriptionEn: null,
   order: 0,
   hidden: false,
+  featured: false,
   createdAt: new Date(0),
   updatedAt: new Date(0),
   ...over,
