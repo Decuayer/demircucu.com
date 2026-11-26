@@ -823,5 +823,11 @@
   },
   "cv": {
     "download": "CV indir"
+  },
+  "theme": {
+    "label": "Tema",
+    "light": "Açık",
+    "dark": "Koyu",
+    "system": "Sistem"
   }
 }

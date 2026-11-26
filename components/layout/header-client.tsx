@@ -7,6 +7,7 @@ import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const navLinks = [
   { href: "/", key: "home" },
@@ -118,13 +119,11 @@ export default function HeaderClient({ desktopAuth, mobileAuth }: HeaderClientPr
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
-              demircucu
-            </span>
+            <span className="text-foreground">demircucu</span>
             <span className="text-sm font-normal text-muted-foreground">.com</span>
           </Link>
 
-          <nav aria-label={t("mainNav")} className="hidden items-center gap-1 md:flex">
+          <nav aria-label={t("mainNav")} className="hidden items-center gap-1 lg:flex">
             <Nav variant="desktop" />
           </nav>
 
@@ -132,6 +131,7 @@ export default function HeaderClient({ desktopAuth, mobileAuth }: HeaderClientPr
             <Suspense fallback={<LocaleSwitchButton />}>
               <ActiveLocaleSwitch />
             </Suspense>
+            <ThemeToggle />
 
             {desktopAuth}
 
@@ -141,7 +141,7 @@ export default function HeaderClient({ desktopAuth, mobileAuth }: HeaderClientPr
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="md:hidden"
+                    className="lg:hidden"
                     aria-label={t("openMenu")}
                   />
                 }
@@ -151,9 +151,7 @@ export default function HeaderClient({ desktopAuth, mobileAuth }: HeaderClientPr
               <SheetContent side="right" className="w-[280px] p-0">
                 <div className="flex h-full flex-col">
                   <div className="border-b border-border p-6">
-                    <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-lg font-bold text-transparent">
-                      demircucu.com
-                    </span>
+                    <span className="text-lg font-bold">demircucu.com</span>
                   </div>
                   <nav aria-label={t("mainNav")} className="flex flex-1 flex-col gap-1 p-4">
                     <Nav variant="mobile" onNavigate={close} />
