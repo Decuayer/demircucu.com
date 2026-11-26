@@ -2,8 +2,10 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cvUrlFor } from "@/lib/cv";
 import {
+  Download,
   MapPin,
   Calendar,
   Camera,
@@ -198,7 +200,9 @@ interface AboutClientProps {
 
 export default function AboutClient({ settings, skillForest }: AboutClientProps) {
   const t = useTranslations("about");
+  const tCv = useTranslations("cv");
   const locale = useLocale();
+  const cvUrl = cvUrlFor(settings, locale);
 
   const hobbies =
     Array.isArray(settings?.hobbies) && settings.hobbies.length > 0
@@ -298,6 +302,21 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
               </div>
 
               <div className="mt-6 flex flex-wrap gap-3">
+                {cvUrl && (
+                  <a
+                    href={cvUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-track="document"
+                    className={buttonVariants({
+                      variant: "outline",
+                      className:
+                        "border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5",
+                    })}
+                  >
+                    <Download aria-hidden className="mr-2 h-4 w-4" /> {tCv("download")}
+                  </a>
+                )}
                 {settings?.socialGithub && (
                   <a href={settings.socialGithub} target="_blank" rel="noopener noreferrer">
                     <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white shadow-lg shadow-violet-500/20 hover:from-violet-700 hover:to-cyan-700">

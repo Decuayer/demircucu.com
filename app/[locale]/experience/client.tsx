@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Briefcase, ArrowRight, Calendar } from "lucide-react";
+import { Briefcase, ArrowRight, Calendar, MapPin } from "lucide-react";
 import { getTranslated } from "@/lib/i18n-utils";
 
 import type { PublicExperience } from "@/lib/types/content";
@@ -70,6 +70,16 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
                       {exp.endDate ? monthYear(exp.endDate) : t("present")}
                     </span>
                   </div>
+                  {(exp.locationTr || exp.locationEn) && (
+                    <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground md:justify-end">
+                      <MapPin aria-hidden className="h-4 w-4" />
+                      <span>
+                        {(locale === "en" ? exp.locationEn : exp.locationTr) ||
+                          exp.locationTr ||
+                          exp.locationEn}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Card */}

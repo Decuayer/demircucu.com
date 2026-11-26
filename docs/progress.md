@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-26 (Faz 8B başladı: PR 1 erişilebilirlik ve hata sayfaları). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 8B: PR #19 merge; CV + konum migration'ı prod'da, arayüz PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -275,6 +275,13 @@ sayfaları.
   `[locale]/loading`; admin tarihlerinde hydration hatası (`formatDate`, sabit saat dilimi);
   `Permissions-Policy`'den tanınmayan iki özellik; TipTap çift `link` eklentisi. Yerel denetimde
   düzeltilen kurallar 0'a indi (`button-name` 281 → 0, `label` 72 → 0, hydration #418 9 → 0).
+  PR #18 ve #19 merge (2026-11-26); prod public sayfalarda `link-name` 66 → 0, `button-name` 24 → 2
+  (PDF indirme düğmesi, PR 2'de düzeltildi), `Permissions-Policy` uyarıları 150 → 0.
+- **PR 2 (`feat/phase-8-cv-location`):** migration `20261127090000_phase8_cv_location`
+  (`SiteSettings.cvPathTr/cvPathEn` → `MediaFile.path` FK Restrict, `Experience.locationTr/En`).
+  Kullanıcı iki CV alanını onayladı (EN yoksa TR, TR yoksa EN). Admin Ayarlar → Hakkımda'da PDF
+  yükleme (`PdfUpload`), yalnızca `application/pdf` kabul (action'da kontrol); Hakkımda ve ana
+  sayfada "CV indir"; deneyim formunda konum, liste ve detayda gösterim.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
@@ -350,8 +357,14 @@ Kurallar:
 | `20261124004900_auth_profile_sync`                 | `migrate deploy` (onaylı), `verify-db-lockdown` hepsi ok          | 2026-11-24 |
 | `20261124120000_phase3_expand`                     | `migrate deploy` (onaylı), lockdown ok, drift yok                 | 2026-11-24 |
 | `20261125090000_phase3_contract`                   | `migrate deploy` (onaylı, kod deploy'dan sonra), ok               | 2026-11-24 |
-| `20261126090000_phase5_github`                     | `migrate deploy` (onaylı, merge'den önce), lockdown ok, drift yok | 2026-11-24 |
+| `20261126090000_phase5_github`                     | `migrate deploy` (onaylı, merge'den önce), lockdown ok, drift yok |
+| `20261127090000_phase8_cv_location`                | `migrate deploy` (onaylı, merge'den önce), lockdown ok, diff boş  | 2026-11-24 |
 
+- **Faz 8 yedeği:** `~/backups/demircucu/backup-2026-11-26-pre-phase8.dump` (migration'dan hemen
+  önce, 591 KB, mode 600; pg_dump stderr boş; `pg_restore --list`: public 26, auth 27, storage 10
+  tablo verisi). Prod'da Experience 1, SiteSettings 1, MediaFile 22 satır. Staging'de transaction +
+  ROLLBACK dry-run, sonra `db:migrate:staging` ve lockdown ok; prod'da `migrate deploy`, `migrate
+status` güncel, `migrate diff` boş, lockdown ok, canlı sayfalar 200.
 - **Faz 5 yedeği:** `~/backups/demircucu/backup-2026-11-24-pre-phase5.dump` (migration'dan hemen önce,
   476 KB, mode 600; public 26, auth 27, storage 10 tablo verisi). Sonuç: `UnmappedTopic` yok,
   `GithubSyncSettings` 1 satır (RLS açık), canlı sayfalar 200. `media` bucket limiti staging ve

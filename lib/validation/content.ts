@@ -81,6 +81,8 @@ export const experienceSchema = z
     startDate: z.coerce.date(),
     endDate: z.coerce.date().nullish(),
     logoPath: optionalMediaPath,
+    locationTr: optionalText(120),
+    locationEn: optionalText(120),
     order: sortOrder.default(0),
     published: z.boolean().default(true),
     ...relations,
@@ -163,6 +165,9 @@ export const siteSettingsSchema = z
     siteDescriptionTr: long,
     siteDescriptionEn: long,
     faviconPath: optionalMediaPath,
+    /** PDFs only; checked against the media library in the action. */
+    cvPathTr: optionalMediaPath,
+    cvPathEn: optionalMediaPath,
   })
   .partial()
   .strict();

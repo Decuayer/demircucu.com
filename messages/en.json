@@ -456,7 +456,9 @@
     "adminNav": "Admin menu",
     "copyUrl": "Copy URL",
     "openFile": "Open file in a new tab",
-    "removeHobby": "Remove hobby"
+    "removeHobby": "Remove hobby",
+    "cv": "Résumé (CV, PDF)",
+    "cvHint": "The English page shows the TR file when there is no EN file (and vice versa)."
   },
   "common": {
     "loading": "Loading...",
@@ -521,7 +523,12 @@
     "linkNamePlaceholder": "e.g. Project presentation (PDF)",
     "linkUrl": "File link (URL)",
     "add": "Add",
-    "attached": "Attached files"
+    "attached": "Attached files",
+    "notAPdf": "Please choose a PDF file.",
+    "noPdf": "No file selected",
+    "choosePdf": "Choose PDF",
+    "replacePdf": "Replace",
+    "openPdf": "Open PDF in a new tab"
   },
   "tags": {
     "adminTitle": "Tags",
@@ -813,5 +820,8 @@
     "errorText": "An unexpected error occurred while loading the page. You can try again.",
     "reference": "Error code: {digest}",
     "retry": "Try again"
+  },
+  "cv": {
+    "download": "Download CV"
   }
 }

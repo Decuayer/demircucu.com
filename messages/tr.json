@@ -456,7 +456,9 @@
     "adminNav": "Admin menüsü",
     "copyUrl": "URL'yi kopyala",
     "openFile": "Dosyayı yeni sekmede aç",
-    "removeHobby": "Hobiyi kaldır"
+    "removeHobby": "Hobiyi kaldır",
+    "cv": "Özgeçmiş (CV, PDF)",
+    "cvHint": "İngilizce sayfada EN dosyası yoksa TR dosyası gösterilir (ve tersi)."
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -521,7 +523,12 @@
     "linkNamePlaceholder": "Örn: Proje sunumu (PDF)",
     "linkUrl": "Dosya linki (URL)",
     "add": "Ekle",
-    "attached": "Ekli dosyalar"
+    "attached": "Ekli dosyalar",
+    "notAPdf": "Lütfen bir PDF dosyası seçin.",
+    "noPdf": "Dosya seçilmedi",
+    "choosePdf": "PDF seç",
+    "replacePdf": "Değiştir",
+    "openPdf": "PDF'i yeni sekmede aç"
   },
   "tags": {
     "adminTitle": "Etiketler",
@@ -813,5 +820,8 @@
     "errorText": "Sayfa yüklenirken beklenmeyen bir hata oluştu. Tekrar deneyebilirsiniz.",
     "reference": "Hata kodu: {digest}",
     "retry": "Tekrar dene"
+  },
+  "cv": {
+    "download": "CV indir"
   }
 }

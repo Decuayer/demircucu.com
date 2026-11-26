@@ -17,7 +17,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ViewerBoundary } from "./viewer-boundary";
 
 // Same origin (scripts/copy-pdfjs-assets.mjs): CSP allows workers and fetches from 'self' only.
@@ -159,10 +159,9 @@ export default function PdfViewer({ url, title }: { url: string; title: string }
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t("download")}
+            className={buttonVariants({ variant: "ghost", size: "icon" })}
           >
-            <Button variant="ghost" size="icon" tabIndex={-1}>
-              <Download className="h-4 w-4" />
-            </Button>
+            <Download className="h-4 w-4" />
           </a>
         </div>
       </div>

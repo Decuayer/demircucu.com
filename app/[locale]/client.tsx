@@ -1,10 +1,11 @@
 import type { CSSProperties } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cvUrlFor } from "@/lib/cv";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Code2, Briefcase, Newspaper, Sparkles } from "lucide-react";
+import { ArrowRight, Code2, Briefcase, Download, Newspaper, Sparkles } from "lucide-react";
 import { getTranslated, formatDate } from "@/lib/i18n-utils";
 
 import type { PublicPost, PublicProject, PublicSiteSettings } from "@/lib/types/content";
@@ -18,7 +19,9 @@ interface HomeClientProps {
 
 export default function HomeClient({ featuredProjects, latestPosts, settings }: HomeClientProps) {
   const t = useTranslations("home");
+  const tCv = useTranslations("cv");
   const locale = useLocale();
+  const cvUrl = cvUrlFor(settings, locale);
 
   return (
     <div className="relative">
@@ -77,7 +80,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
             </p>
 
             <div
-              className="enter flex items-center justify-center gap-4 pt-4"
+              className="enter flex flex-wrap items-center justify-center gap-4 pt-4"
               style={{ "--enter-delay": "300ms" } as CSSProperties}
             >
               <Link href="/contact">
@@ -94,6 +97,22 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                   {t("featuredProjects")}
                 </Button>
               </Link>
+              {cvUrl && (
+                <a
+                  href={cvUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-track="document"
+                  className={buttonVariants({
+                    size: "lg",
+                    variant: "outline",
+                    className: "border-border/50 hover:bg-accent",
+                  })}
+                >
+                  <Download aria-hidden className="mr-2 h-4 w-4" />
+                  {tCv("download")}
+                </a>
+              )}
             </div>
           </div>
         </div>
