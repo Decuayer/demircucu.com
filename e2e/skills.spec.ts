@@ -36,7 +36,7 @@ test("blog list filters by tag", async ({ page }) => {
 test("project list filters by skill subtree and can be cleared", async ({ page }) => {
   await page.goto("/tr/projects?skill=web");
   await expect(page.getByText(/etiketiyle filtrelendi/)).toBeVisible();
-  const filtered = await page.locator("main h3").count();
+  const filtered = await page.locator("main h2").count();
   expect(filtered).toBeGreaterThan(0);
   await page.getByRole("link", { name: "Filtreyi kaldır" }).click();
   await expect(page).toHaveURL(/\/tr\/projects$/);

@@ -63,7 +63,7 @@ const ADMIN_PAGES: AuditPage[] = [
   adminPage("profile-en", "Profil", "Profile (EN)", "/en/profile"),
 ];
 
-interface WidthResult {
+export interface WidthResult {
   width: number;
   status: number | null;
   finalUrl: string;
@@ -130,7 +130,7 @@ async function focusWalk(page: Page) {
   return result;
 }
 
-async function auditWidth(page: Page, item: AuditPage, url: string, width: number) {
+export async function auditWidth(page: Page, item: AuditPage, url: string, width: number) {
   const errors: string[] = [];
   const warnings: string[] = [];
   const onConsole = (message: { type(): string; text(): string }) => {
@@ -252,6 +252,70 @@ function register(pages: AuditPage[], storage?: string) {
   });
 }
 
-register(PROD_PAGES);
-register(ANON_PAGES);
-register(ADMIN_PAGES, AUTH_STATE);
+/**
+ * AUDIT_THEME=light|dark emulates the system colour scheme (the site follows it by default).
+ * AUDIT_SET=theme audits a fixed set of local pages (seed content) so that runs against different
+ * builds (before / after a design change) compare the same content.
+ */
+const THEME = process.env.AUDIT_THEME as "light" | "dark" | undefined;
+if (THEME) test.use({ colorScheme: THEME });
+
+const local = (id: string, group: string, title: string, path: AuditPage["path"]): AuditPage => ({
+  id,
+  group,
+  title,
+  source: "local-anon",
+  path,
+});
+
+const THEME_PUBLIC: AuditPage[] = [
+  local("home-tr", "Public", "Ana sayfa", "/tr"),
+  local("home-en", "Public", "Home (EN)", "/en"),
+  local("about-tr", "Public", "Hakkımda", "/tr/about"),
+  local("experience-list-tr", "Public", "Deneyim listesi", "/tr/experience"),
+  local(
+    "experience-detail-tr",
+    "Public",
+    "Deneyim detay",
+    async () =>
+      `/tr/experience/${await one(`SELECT id FROM public."Experience" WHERE published ORDER BY "createdAt" LIMIT 1`)}`,
+  ),
+  local("projects-list-tr", "Public", "Proje listesi", "/tr/projects"),
+  local(
+    "project-detail-tr",
+    "Public",
+    "Proje detay (GitHub README)",
+    async () =>
+      `/tr/projects/${(await sql<{ slug: string }>(`SELECT slug FROM public."Project" WHERE published AND "readmeHtml" IS NOT NULL ORDER BY "createdAt" LIMIT 1`))[0]?.slug ?? "sample-project"}`,
+  ),
+  local("blog-list-tr", "Public", "Blog listesi", "/tr/blog"),
+  local("blog-post-tr", "Public", "Blog yazısı", "/tr/blog/hello-world"),
+  local("skills-tr", "Public", "Skill ağacı", "/tr/skills"),
+  local("contact-tr", "Public", "İletişim", "/tr/contact"),
+  local("not-found-tr", "Public", "404", "/tr/bu-sayfa-yok"),
+  local("login-tr", "Giriş / kayıt", "Giriş", "/tr/auth/login"),
+];
+
+const THEME_ADMIN: AuditPage[] = [
+  adminPage("admin-dashboard-tr", "Admin", "Dashboard", "/tr/admin"),
+  adminPage("admin-analytics", "Admin", "Analitik", "/tr/admin/analytics"),
+  adminPage("admin-projects", "Admin", "Projeler", "/tr/admin/projects"),
+  adminPage(
+    "admin-blog-edit",
+    "Admin",
+    "Yazı düzenle",
+    async () =>
+      `/tr/admin/blog/${await one(`SELECT id FROM public."BlogPost" WHERE slug = 'hello-world'`)}/edit`,
+  ),
+  adminPage("admin-settings", "Admin", "Ayarlar", "/tr/admin/settings"),
+  adminPage("admin-contacts", "Admin", "Mesajlar", "/tr/admin/contacts"),
+];
+
+if (process.env.AUDIT_SET === "theme") {
+  register(THEME_PUBLIC);
+  register(THEME_ADMIN, AUTH_STATE);
+} else {
+  register(PROD_PAGES);
+  register(ANON_PAGES);
+  register(ADMIN_PAGES, AUTH_STATE);
+}

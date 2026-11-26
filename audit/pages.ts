@@ -1,6 +1,7 @@
 /** Pages covered by the design audit. `prod` pages are read from the live site. */
 export const PROD = "https://www.demircucu.com";
-export const OUT = "audit-screenshots";
+/** Output folder; AUDIT_OUT lets a run (e.g. one theme) write next to an earlier one. */
+export const OUT = process.env.AUDIT_OUT ?? "audit-screenshots";
 export const AUTH_STATE = `${OUT}/.auth/admin.json`;
 export const WIDTHS = [1440, 768, 375] as const;
 
