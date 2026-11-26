@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-26 (Faz 8B: PR #19 merge; CV + konum migration'ı prod'da, arayüz PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 8B: PR #20 ve #21 merge; renk ve tema PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -281,7 +281,18 @@ sayfaları.
   (`SiteSettings.cvPathTr/cvPathEn` → `MediaFile.path` FK Restrict, `Experience.locationTr/En`).
   Kullanıcı iki CV alanını onayladı (EN yoksa TR, TR yoksa EN). Admin Ayarlar → Hakkımda'da PDF
   yükleme (`PdfUpload`), yalnızca `application/pdf` kabul (action'da kontrol); Hakkımda ve ana
-  sayfada "CV indir"; deneyim formunda konum, liste ve detayda gösterim.
+  sayfada "CV indir"; deneyim formunda konum, liste ve detayda gösterim. PR #20 merge, kullanıcı
+  prod'da doğruladı.
+- **PR #21 (`fix/preview-e2e-trigger`):** `staging-migrate.yml`'in `environment: staging` kaydı
+  Preview E2E'yi tetikleyip testleri Actions iş sayfasına karşı çalıştırıyordu; iş artık yalnızca
+  `vercel[bot]` deployment'larında ve `*.vercel.app` adresinde çalışıyor.
+- **PR 3 (`feat/phase-8-theme`):** onaylı token'lar (zinc + tek violet; `--link` light violet-700 /
+  dark violet-400; buton violet-600; dark `--border` kullanıcı isteğiyle zinc-700, `--input`
+  zinc-600; light `--destructive` red-700). `next-themes` (sistem varsayılan, FOUC yok, header'da
+  Açık/Koyu/Sistem menüsü). ~300 sabit `violet-/cyan-`/gradyan sınıfı token'a çevrildi; isim
+  `--link` (1a), grafiklerde ikinci seri nötr + kesikli (2a). Kart/footer başlıkları `h2`, README
+  `h1` → `h2[data-readme-h1]`, dark kod yorumu rengi CSS ile 5,3:1. Masaüstü menü 768 px'te taşmasın
+  diye `lg`'den itibaren. Kullanıcı içeriğindeki başlık sırası (blog/deneyim gövdesi) içerik notu.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
