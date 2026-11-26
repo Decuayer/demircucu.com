@@ -115,7 +115,7 @@ export default function DashboardClient({
         topAction={
           <Link
             href="/admin/analytics"
-            className="inline-flex items-center gap-1 text-xs text-cyan-400 hover:underline"
+            className="inline-flex items-center gap-1 text-xs text-link hover:underline"
           >
             {t("allAnalytics")} <ArrowUpRight className="h-3 w-3" />
           </Link>
@@ -137,7 +137,7 @@ export default function DashboardClient({
                     <span className="flex min-w-0 items-center gap-2">
                       {!msg.read && (
                         <span
-                          className="h-2 w-2 shrink-0 rounded-full bg-violet-500"
+                          className="h-2 w-2 shrink-0 rounded-full bg-primary"
                           aria-label={t("unread")}
                         />
                       )}

@@ -34,13 +34,13 @@ export function KpiCard({ label, value, icon: Icon, change, hint, href }: KpiCar
     <Card
       className={cn(
         "h-full border-border/50 bg-card/50 transition-colors",
-        href && "hover:border-violet-500/30 hover:bg-card",
+        href && "hover:border-primary/40 hover:bg-card",
       )}
     >
       <CardContent className="p-5">
         <div className="mb-3 flex items-center justify-between">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10">
-            <Icon className="h-4 w-4 text-violet-400" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+            <Icon className="h-4 w-4 text-link" />
           </div>
           {changeText !== undefined && (
             <span
@@ -49,8 +49,8 @@ export function KpiCard({ label, value, icon: Icon, change, hint, href }: KpiCar
                 change === null || change === undefined || Math.round(change) === 0
                   ? "text-muted-foreground"
                   : change > 0
-                    ? "text-green-400"
-                    : "text-red-400",
+                    ? "text-success"
+                    : "text-destructive",
               )}
               title={t("comparedToPrevious")}
             >
@@ -61,7 +61,7 @@ export function KpiCard({ label, value, icon: Icon, change, hint, href }: KpiCar
         </div>
         <p className="text-2xl font-bold tabular-nums">{value}</p>
         <p className="text-sm text-muted-foreground">{label}</p>
-        {hint && <p className="mt-1 text-xs text-muted-foreground/80">{hint}</p>}
+        {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
       </CardContent>
     </Card>
   );

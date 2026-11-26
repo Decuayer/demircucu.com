@@ -29,9 +29,9 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
       <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden">
         {/* Animated background */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/4 left-1/4 h-96 w-96 animate-pulse rounded-full bg-violet-500/10 blur-3xl" />
-          <div className="absolute right-1/4 bottom-1/4 h-96 w-96 animate-pulse rounded-full bg-cyan-500/10 blur-3xl delay-1000" />
-          <div className="absolute top-1/2 left-1/2 h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-violet-500/5 to-cyan-500/5 blur-3xl" />
+          <div className="absolute top-1/4 left-1/4 h-96 w-96 animate-pulse rounded-full bg-muted blur-3xl" />
+          <div className="absolute right-1/4 bottom-1/4 h-96 w-96 animate-pulse rounded-full bg-muted blur-3xl delay-1000" />
+          <div className="absolute top-1/2 left-1/2 h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted blur-3xl" />
           {/* Grid pattern */}
           <div
             className="absolute inset-0 opacity-[0.03]"
@@ -48,7 +48,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
             <div className="enter" style={{ "--enter-delay": "0ms" } as CSSProperties}>
               <Badge
                 variant="secondary"
-                className="border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-xs font-medium text-violet-400 hover:bg-violet-500/20"
+                className="border-primary/40 bg-muted px-4 py-1.5 text-xs font-medium text-link hover:bg-accent"
               >
                 <Sparkles className="mr-1 h-3 w-3" />
                 {getTranslated(settings, "heroSub", locale) || t("heroSub")}
@@ -60,13 +60,10 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
               style={{ "--enter-delay": "100ms" } as CSSProperties}
             >
               {t("heroTitle")}{" "}
-              <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
+              <span className="text-link">
                 {getTranslated(settings, "heroTitle", locale) || (
                   <>
-                    {t("heroTitle")}{" "}
-                    <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
-                      Demircucu
-                    </span>
+                    {t("heroTitle")} <span className="text-link">Demircucu</span>
                   </>
                 )}
               </span>
@@ -84,10 +81,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
               style={{ "--enter-delay": "300ms" } as CSSProperties}
             >
               <Link href="/contact">
-                <Button
-                  size="lg"
-                  className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-700 hover:to-cyan-700"
-                >
+                <Button size="lg" className="border-0 bg-primary text-primary-foreground shadow-lg">
                   {t("heroCta")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -130,8 +124,8 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
         <div className="container mx-auto px-4 md:px-6">
           <div className="reveal mb-12 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
-                <Code2 className="h-5 w-5 text-violet-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                <Code2 className="h-5 w-5 text-link" />
               </div>
               <h2 className="text-2xl font-bold md:text-3xl">{t("featuredProjects")}</h2>
             </div>
@@ -145,10 +139,10 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featuredProjects.map((project) => (
               <div key={project.id} className="reveal">
-                <Card className="group relative h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card hover:shadow-lg hover:shadow-violet-500/5">
+                <Card className="group relative h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-primary/40 hover:bg-card hover:shadow-lg">
                   <CardContent className="space-y-4 p-6">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold transition-colors group-hover:text-violet-400">
+                      <h3 className="text-lg font-semibold transition-colors group-hover:text-link">
                         <Link
                           href={`/projects/${project.slug}`}
                           className="after:absolute after:inset-0"
@@ -156,7 +150,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                           {getTranslated(project, "title", locale)}
                         </Link>
                       </h3>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-violet-400" />
+                      <ArrowRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-link" />
                     </div>
                     <p className="text-sm leading-relaxed text-muted-foreground">
                       {getTranslated(project, "summary", locale)}
@@ -175,8 +169,8 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
         <div className="container mx-auto px-4 md:px-6">
           <div className="reveal mb-12 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10">
-                <Newspaper className="h-5 w-5 text-cyan-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                <Newspaper className="h-5 w-5 text-link" />
               </div>
               <h2 className="text-2xl font-bold md:text-3xl">{t("latestPosts")}</h2>
             </div>
@@ -191,7 +185,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
             {latestPosts.map((post) => (
               <div key={post.id} className="reveal">
                 <Link href={`/blog/${post.slug}`}>
-                  <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
+                  <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-primary/40 hover:bg-card hover:shadow-lg">
                     <CardContent className="space-y-4 p-6">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <time>{formatDate(post.createdAt)}</time>
@@ -204,13 +198,13 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
                           dk okuma
                         </span>
                       </div>
-                      <h3 className="text-lg font-semibold transition-colors group-hover:text-cyan-400">
+                      <h3 className="text-lg font-semibold transition-colors group-hover:text-link">
                         {getTranslated(post, "title", locale)}
                       </h3>
                       <p className="text-sm leading-relaxed text-muted-foreground">
                         {getTranslated(post, "excerpt", locale)}
                       </p>
-                      <div className="flex items-center text-sm font-medium text-cyan-400">
+                      <div className="flex items-center text-sm font-medium text-link">
                         {t("readMore")}{" "}
                         <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" />
                       </div>
@@ -226,13 +220,13 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
       {/* About Preview / CTA */}
       <section className="border-t border-border/40 py-24">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="reveal relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet-500/5 via-background to-cyan-500/5 p-8 text-center md:p-16">
-            <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-violet-500/10 blur-3xl" />
-            <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div className="reveal relative overflow-hidden rounded-2xl border border-border/50 bg-muted via-background p-8 text-center md:p-16">
+            <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-muted blur-3xl" />
+            <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-muted blur-3xl" />
             <div className="relative space-y-6">
               <div className="flex items-center justify-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10">
-                  <Briefcase className="h-6 w-6 text-violet-400" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
+                  <Briefcase className="h-6 w-6 text-link" />
                 </div>
               </div>
               <h2 className="text-3xl font-bold md:text-4xl">
@@ -244,10 +238,7 @@ export default function HomeClient({ featuredProjects, latestPosts, settings }: 
               </p>
               <div className="flex items-center justify-center gap-4 pt-2">
                 <Link href="/contact">
-                  <Button
-                    size="lg"
-                    className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700"
-                  >
+                  <Button size="lg" className="border-0 bg-primary text-primary-foreground">
                     {t("heroCta")}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>

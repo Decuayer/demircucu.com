@@ -109,7 +109,7 @@ export default function ProjectDetailClient({
       {attachments.length > 0 && (
         <div className="space-y-3">
           <h3 className="flex items-center gap-2 text-lg font-semibold">
-            <FileIcon className="h-5 w-5 text-violet-400" />
+            <FileIcon className="h-5 w-5 text-link" />
             {t("attachments")}
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -121,9 +121,9 @@ export default function ProjectDetailClient({
                 rel="noopener noreferrer"
                 data-track="document"
               >
-                <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
+                <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-primary/40 hover:bg-card">
                   <CardContent className="flex items-center gap-3 overflow-hidden p-4">
-                    <FileIcon className="h-4 w-4 shrink-0 text-cyan-400" />
+                    <FileIcon className="h-4 w-4 shrink-0 text-link" />
                     <p className="truncate text-sm font-medium">{file.name}</p>
                   </CardContent>
                 </Card>
@@ -155,7 +155,7 @@ export default function ProjectDetailClient({
 
           <header className="mb-8 max-w-4xl">
             <div className="mb-4 flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-muted">
                 {project.logoUrl ? (
                   <Image
                     src={project.logoUrl}
@@ -166,7 +166,7 @@ export default function ProjectDetailClient({
                     className="h-10 w-10 rounded object-contain"
                   />
                 ) : (
-                  <Code2 className="h-8 w-8 text-cyan-400" />
+                  <Code2 className="h-8 w-8 text-link" />
                 )}
               </div>
               <div className="min-w-0">
@@ -174,7 +174,7 @@ export default function ProjectDetailClient({
                 {project.isArchived && (
                   <Badge
                     variant="outline"
-                    className="mt-2 gap-1 border-yellow-500/30 text-yellow-500"
+                    className="mt-2 gap-1 border-amber-500/40 text-amber-700 dark:text-amber-400"
                   >
                     <Archive className="h-3 w-3" />
                     {t("archived")}
@@ -203,7 +203,7 @@ export default function ProjectDetailClient({
             )}
             {project.liveUrl && (
               <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-track="live">
-                <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
+                <Button className="border-0 bg-primary text-primary-foreground">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   {t("liveSite")}
                 </Button>

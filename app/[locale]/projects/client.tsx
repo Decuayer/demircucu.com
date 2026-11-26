@@ -31,7 +31,7 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
         <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
-            className="mb-4 border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-cyan-400"
+            className="mb-4 border-primary/40 bg-muted px-4 py-1.5 text-link"
           >
             <Code2 className="mr-1 h-3 w-3" />
             {t("title")}
@@ -45,12 +45,12 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {projects.map((project) => (
             <div key={project.id} className="reveal">
-              <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
+              <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-primary/40 hover:bg-card hover:shadow-lg">
                 <CardContent className="flex h-full flex-col space-y-4 p-6">
                   {/* Project header */}
                   <div className="flex items-start justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/10 to-cyan-500/10 transition-transform group-hover:scale-110">
-                      <Code2 className="h-6 w-6 text-cyan-400" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border/50 bg-muted transition-transform group-hover:scale-110">
+                      <Code2 className="h-6 w-6 text-link" />
                     </div>
                     <div className="flex gap-2">
                       {project.githubUrl && (
@@ -84,9 +84,9 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
                   {/* Content */}
                   <div className="flex-1 space-y-3">
                     <Link href={`/projects/${project.slug}`}>
-                      <h3 className="cursor-pointer text-lg font-semibold transition-colors group-hover:text-cyan-400">
+                      <h2 className="cursor-pointer text-lg font-semibold transition-colors group-hover:text-link">
                         {getTranslated(project, "title", locale)}
-                      </h3>
+                      </h2>
                     </Link>
                     <p className="text-sm leading-relaxed text-muted-foreground">
                       {getTranslated(project, "summary", locale)}
@@ -112,7 +112,7 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
                         </span>
                       )}
                       {project.isArchived && (
-                        <span className="inline-flex items-center gap-1 text-yellow-500">
+                        <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400">
                           <Archive className="h-3.5 w-3.5" />
                           {t("archived")}
                         </span>
@@ -125,7 +125,7 @@ export default function ProjectsClient({ projects, filter }: ProjectsClientProps
 
                   {/* View details */}
                   <Link href={`/projects/${project.slug}`}>
-                    <div className="flex cursor-pointer items-center pt-2 text-sm font-medium text-cyan-400">
+                    <div className="flex cursor-pointer items-center pt-2 text-sm font-medium text-link">
                       {t("viewProject")}
                       <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" />
                     </div>

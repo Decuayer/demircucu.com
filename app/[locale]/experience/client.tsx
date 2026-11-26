@@ -33,7 +33,7 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
         <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
-            className="mb-4 border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-violet-400"
+            className="mb-4 border-primary/40 bg-muted px-4 py-1.5 text-link"
           >
             <Briefcase className="mr-1 h-3 w-3" />
             {t("title")}
@@ -46,7 +46,7 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
         {/* Timeline */}
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute top-0 bottom-0 left-0 w-px bg-gradient-to-b from-violet-500/50 via-cyan-500/50 to-transparent md:left-1/2 md:-translate-x-px" />
+          <div className="absolute top-0 bottom-0 left-0 w-px bg-muted via-border to-transparent md:left-1/2 md:-translate-x-px" />
 
           <div className="space-y-12">
             {experiences.map((exp, i) => (
@@ -57,7 +57,7 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
                 }`}`}
               >
                 {/* Timeline dot */}
-                <div className="absolute left-0 z-10 h-4 w-4 -translate-x-[7px] rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 ring-4 ring-background md:left-1/2 md:-translate-x-2" />
+                <div className="absolute left-0 z-10 h-4 w-4 -translate-x-[7px] rounded-full bg-primary text-primary-foreground ring-4 ring-background md:left-1/2 md:-translate-x-2" />
 
                 {/* Date */}
                 <div
@@ -84,7 +84,7 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
 
                 {/* Card */}
                 <div className={`pl-8 md:w-1/2 md:pl-0 ${i % 2 === 0 ? "md:pl-12" : "md:pr-12"}`}>
-                  <Card className="group relative border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card hover:shadow-lg hover:shadow-violet-500/5">
+                  <Card className="group relative border-border/50 bg-card/50 transition-all duration-300 hover:border-primary/40 hover:bg-card hover:shadow-lg">
                     <CardContent className="space-y-3 p-6">
                       <div className="flex items-center justify-between gap-3">
                         {exp.logoUrl && (
@@ -97,19 +97,19 @@ export default function ExperienceClient({ experiences, filter }: ExperienceClie
                           />
                         )}
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-lg font-semibold transition-colors group-hover:text-violet-400">
+                          <h2 className="text-lg font-semibold transition-colors group-hover:text-link">
                             <Link
                               href={`/experience/${exp.id}`}
                               className="after:absolute after:inset-0"
                             >
                               {exp.company}
                             </Link>
-                          </h3>
+                          </h2>
                           <p className="text-sm text-muted-foreground">
                             {getTranslated(exp, "position", locale)}
                           </p>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-violet-400" />
+                        <ArrowRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-link" />
                       </div>
                       <p className="text-sm leading-relaxed text-muted-foreground">
                         {getTranslated(exp, "description", locale)}

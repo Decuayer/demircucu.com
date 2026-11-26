@@ -54,7 +54,7 @@ export default function AdminCommentsClient({
   return (
     <div className="space-y-6">
       <h1 className="flex items-center gap-3 text-2xl font-bold">
-        <MessageSquare className="h-6 w-6 text-cyan-400" />
+        <MessageSquare className="h-6 w-6 text-link" />
         {t("comments")}
       </h1>
 
@@ -75,7 +75,7 @@ export default function AdminCommentsClient({
                   </span>
                   {comment.hidden && <Badge variant="secondary">{t("hiddenBadge")}</Badge>}
                 </div>
-                <Link href={`/blog/${comment.post.slug}`} className="text-cyan-400 hover:underline">
+                <Link href={`/blog/${comment.post.slug}`} className="text-link hover:underline">
                   {locale === "tr" ? comment.post.titleTr : comment.post.titleEn}
                 </Link>
               </div>
@@ -97,7 +97,7 @@ export default function AdminCommentsClient({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="text-red-400"
+                  className="text-destructive"
                   disabled={isPending}
                   onClick={() => remove(comment.id)}
                 >

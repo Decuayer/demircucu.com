@@ -61,7 +61,7 @@ export function LoginForm() {
         <div className="text-right">
           <Link
             href="/auth/forgot-password"
-            className="text-xs text-muted-foreground transition-colors hover:text-violet-400"
+            className="text-xs text-muted-foreground transition-colors hover:text-link"
           >
             {t("forgotPassword")}
           </Link>
@@ -70,7 +70,7 @@ export function LoginForm() {
       </form>
       <div className="text-center text-sm text-muted-foreground">
         {t("noAccount")}{" "}
-        <Link href="/auth/register" className="font-medium text-violet-400 hover:underline">
+        <Link href="/auth/register" className="font-medium text-link hover:underline">
           {t("registerButton")}
         </Link>
       </div>

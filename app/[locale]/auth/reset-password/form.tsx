@@ -51,7 +51,7 @@ export function ResetPasswordForm() {
       {error && <FormAlert tone="error">{error}</FormAlert>}
       {expired ? (
         <div className="text-center text-sm">
-          <Link href="/auth/forgot-password" className="text-violet-400 hover:underline">
+          <Link href="/auth/forgot-password" className="text-link hover:underline">
             {t("requestNewLink")}
           </Link>
         </div>

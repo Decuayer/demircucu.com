@@ -62,7 +62,7 @@ export function EntityAnalyticsView({
             href={`/${locale}${data.publicPath === "/" ? "" : data.publicPath}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-sm text-cyan-400 hover:underline"
+            className="inline-flex items-center gap-1 text-sm text-link hover:underline"
           >
             {data.publicPath} <ExternalLink className="h-3 w-3" />
           </a>

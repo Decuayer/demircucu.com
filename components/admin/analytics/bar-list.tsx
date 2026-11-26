@@ -26,7 +26,7 @@ export function BarList({ items, empty }: { items: BarListItem[]; empty?: string
         const content = (
           <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-md px-2.5 py-1.5 text-sm">
             <div
-              className="absolute inset-y-0 left-0 rounded-md bg-violet-500/10"
+              className="absolute inset-y-0 left-0 rounded-md bg-muted"
               style={{ width: `${(item.views / max) * 100}%` }}
               aria-hidden
             />
@@ -34,7 +34,7 @@ export function BarList({ items, empty }: { items: BarListItem[]; empty?: string
             <span className="relative shrink-0 text-xs text-muted-foreground tabular-nums">
               {formatNumber(item.views, locale)}
               {item.visitors !== undefined && (
-                <span className="ml-2 text-muted-foreground/70">
+                <span className="ml-2 text-muted-foreground">
                   {t("visitorsShort", { count: item.visitors })}
                 </span>
               )}

@@ -63,7 +63,7 @@ export function FileUploader({ files, onChange, folder = "general" }: FileUpload
 
         <TabsContent value="upload" className="mt-0">
           <div
-            className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors ${isUploading ? "pointer-events-none border-border/50 opacity-50" : "border-border/50 hover:border-violet-500/50 hover:bg-accent/30"}`}
+            className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors ${isUploading ? "pointer-events-none border-border/50 opacity-50" : "border-border/50 hover:border-primary/40 hover:bg-accent/30"}`}
             onClick={() => !isUploading && fileInputRef.current?.click()}
           >
             <input
@@ -79,16 +79,16 @@ export function FileUploader({ files, onChange, folder = "general" }: FileUpload
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               {isUploading ? (
                 <>
-                  <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-link" />
                   <p className="text-sm font-medium">{t("uploading")}</p>
                 </>
               ) : (
                 <>
                   <div className="mb-2 rounded-full bg-background p-3 shadow-sm">
-                    <Upload className="h-6 w-6 text-violet-400" />
+                    <Upload className="h-6 w-6 text-link" />
                   </div>
                   <p className="text-sm font-medium">{t("fileDropHint")}</p>
-                  <p className="text-xs opacity-70">{t("fileTypes")}</p>
+                  <p className="text-xs">{t("fileTypes")}</p>
                 </>
               )}
             </div>
@@ -138,7 +138,7 @@ export function FileUploader({ files, onChange, folder = "general" }: FileUpload
               className="flex items-center justify-between rounded-md border border-border/50 bg-accent/20 p-2"
             >
               <div className="flex items-center gap-3 overflow-hidden">
-                <FileIcon className="h-4 w-4 shrink-0 text-violet-400" />
+                <FileIcon className="h-4 w-4 shrink-0 text-link" />
                 <div className="overflow-hidden">
                   <p className="truncate text-sm font-medium">{file.name}</p>
                   <p className="truncate text-xs text-muted-foreground">

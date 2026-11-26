@@ -57,11 +57,11 @@ export default function AdminExperiencesClient({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="enter flex items-center gap-3 text-2xl font-bold">
-          <Briefcase className="h-6 w-6 text-violet-400" />
+          <Briefcase className="h-6 w-6 text-link" />
           {t("experiences")}
         </h1>
         <Link href="/admin/experiences/new">
-          <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
+          <Button className="border-0 bg-primary text-primary-foreground">
             <Plus className="mr-2 h-4 w-4" />
             {t("add") || "Ekle"}
           </Button>

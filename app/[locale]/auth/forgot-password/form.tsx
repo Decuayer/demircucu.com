@@ -44,7 +44,7 @@ export function ForgotPasswordForm() {
         <SubmitButton pending={pending}>{t("sendResetLink")}</SubmitButton>
       </form>
       <div className="text-center text-sm">
-        <Link href="/auth/login" className="text-violet-400 hover:underline">
+        <Link href="/auth/login" className="text-link hover:underline">
           {t("backToLogin")}
         </Link>
       </div>

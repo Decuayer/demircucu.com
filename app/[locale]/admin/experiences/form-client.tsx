@@ -121,7 +121,7 @@ export default function ExperienceFormClient({
           <Button
             type="submit"
             disabled={isPending}
-            className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+            className="border-0 bg-primary text-primary-foreground"
           >
             {isPending ? t("saving") : t("save")}
           </Button>

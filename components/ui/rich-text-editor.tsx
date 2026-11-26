@@ -46,7 +46,7 @@ export function RichTextEditor({ content, onChange, placeholder, label }: RichTe
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: "text-violet-500 underline",
+          class: "text-link underline",
         },
       }),
       Image.configure({

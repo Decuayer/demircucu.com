@@ -21,7 +21,7 @@ function PostCard({ post }: { post: BlogPostWithTags }) {
   const content = getTranslated(post, "content", locale);
   return (
     <div className="reveal">
-      <Card className="group relative h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/5">
+      <Card className="group relative h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-primary/40 hover:bg-card hover:shadow-lg">
         <CardContent className="space-y-4 p-6">
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
@@ -36,17 +36,17 @@ function PostCard({ post }: { post: BlogPostWithTags }) {
             <span>·</span>
             <time>{formatDate(post.createdAt, locale)}</time>
           </div>
-          <h3 className="text-lg font-semibold transition-colors group-hover:text-cyan-400">
+          <h2 className="text-lg font-semibold transition-colors group-hover:text-link">
             {/* Stretched link: the whole card opens the post; tag chips sit above it. */}
             <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
               {getTranslated(post, "title", locale)}
             </Link>
-          </h3>
+          </h2>
           <p className="text-sm leading-relaxed text-muted-foreground">
             {getTranslated(post, "excerpt", locale)}
           </p>
           <TagChips tags={post.tags} locale={locale} chipClassName="text-xs" />
-          <div className="flex items-center pt-1 text-sm font-medium text-cyan-400">
+          <div className="flex items-center pt-1 text-sm font-medium text-link">
             Devamını Oku{" "}
             <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" />
           </div>
@@ -76,7 +76,7 @@ export default function BlogClient({ posts, filter }: BlogClientProps) {
         <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
-            className="mb-4 border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-cyan-400"
+            className="mb-4 border-primary/40 bg-muted px-4 py-1.5 text-link"
           >
             <Newspaper className="mr-1 h-3 w-3" />
             {t("title")}

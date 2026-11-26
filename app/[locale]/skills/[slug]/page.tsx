@@ -117,7 +117,7 @@ export default async function SkillPage({ params }: PageProps<"/[locale]/skills/
           </section>
         )}
 
-        <ContentSection icon={<Code2 className="h-5 w-5 text-cyan-400" />} title={t("projects")}>
+        <ContentSection icon={<Code2 className="h-5 w-5 text-link" />} title={t("projects")}>
           {projects.map((p) => (
             <ItemCard
               key={p.id}
@@ -127,10 +127,7 @@ export default async function SkillPage({ params }: PageProps<"/[locale]/skills/
             />
           ))}
         </ContentSection>
-        <ContentSection
-          icon={<Briefcase className="h-5 w-5 text-violet-400" />}
-          title={t("experiences")}
-        >
+        <ContentSection icon={<Briefcase className="h-5 w-5 text-link" />} title={t("experiences")}>
           {experiences.map((e) => (
             <ItemCard
               key={e.id}
@@ -140,7 +137,7 @@ export default async function SkillPage({ params }: PageProps<"/[locale]/skills/
             />
           ))}
         </ContentSection>
-        <ContentSection icon={<Newspaper className="h-5 w-5 text-cyan-400" />} title={t("posts")}>
+        <ContentSection icon={<Newspaper className="h-5 w-5 text-link" />} title={t("posts")}>
           {posts.map((p) => (
             <ItemCard
               key={p.id}

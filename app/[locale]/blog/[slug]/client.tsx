@@ -120,7 +120,7 @@ export default function BlogDetailClient({
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-gradient-to-r from-violet-500 to-cyan-500 text-xs text-white">
+                    <AvatarFallback className="bg-primary text-xs text-primary-foreground">
                       DC
                     </AvatarFallback>
                   </Avatar>
@@ -146,7 +146,7 @@ export default function BlogDetailClient({
 
             {/* Article Content */}
             <div
-              className="prose prose-sm mb-10 max-w-none md:prose-base dark:prose-invert prose-headings:font-bold prose-headings:text-foreground prose-p:leading-relaxed prose-p:text-muted-foreground prose-strong:text-foreground prose-code:rounded prose-code:bg-accent/50 prose-code:px-1 prose-code:py-0.5 prose-code:text-cyan-400 prose-pre:rounded-xl prose-pre:border prose-pre:border-border/50 prose-pre:bg-accent/30 prose-li:text-muted-foreground"
+              className="prose prose-sm mb-10 max-w-none md:prose-base dark:prose-invert prose-headings:font-bold prose-headings:text-foreground prose-p:leading-relaxed prose-p:text-muted-foreground prose-strong:text-foreground prose-code:rounded prose-code:bg-accent/50 prose-code:px-1 prose-code:py-0.5 prose-code:text-link prose-pre:rounded-xl prose-pre:border prose-pre:border-border/50 prose-pre:bg-accent/30 prose-li:text-muted-foreground"
               dangerouslySetInnerHTML={{ __html: content }}
             />
 
@@ -154,7 +154,7 @@ export default function BlogDetailClient({
             {toAttachments(post.files).length > 0 && (
               <div className="mb-10 space-y-3">
                 <h3 className="flex items-center gap-2 text-lg font-semibold">
-                  <FileIcon className="h-5 w-5 text-violet-400" />
+                  <FileIcon className="h-5 w-5 text-link" />
                   Ekli Dosyalar
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -165,9 +165,9 @@ export default function BlogDetailClient({
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
+                      <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-primary/40 hover:bg-card">
                         <CardContent className="flex items-center gap-3 p-4">
-                          <FileIcon className="h-4 w-4 shrink-0 text-cyan-400" />
+                          <FileIcon className="h-4 w-4 shrink-0 text-link" />
                           <p className="truncate text-sm font-medium">{file.name}</p>
                         </CardContent>
                       </Card>
@@ -182,11 +182,7 @@ export default function BlogDetailClient({
               <Button
                 variant={liked ? "default" : "outline"}
                 onClick={handleLike}
-                className={
-                  liked
-                    ? "border-0 bg-gradient-to-r from-pink-600 to-rose-600 text-white"
-                    : "border-border/50"
-                }
+                className={liked ? "border-0" : "border-border/50"}
               >
                 <Heart className={`mr-2 h-4 w-4 ${liked ? "fill-current" : ""}`} />
                 {liked ? t("liked") || "Beğenildi" : t("like") || "Beğen"} ({likesCount})
@@ -197,7 +193,7 @@ export default function BlogDetailClient({
           {/* Comments Section */}
           <section className="space-y-8">
             <h2 className="flex items-center gap-2 text-xl font-bold">
-              <MessageSquare className="h-5 w-5 text-cyan-400" />
+              <MessageSquare className="h-5 w-5 text-link" />
               {t("comments")} ({initialComments.length})
             </h2>
 
@@ -211,14 +207,11 @@ export default function BlogDetailClient({
                     </p>
                     <Textarea
                       placeholder={t("writeComment") || "Yorumunuzu buraya yazın..."}
-                      className="resize-none border-border/50 bg-accent/30"
+                      className="resize-none bg-accent/30"
                       rows={3}
                       disabled
                     />
-                    <Button
-                      disabled
-                      className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
-                    >
+                    <Button disabled className="border-0 bg-primary text-primary-foreground">
                       {t("submitComment") || "Yorum Gönder"}
                     </Button>
                   </>
@@ -227,7 +220,7 @@ export default function BlogDetailClient({
                     <Textarea
                       name="content"
                       placeholder={t("writeComment") || "Yorumunuzu buraya yazın..."}
-                      className="resize-none border-border/50 bg-accent/30"
+                      className="resize-none bg-accent/30"
                       rows={3}
                       maxLength={2000}
                       required
@@ -235,7 +228,7 @@ export default function BlogDetailClient({
                     <Button
                       type="submit"
                       disabled={isPending}
-                      className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700"
+                      className="border-0 bg-primary text-primary-foreground"
                     >
                       {isPending ? t("submitting") : t("submitComment")}
                     </Button>
@@ -251,7 +244,7 @@ export default function BlogDetailClient({
                   <CardContent className="p-6">
                     <div className="mb-3 flex items-center gap-3">
                       <Avatar className="h-8 w-8 border border-border/50">
-                        <AvatarFallback className="bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-xs text-violet-400">
+                        <AvatarFallback className="bg-muted text-xs text-link">
                           {comment.author.name?.charAt(0).toUpperCase() || (
                             <User className="h-4 w-4" />
                           )}

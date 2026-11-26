@@ -53,8 +53,8 @@ export default function ProfileClient({ user }: { user: Profile }) {
   return (
     <div className="container mx-auto max-w-2xl px-4 py-16 md:px-6">
       <div className="mb-8 flex items-center gap-3">
-        <div className="rounded-xl bg-violet-500/10 p-3">
-          <Settings className="h-6 w-6 text-violet-400" />
+        <div className="rounded-xl bg-muted p-3">
+          <Settings className="h-6 w-6 text-link" />
         </div>
         <h1 className="text-3xl font-bold">{t("profile") || "Profilim"}</h1>
       </div>
@@ -91,7 +91,7 @@ export default function ProfileClient({ user }: { user: Profile }) {
               <Button
                 disabled={isPending}
                 type="submit"
-                className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+                className="border-0 bg-primary text-primary-foreground"
               >
                 {isPending ? t("updating") || "Güncelleniyor..." : t("save") || "Kaydet"}
               </Button>
@@ -133,7 +133,7 @@ export default function ProfileClient({ user }: { user: Profile }) {
               <Button
                 disabled={isPending}
                 type="submit"
-                className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+                className="border-0 bg-primary text-primary-foreground"
               >
                 {isPending
                   ? t("updating") || "Güncelleniyor..."

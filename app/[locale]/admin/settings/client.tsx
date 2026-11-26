@@ -335,13 +335,13 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="enter flex items-center gap-3 text-2xl font-bold">
-          <Settings className="h-6 w-6 text-violet-400" />
+          <Settings className="h-6 w-6 text-link" />
           {t("siteSettings")}
         </h1>
         <Button
           onClick={handleSubmit}
           disabled={isPending}
-          className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+          className="border-0 bg-primary text-primary-foreground"
         >
           <Save className="mr-2 h-4 w-4" />
           {isPending ? "Kaydediliyor..." : t("save")}
@@ -733,10 +733,7 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
             <CardContent className="space-y-2 p-6">
               <h2 className="text-lg font-semibold">{t("skillsSettings")}</h2>
               <p className="text-sm text-muted-foreground">{t("skillsMovedToTags")}</p>
-              <Link
-                href="/admin/tags"
-                className="text-sm font-medium text-cyan-400 hover:underline"
-              >
+              <Link href="/admin/tags" className="text-sm font-medium text-link hover:underline">
                 {t("tags")}
               </Link>
             </CardContent>

@@ -33,8 +33,8 @@ export default function ProfileLikesClient({
   return (
     <div className="container mx-auto max-w-4xl px-4 py-16 md:px-6">
       <div className="mb-8 flex items-center gap-3">
-        <div className="rounded-xl bg-pink-500/10 p-3">
-          <Heart className="h-6 w-6 text-pink-400" />
+        <div className="rounded-xl bg-muted p-3">
+          <Heart className="h-6 w-6 text-link" />
         </div>
         <h1 className="text-3xl font-bold">{t("activities") || "Aktivitelerim"}</h1>
       </div>
@@ -65,10 +65,10 @@ export default function ProfileLikesClient({
           ) : (
             likes.map((like) => (
               <Link key={like.id} href={`/blog/${like.post.slug}`}>
-                <Card className="group cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
+                <Card className="group cursor-pointer border-border/50 bg-card/50 transition-all hover:border-primary/40 hover:bg-card">
                   <CardContent className="flex items-center justify-between p-4">
                     <div>
-                      <h3 className="font-medium transition-colors group-hover:text-violet-400">
+                      <h3 className="font-medium transition-colors group-hover:text-link">
                         {getTranslated(like.post, "title", locale)}
                       </h3>
                       <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
@@ -76,7 +76,7 @@ export default function ProfileLikesClient({
                         {formatDate(like.createdAt)} {t("liked") || "tarihinde beğenildi"}
                       </p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-violet-400" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-link" />
                   </CardContent>
                 </Card>
               </Link>
@@ -96,7 +96,7 @@ export default function ProfileLikesClient({
                   <div className="mb-3 flex items-center justify-between">
                     <Link
                       href={`/blog/${comment.post.slug}`}
-                      className="text-sm font-medium text-violet-400 hover:underline"
+                      className="text-sm font-medium text-link hover:underline"
                     >
                       {getTranslated(comment.post, "title", locale)}
                     </Link>

@@ -66,7 +66,7 @@ export default function Footer({ settings, year }: FooterProps) {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {/* Brand */}
           <div className="space-y-4">
-            <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-lg font-bold text-transparent">
+            <span className="text-lg font-bold">
               {getTranslated(settings, "footerTitle", locale) || "demircucu.com"}
             </span>
             <p className="max-w-xs text-sm text-muted-foreground">
@@ -77,9 +77,9 @@ export default function Footer({ settings, year }: FooterProps) {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+            <h2 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
               {t("fastlinks")}
-            </h3>
+            </h2>
             <nav aria-label={t("fastlinks")} className="flex flex-col gap-2">
               {footerLinks.map((link) => (
                 <Link
@@ -95,9 +95,9 @@ export default function Footer({ settings, year }: FooterProps) {
 
           {/* Social */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+            <h2 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
               {t("socialmedia")}
-            </h3>
+            </h2>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <a
