@@ -4,22 +4,28 @@ import { sql } from "./helpers/supabase";
 
 /**
  * Light / dark / system theme (next-themes) and the contrast and heading fixes of phase 8.
- * "First frame" is the theme class on <html> in the first animation frame, recorded by an init
- * script: if it is already right, the page never flashes the other theme.
+ *
+ * No flash of the wrong theme means two things: the theme script runs before anything visible
+ * (it precedes the header in the HTML, and scripts block parsing), and the class is right when
+ * content is first painted. "First paint" records the <html> class when the first contentful
+ * paint is reported. (A plain first animation frame can come before the body arrives on a slow
+ * machine; nothing is painted then, so it is not a useful signal.)
  */
 
-async function recordFirstFrame(page: Page) {
+async function recordFirstPaint(page: Page) {
   await page.addInitScript(() => {
-    requestAnimationFrame(() => {
-      (window as unknown as { __firstFrame: string }).__firstFrame =
-        document.documentElement.className;
-    });
+    new PerformanceObserver((list) => {
+      if (list.getEntries().some((entry) => entry.name === "first-contentful-paint")) {
+        (window as unknown as { __firstPaint: string }).__firstPaint =
+          document.documentElement.className;
+      }
+    }).observe({ type: "paint", buffered: true });
   });
 }
 
-const firstFrame = (page: Page) =>
+const firstPaint = (page: Page) =>
   page
-    .waitForFunction(() => (window as unknown as { __firstFrame?: string }).__firstFrame)
+    .waitForFunction(() => (window as unknown as { __firstPaint?: string }).__firstPaint)
     .then((handle) => handle.jsonValue() as Promise<string>);
 
 /** Body background as rgb (Chromium reports oklch tokens in lab()); painted via a canvas. */
@@ -36,10 +42,15 @@ for (const scheme of ["light", "dark"] as const) {
   test.describe(`system ${scheme}`, () => {
     test.use({ colorScheme: scheme });
 
-    test("follows the system theme from the first frame", async ({ page }) => {
-      await recordFirstFrame(page);
+    test("follows the system theme from the first paint", async ({ page, request }) => {
+      const html = await (await request.get("/tr")).text();
+      const script = html.indexOf("localStorage.getItem");
+      expect(script).toBeGreaterThan(-1);
+      expect(script).toBeLessThan(html.indexOf("<header"));
+
+      await recordFirstPaint(page);
       await page.goto("/tr");
-      expect(await firstFrame(page)).toContain(scheme);
+      expect(await firstPaint(page)).toContain(scheme);
       await expect(page.locator("html")).toHaveClass(new RegExp(`\\b${scheme}\\b`));
       expect(await background(page)).toBe(
         scheme === "light" ? "rgb(255, 255, 255)" : "rgb(9, 9, 11)",
@@ -72,7 +83,7 @@ test.describe("theme menu", () => {
   test("a chosen theme overrides the system and survives a reload without a flash", async ({
     page,
   }) => {
-    await recordFirstFrame(page);
+    await recordFirstPaint(page);
     await page.goto("/tr/about");
     await page.getByRole("button", { name: "Tema" }).click();
     await page.getByRole("menuitemradio", { name: "Koyu" }).click();
@@ -80,7 +91,7 @@ test.describe("theme menu", () => {
     expect(await page.evaluate(() => localStorage.getItem("theme"))).toBe("dark");
 
     await page.reload();
-    expect(await firstFrame(page)).toContain("dark");
+    expect(await firstPaint(page)).toContain("dark");
 
     await page.getByRole("button", { name: "Tema" }).click();
     await expect(page.getByRole("menuitemradio", { name: "Koyu" })).toHaveAttribute(
