@@ -12,8 +12,11 @@ permissions:
 
 jobs:
   e2e:
+    # Only Vercel's own deployments: GitHub also records a deployment (with an Actions run URL as
+    # its target) for workflow jobs that use `environment:`, such as staging-migrate.yml.
     if: >-
       github.event.deployment_status.state == 'success' &&
+      github.event.deployment.creator.login == 'vercel[bot]' &&
       github.event.deployment_status.environment != 'Production'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -34,6 +37,13 @@ jobs:
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
+      - name: Require a Vercel deployment URL
+        if: steps.bypass.outputs.ready == 'true'
+        run: |
+          case "$E2E_BASE_URL" in
+            https://*.vercel.app|https://*.vercel.app/) ;;
+            *) echo "::error::Not a Vercel deployment URL: $E2E_BASE_URL"; exit 1 ;;
+          esac
       - uses: actions/checkout@v4
         if: steps.bypass.outputs.ready == 'true'
         with:
