@@ -137,7 +137,7 @@ export function MediaPickerDialog({
                 onClick={() => pick(image)}
                 title={image.name}
                 aria-label={t("insert", { name: image.name })}
-                className="group overflow-hidden rounded-lg border border-border/50 bg-accent/20 text-left focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none"
+                className="group overflow-hidden rounded-lg border border-border/50 bg-accent/20 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
                 <span className="relative block aspect-square">
                   <Image

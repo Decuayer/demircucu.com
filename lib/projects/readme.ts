@@ -4,7 +4,17 @@
 
 /** Document links are stored without a locale ("/projects/<slug>/docs/<id>"). */
 export function localizeReadmeHtml(html: string, locale: string): string {
-  return html.replaceAll('href="/projects/', `href="/${locale}/projects/`);
+  return demoteReadmeTitles(html.replaceAll('href="/projects/', `href="/${locale}/projects/`));
+}
+
+/**
+ * The project page already has the page `<h1>`; a README's own `# Title` becomes an `<h2>`
+ * (marked `data-readme-h1` so it keeps its larger size), giving one `<h1>` per page.
+ */
+export function demoteReadmeTitles(html: string): string {
+  return html
+    .replace(/<h1(\s|>)/g, (_, next: string) => `<h2 data-readme-h1${next === ">" ? ">" : " "}`)
+    .replaceAll("</h1>", "</h2>");
 }
 
 export interface ReadmeHeading {

@@ -31,7 +31,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
         aria-label={t("profile")}
       >
         <Avatar className="h-8 w-8 border border-border/50">
-          <AvatarFallback className="bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-violet-400">
+          <AvatarFallback className="bg-muted text-link">
             {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
           </AvatarFallback>
         </Avatar>
@@ -48,7 +48,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
           <DropdownMenuItem
             render={<Link href="/admin" className="flex cursor-pointer items-center" />}
           >
-            <LayoutDashboard className="mr-2 h-4 w-4 text-violet-400" />
+            <LayoutDashboard className="mr-2 h-4 w-4 text-link" />
             <span>{t("admin")}</span>
           </DropdownMenuItem>
         )}
@@ -61,13 +61,13 @@ export function UserMenu({ user }: { user: SessionUser }) {
         <DropdownMenuItem
           render={<Link href="/profile/likes" className="flex cursor-pointer items-center" />}
         >
-          <Heart className="mr-2 h-4 w-4 text-red-400" />
+          <Heart className="mr-2 h-4 w-4 text-destructive" />
           <span>{t("likes")}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => void signOut(locale)}
-          className="cursor-pointer text-red-400"
+          className="cursor-pointer text-destructive"
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>{t("logout")}</span>
@@ -86,7 +86,7 @@ export function MobileAuthButton({ user }: { user: SessionUser | null }) {
       <Button
         onClick={() => void signOut(locale)}
         variant="outline"
-        className="w-full border-red-400/20 text-red-400 hover:bg-red-400/10"
+        className="w-full border-destructive/30 text-destructive hover:bg-destructive/10"
       >
         <LogOut className="mr-2 h-4 w-4" />
         {t("logout")}
@@ -97,7 +97,7 @@ export function MobileAuthButton({ user }: { user: SessionUser | null }) {
     <Link
       href="/auth/login"
       className={buttonVariants({
-        className: "w-full border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white",
+        className: "w-full border-0 bg-primary text-primary-foreground",
       })}
     >
       {t("login")}
@@ -114,8 +114,7 @@ export function LoginButton() {
       href="/auth/login"
       className={buttonVariants({
         size: "sm",
-        className:
-          "hidden border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700 md:inline-flex",
+        className: "hidden border-0 bg-primary text-primary-foreground lg:inline-flex",
       })}
     >
       {t("login")}

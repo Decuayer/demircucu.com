@@ -38,7 +38,7 @@ export default function SkillsClient({ forest }: { forest: SkillForest }) {
         <div className="mb-12 text-center">
           <Badge
             variant="secondary"
-            className="mb-4 border-cyan-500/20 bg-cyan-500/10 px-4 py-1.5 text-cyan-400"
+            className="mb-4 border-primary/40 bg-muted px-4 py-1.5 text-link"
           >
             <Code2 className="mr-1 h-3 w-3" />
             {t("title")}

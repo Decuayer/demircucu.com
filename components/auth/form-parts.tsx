@@ -32,12 +32,12 @@ export function IconField({
           name={id}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
-          className="border-border/50 bg-accent/30 pl-10"
+          className="bg-accent/30 pl-10"
           {...input}
         />
       </div>
       {error && (
-        <p id={errorId} className="text-xs text-red-400">
+        <p id={errorId} className="text-xs text-destructive">
           {error}
         </p>
       )}
@@ -48,8 +48,8 @@ export function IconField({
 export function FormAlert({ tone, children }: { tone: "error" | "success"; children: string }) {
   const styles =
     tone === "error"
-      ? "border-red-500/20 bg-red-500/10 text-red-500"
-      : "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
+      ? "border-destructive/30 bg-destructive/10 text-destructive"
+      : "border-success/30 bg-success/10 text-success";
   return (
     <div
       role={tone === "error" ? "alert" : "status"}
@@ -66,7 +66,7 @@ export function SubmitButton({ pending, children }: { pending: boolean; children
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="w-full border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700"
+      className="w-full border-0 bg-primary text-primary-foreground"
     >
       {pending ? "…" : children}
     </Button>

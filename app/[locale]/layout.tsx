@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Analytics } from "@/components/analytics/tracker";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { getCurrentYear, getSiteSettings } from "@/lib/data/settings";
 import { getAppUrl } from "@/lib/env/app-url";
 
@@ -70,23 +71,27 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // next-themes sets the theme class before hydration.
+      suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <TooltipProvider>
-            <Header />
-            <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
-              {children}
-            </main>
-            <Footer settings={settings} year={year} />
-            <Toaster />
-            {/* usePathname suspends on routes with params unknown at build time. */}
-            <Suspense fallback={null}>
-              <Analytics />
-            </Suspense>
-          </TooltipProvider>
-        </NextIntlClientProvider>
+        <ThemeProvider>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <TooltipProvider>
+              <Header />
+              <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+                {children}
+              </main>
+              <Footer settings={settings} year={year} />
+              <Toaster />
+              {/* usePathname suspends on routes with params unknown at build time. */}
+              <Suspense fallback={null}>
+                <Analytics />
+              </Suspense>
+            </TooltipProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

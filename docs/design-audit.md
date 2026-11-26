@@ -244,6 +244,10 @@ Tek vurgu + nötr skala, light ve dark için token'lar (`globals.css`, `oklch`):
 - İkon kutuları ve rozetler nötr, butonlar düz renk.
 - Dil ve durum renkleri yalnızca küçük noktalarda.
 
+Uygulanan token'lar ve kontrast oranları (PR 3, 2026-11-26): metin/zemin 19,9 (light) ve 19,1
+(dark); ikincil metin 7,7 / 7,6; link 7,3 / 7,0; buton metni 5,9; focus halkası 5,9 / 7,0. Dark'ta
+kenarlık zinc-700, input kenarı zinc-600 (muted zemin zinc-800 üstünde kaybolmasın diye).
+
 ### Tipografi
 
 - Geist Sans + Geist Mono kalır (yükleme Faz 6'da optimize edildi).

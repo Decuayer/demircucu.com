@@ -40,8 +40,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="hidden w-64 flex-col border-r border-border/40 bg-card/30 md:flex">
         <div className="border-b border-border/40 p-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-violet-500/20 to-cyan-500/20">
-              <Shield className="h-5 w-5 text-violet-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+              <Shield className="h-5 w-5 text-link" />
             </div>
             <div>
               <h2 className="text-sm font-bold">{t("adminPanel")}</h2>
@@ -60,7 +60,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-violet-500/10 text-violet-400"
+                    ? "bg-muted text-link"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground",
                 )}
               >

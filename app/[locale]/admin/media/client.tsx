@@ -154,7 +154,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
       {/* Header & Controls */}
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <h1 className="enter flex items-center gap-3 text-2xl font-bold">
-          <ImageIcon className="h-6 w-6 text-violet-400" />
+          <ImageIcon className="h-6 w-6 text-link" />
           {t("mediaLibrary")}
         </h1>
 
@@ -171,7 +171,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
           <Button
             onClick={() => !isUploading && fileInputRef.current?.click()}
             disabled={isUploading}
-            className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 whitespace-nowrap text-white"
+            className="border-0 bg-primary whitespace-nowrap text-primary-foreground"
           >
             {isUploading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -278,7 +278,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
               style={{ "--enter-delay": `${i * 50}ms` } as React.CSSProperties}
             >
               <Card
-                className="group cursor-pointer overflow-hidden border-border/50 bg-card/50 transition-colors hover:border-violet-500/50"
+                className="group cursor-pointer overflow-hidden border-border/50 bg-card/50 transition-colors hover:border-primary/40"
                 onClick={() => setSelectedFile(file)}
               >
                 <div className="relative flex aspect-square items-center justify-center bg-accent/20 p-2">
@@ -294,7 +294,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                       />
                     </span>
                   ) : (
-                    <FileIcon className="h-12 w-12 text-cyan-400 opacity-80" />
+                    <FileIcon className="h-12 w-12 text-link opacity-80" />
                   )}
 
                   {/* Hover Overlay */}
@@ -344,7 +344,7 @@ export default function AdminMediaClient({ initialFiles }: AdminMediaClientProps
                     />
                   </span>
                 ) : (
-                  <FileIcon className="h-24 w-24 text-cyan-400" />
+                  <FileIcon className="h-24 w-24 text-link" />
                 )}
               </div>
 

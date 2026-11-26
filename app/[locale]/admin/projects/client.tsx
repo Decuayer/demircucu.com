@@ -120,7 +120,7 @@ export default function AdminProjectsClient({ initialProjects, github }: AdminPr
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="flex items-center gap-3 text-2xl font-bold">
-          <Code2 className="h-6 w-6 text-cyan-400" />
+          <Code2 className="h-6 w-6 text-link" />
           {t("projects")}
         </h1>
         <div className="flex flex-wrap gap-2">
@@ -129,7 +129,7 @@ export default function AdminProjectsClient({ initialProjects, github }: AdminPr
             {running ? g("running") : g("syncAll")}
           </Button>
           <Link href="/admin/projects/new">
-            <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white">
+            <Button className="border-0 bg-primary text-primary-foreground">
               <Plus className="mr-2 h-4 w-4" />
               {t("add")}
             </Button>
@@ -268,7 +268,7 @@ export default function AdminProjectsClient({ initialProjects, github }: AdminPr
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-semibold">{title}</h3>
+                    <h2 className="font-semibold">{title}</h2>
                     <Badge variant="outline" className="gap-1 text-xs">
                       {isGithub ? <GithubIcon className="h-3 w-3" /> : null}
                       {isGithub ? g("sourceGithub") : g("sourceManual")}
@@ -282,7 +282,7 @@ export default function AdminProjectsClient({ initialProjects, github }: AdminPr
                     {project.featured && (
                       <Badge
                         variant="outline"
-                        className="border-yellow-400/30 text-xs text-yellow-400"
+                        className="border-amber-500/40 text-xs text-amber-700 dark:text-amber-400"
                       >
                         {t("featured")}
                       </Badge>

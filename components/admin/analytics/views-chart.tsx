@@ -26,7 +26,7 @@ export function ViewsChart({
   const locale = useLocale();
   const config = {
     views: { label: t("views"), color: CHART_COLORS.violet },
-    visitors: { label: t("visitors"), color: CHART_COLORS.cyan },
+    visitors: { label: t("visitors"), color: CHART_COLORS.neutral },
     previousViews: { label: t("previousViews"), color: CHART_COLORS.muted },
   } satisfies ChartConfig;
 
@@ -67,7 +67,7 @@ export function ViewsChart({
               dataKey="previousViews"
               type="monotone"
               stroke="var(--color-previousViews)"
-              strokeDasharray="4 4"
+              strokeDasharray="2 4"
               strokeOpacity={0.6}
               dot={false}
               isAnimationActive={false}
@@ -81,10 +81,12 @@ export function ViewsChart({
             strokeWidth={2}
             isAnimationActive={false}
           />
+          {/* Secondary series: neutral and dashed, so it does not rely on colour alone. */}
           <Area
             dataKey="visitors"
             type="monotone"
             stroke="var(--color-visitors)"
+            strokeDasharray="6 3"
             fill="transparent"
             strokeWidth={2}
             isAnimationActive={false}

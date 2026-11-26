@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { languageColor, languageShares, localizeReadmeHtml, readmeHeadings } from "./readme";
+import {
+  demoteReadmeTitles,
+  languageColor,
+  languageShares,
+  localizeReadmeHtml,
+  readmeHeadings,
+} from "./readme";
 
 describe("localizeReadmeHtml", () => {
   it("prefixes document links with the locale and leaves other links alone", () => {
@@ -55,5 +61,14 @@ describe("languages", () => {
     expect(languageShares("x")).toEqual([]);
     expect(languageShares({})).toEqual([]);
     expect(languageShares({ A: 0, B: "12" })).toEqual([]);
+  });
+});
+
+describe("demoteReadmeTitles", () => {
+  it("turns README h1 into marked h2 so the page keeps a single h1", () => {
+    expect(demoteReadmeTitles('<h1 id="x">Title</h1><h2>Sub</h2><h1>Two</h1>')).toBe(
+      '<h2 data-readme-h1 id="x">Title</h2><h2>Sub</h2><h2 data-readme-h1>Two</h2>',
+    );
+    expect(demoteReadmeTitles("<h10>not a heading</h10>")).toBe("<h10>not a heading</h10>");
   });
 });

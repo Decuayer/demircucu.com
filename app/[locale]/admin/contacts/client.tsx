@@ -80,7 +80,7 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
   return (
     <div className="space-y-6">
       <h1 className="enter flex items-center gap-3 text-2xl font-bold">
-        <Mail className="h-6 w-6 text-cyan-400" />
+        <Mail className="h-6 w-6 text-link" />
         {t("messages")}
       </h1>
 
@@ -104,7 +104,7 @@ export default function AdminContactsClient({ initialMessages }: AdminContactsCl
                     <div className="flex items-center gap-2">
                       {!msg.read && (
                         <span
-                          className="h-2 w-2 rounded-full bg-violet-500"
+                          className="h-2 w-2 rounded-full bg-primary"
                           aria-label={t("unread")}
                         />
                       )}

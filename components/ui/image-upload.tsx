@@ -87,7 +87,7 @@ export function ImageUpload({ value, onChange, folder = "general" }: ImageUpload
 
   return (
     <div
-      className={`relative cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors ${dragActive ? "border-violet-500 bg-violet-500/10" : "border-border/50 hover:border-violet-500/50 hover:bg-accent/30"} ${isUploading ? "pointer-events-none opacity-50" : ""}`}
+      className={`relative cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors ${dragActive ? "border-primary bg-muted" : "border-border/50 hover:border-primary/40 hover:bg-accent/30"} ${isUploading ? "pointer-events-none opacity-50" : ""}`}
       onDragEnter={onDrag}
       onDragLeave={onDrag}
       onDragOver={onDrag}
@@ -108,16 +108,16 @@ export function ImageUpload({ value, onChange, folder = "general" }: ImageUpload
       <div className="flex flex-col items-center gap-2 text-muted-foreground">
         {isUploading ? (
           <>
-            <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
+            <Loader2 className="h-8 w-8 animate-spin text-link" />
             <p className="text-sm font-medium">{t("uploading")}</p>
           </>
         ) : (
           <>
             <div className="mb-2 rounded-full bg-background p-3 shadow-sm">
-              <Upload className="h-6 w-6 text-violet-400" />
+              <Upload className="h-6 w-6 text-link" />
             </div>
             <p className="text-sm font-medium">{t("imageDropHint")}</p>
-            <p className="text-xs opacity-70">{t("imageTypes")}</p>
+            <p className="text-xs">{t("imageTypes")}</p>
           </>
         )}
       </div>

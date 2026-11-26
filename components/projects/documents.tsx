@@ -41,11 +41,9 @@ export function ProjectDocuments({
         {documents.map((doc) => (
           <li key={doc.id}>
             <div
-              className={`flex items-center gap-3 rounded-lg border p-3 text-sm transition-colors ${
-                doc.id === open ? "border-cyan-500/40 bg-cyan-500/5" : "border-border/50"
-              }`}
+              className={`flex items-center gap-3 rounded-lg border p-3 text-sm transition-colors ${doc.id === open ? "border-primary/40 bg-muted" : "border-border/50"}`}
             >
-              <FileText className="h-4 w-4 shrink-0 text-cyan-400" />
+              <FileText className="h-4 w-4 shrink-0 text-link" />
               <div className="min-w-0 flex-1">
                 {doc.url ? (
                   <button

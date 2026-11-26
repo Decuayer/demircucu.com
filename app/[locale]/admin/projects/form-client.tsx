@@ -121,7 +121,7 @@ export default function ProjectFormClient({
           <Button
             type="submit"
             disabled={isPending}
-            className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white"
+            className="border-0 bg-primary text-primary-foreground"
           >
             {isPending ? t("saving") : t("save")}
           </Button>
@@ -137,7 +137,7 @@ export default function ProjectFormClient({
             </CardHeader>
             <CardContent className="space-y-4">
               {isGithub && (
-                <p className="rounded-md border border-cyan-500/20 bg-cyan-500/5 p-3 text-sm text-muted-foreground">
+                <p className="rounded-md border border-primary/40 bg-muted p-3 text-sm text-muted-foreground">
                   {g("overrideHint", { repo: initialData?.githubFullName ?? "" })}
                 </p>
               )}

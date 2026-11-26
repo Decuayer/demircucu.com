@@ -36,7 +36,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
           {/* Header */}
           <div className="mb-12">
             <div className="mb-4 flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20">
+              <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border/50 bg-muted">
                 {experience.logoUrl ? (
                   <Image
                     src={experience.logoUrl}
@@ -47,7 +47,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
                     className="h-10 w-10 rounded object-contain"
                   />
                 ) : (
-                  <Building2 className="h-8 w-8 text-violet-400" />
+                  <Building2 className="h-8 w-8 text-link" />
                 )}
               </div>
               <div>
@@ -96,7 +96,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
           {experience.files && Array.isArray(experience.files) && experience.files.length > 0 && (
             <div className="mb-8 space-y-3">
               <h3 className="flex items-center gap-2 text-lg font-semibold">
-                <FileIcon className="h-5 w-5 text-violet-400" />
+                <FileIcon className="h-5 w-5 text-link" />
                 Ekli Dosyalar
               </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -107,10 +107,10 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-violet-500/30 hover:bg-card">
+                    <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-primary/40 hover:bg-card">
                       <CardContent className="flex items-center justify-between p-4">
                         <div className="flex items-center gap-3 overflow-hidden">
-                          <FileIcon className="h-4 w-4 shrink-0 text-cyan-400" />
+                          <FileIcon className="h-4 w-4 shrink-0 text-link" />
                           <p className="truncate text-sm font-medium">{file.name}</p>
                         </div>
                       </CardContent>
@@ -124,7 +124,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
           {/* GitHub Link */}
           {experience.githubUrl && (
             <a href={experience.githubUrl} target="_blank" rel="noopener noreferrer">
-              <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700">
+              <Button className="border-0 bg-primary text-primary-foreground">
                 <GithubIcon className="mr-2 h-4 w-4" />
                 GitHub
               </Button>

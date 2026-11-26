@@ -823,5 +823,11 @@
   },
   "cv": {
     "download": "Download CV"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   }
 }

@@ -103,7 +103,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
         <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
-            className="mb-4 border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-violet-400"
+            className="mb-4 border-primary/40 bg-muted px-4 py-1.5 text-link"
           >
             <Mail className="mr-1 h-3 w-3" />
             {t("title")}
@@ -138,7 +138,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                         id="name"
                         name="name"
                         required
-                        className="border-border/50 bg-accent/30"
+                        className="bg-accent/30"
                         placeholder="John Doe"
                       />
                     </div>
@@ -149,7 +149,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                         name="email"
                         type="email"
                         required
-                        className="border-border/50 bg-accent/30"
+                        className="bg-accent/30"
                         placeholder="john@example.com"
                       />
                     </div>
@@ -159,7 +159,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                     <Input
                       id="subject"
                       name="subject"
-                      className="border-border/50 bg-accent/30"
+                      className="bg-accent/30"
                       placeholder="Proje hakkında..."
                     />
                   </div>
@@ -170,14 +170,14 @@ export default function ContactClient({ settings }: ContactClientProps) {
                       name="message"
                       required
                       rows={6}
-                      className="resize-none border-border/50 bg-accent/30"
+                      className="resize-none bg-accent/30"
                       placeholder="Mesajınızı buraya yazın..."
                     />
                   </div>
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-700 hover:to-cyan-700"
+                    className="w-full border-0 bg-primary text-primary-foreground"
                   >
                     {loading ? (
                       <span className="animate-pulse">Gönderiliyor...</span>
@@ -198,19 +198,19 @@ export default function ContactClient({ settings }: ContactClientProps) {
             {/* Info Cards */}
             <Card className="border-border/50 bg-card/50">
               <CardContent className="space-y-6 p-6">
-                <h3 className="text-lg font-semibold">{t("info")}</h3>
+                <h2 className="text-lg font-semibold">{t("info")}</h2>
                 <div className="space-y-4">
                   {contactInfo.map((info) => (
                     <div key={info.label} className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
-                        <info.icon className="h-5 w-5 text-violet-400" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                        <info.icon className="h-5 w-5 text-link" />
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">{info.label}</p>
                         {info.href ? (
                           <a
                             href={info.href}
-                            className="text-sm font-medium transition-colors hover:text-violet-400"
+                            className="text-sm font-medium transition-colors hover:text-link"
                           >
                             {info.value}
                           </a>
@@ -228,7 +228,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
             {socialLinks.length > 0 && (
               <Card className="border-border/50 bg-card/50">
                 <CardContent className="space-y-4 p-6">
-                  <h3 className="text-lg font-semibold">{t("social")}</h3>
+                  <h2 className="text-lg font-semibold">{t("social")}</h2>
                   <div className="flex gap-3">
                     {socialLinks.map((social) => (
                       <a

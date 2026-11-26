@@ -227,18 +227,16 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
         <div className="enter mb-16 text-center">
           <Badge
             variant="secondary"
-            className="mb-4 border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-violet-400"
+            className="mb-4 border-primary/40 bg-muted px-4 py-1.5 text-link"
           >
             {t("title")}
           </Badge>
           <h1 className="mb-4 text-3xl font-bold md:text-5xl">
             {t("heroTitle")}{" "}
-            <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
+            <span className="text-link">
               {getTranslated(settings, "heroTitle", locale) || (
                 <>
-                  <span className="bg-gradient-to-r from-violet-500 to-cyan-500 bg-clip-text text-transparent">
-                    Demircucu
-                  </span>
+                  <span className="text-link">Demircucu</span>
                 </>
               )}
             </span>
@@ -255,7 +253,7 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
             {/* Photo */}
             <div className="mb-10 flex justify-center md:float-left md:mr-10 md:mb-8 md:block">
               <div className="relative">
-                <div className="relative flex h-64 w-64 items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-violet-500/20 to-cyan-500/20 shadow-2xl md:h-72 md:w-72">
+                <div className="relative flex h-64 w-64 items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-muted shadow-2xl md:h-72 md:w-72">
                   {settings?.aboutPhotoUrl ? (
                     <Image
                       src={settings.aboutPhotoUrl}
@@ -272,9 +270,6 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                     <span className="text-6xl">👨‍💻</span>
                   )}
                 </div>
-                <div className="absolute -right-3 -bottom-3 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 shadow-lg md:h-20 md:w-20">
-                  <Globe className="h-6 w-6 text-white md:h-8 md:w-8" />
-                </div>
               </div>
             </div>
 
@@ -282,19 +277,19 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
             <div className="space-y-6">
               <h2 className="flex items-center gap-2 text-2xl font-bold md:text-3xl">{t("bio")}</h2>
               <div
-                className="prose max-w-none leading-relaxed text-muted-foreground prose-invert prose-p:mb-4"
+                className="prose max-w-none leading-relaxed text-muted-foreground dark:prose-invert prose-p:mb-4"
                 dangerouslySetInnerHTML={{ __html: bioHtml }}
               />
 
               <div className="flex flex-wrap items-center gap-6 border-t border-border/50 pt-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground md:text-base">
-                  <MapPin className="h-4 w-4 text-violet-400" />
+                  <MapPin className="h-4 w-4 text-link" />
                   <span>
                     {getTranslated(settings, "aboutLocation", locale) || "İstanbul, Türkiye"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground md:text-base">
-                  <Calendar className="h-4 w-4 text-cyan-400" />
+                  <Calendar className="h-4 w-4 text-link" />
                   <span>
                     {getTranslated(settings, "aboutExperience", locale) || "5+ Yıl Deneyim"}
                   </span>
@@ -310,8 +305,7 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                     data-track="document"
                     className={buttonVariants({
                       variant: "outline",
-                      className:
-                        "border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5",
+                      className: "border-border/50 hover:border-primary/40 hover:bg-accent",
                     })}
                   >
                     <Download aria-hidden className="mr-2 h-4 w-4" /> {tCv("download")}
@@ -319,14 +313,14 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                 )}
                 {settings?.socialGithub && (
                   <a href={settings.socialGithub} target="_blank" rel="noopener noreferrer">
-                    <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white shadow-lg shadow-violet-500/20 hover:from-violet-700 hover:to-cyan-700">
+                    <Button className="border-0 bg-primary text-primary-foreground shadow-lg">
                       <GithubIcon className="mr-2 h-4 w-4" /> {t("github")}
                     </Button>
                   </a>
                 )}
                 {!settings?.socialGithub && (
                   <a href="https://github.com/demircucu" target="_blank" rel="noopener noreferrer">
-                    <Button className="border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white shadow-lg shadow-violet-500/20 hover:from-violet-700 hover:to-cyan-700">
+                    <Button className="border-0 bg-primary text-primary-foreground shadow-lg">
                       <GithubIcon className="mr-2 h-4 w-4" /> {t("github")}
                     </Button>
                   </a>
@@ -336,7 +330,7 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                   <a href={settings.socialLinkedin} target="_blank" rel="noopener noreferrer">
                     <Button
                       variant="outline"
-                      className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"
+                      className="border-border/50 hover:border-primary/40 hover:bg-accent"
                     >
                       <LinkedinIcon className="mr-2 h-4 w-4" /> LinkedIn
                     </Button>
@@ -346,7 +340,7 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                   <a href={settings.socialTwitter} target="_blank" rel="noopener noreferrer">
                     <Button
                       variant="outline"
-                      className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"
+                      className="border-border/50 hover:border-primary/40 hover:bg-accent"
                     >
                       <TwitterIcon className="mr-2 h-4 w-4" /> Twitter / X
                     </Button>
@@ -356,7 +350,7 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                   <a href={settings.socialInstagram} target="_blank" rel="noopener noreferrer">
                     <Button
                       variant="outline"
-                      className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"
+                      className="border-border/50 hover:border-primary/40 hover:bg-accent"
                     >
                       <InstagramIcon className="mr-2 h-4 w-4" /> Instagram
                     </Button>
@@ -366,7 +360,7 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                   <a href={settings.socialYoutube} target="_blank" rel="noopener noreferrer">
                     <Button
                       variant="outline"
-                      className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"
+                      className="border-border/50 hover:border-primary/40 hover:bg-accent"
                     >
                       <YoutubeIcon className="mr-2 h-4 w-4" /> YouTube
                     </Button>
@@ -376,7 +370,7 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                   <a href={settings.socialMedium} target="_blank" rel="noopener noreferrer">
                     <Button
                       variant="outline"
-                      className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"
+                      className="border-border/50 hover:border-primary/40 hover:bg-accent"
                     >
                       <MediumIcon className="mr-2 h-4 w-4" /> Medium
                     </Button>
@@ -386,7 +380,7 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
                   <a href={settings.socialStackoverflow} target="_blank" rel="noopener noreferrer">
                     <Button
                       variant="outline"
-                      className="border-border/50 hover:border-violet-500/50 hover:bg-violet-500/5"
+                      className="border-border/50 hover:border-primary/40 hover:bg-accent"
                     >
                       <StackOverflowIcon className="mr-2 h-4 w-4" /> StackOverflow
                     </Button>
@@ -400,15 +394,15 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
         {/* Skills */}
         <section className="reveal mb-20">
           <h2 className="mb-8 flex items-center gap-3 text-2xl font-bold">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10">
-              <Code2 className="h-5 w-5 text-cyan-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+              <Code2 className="h-5 w-5 text-link" />
             </div>
             {t("skills")}
           </h2>
           <SkillForestView forest={skillForest} locale={locale} headingLevel="h3" />
           <Link
             href="/skills"
-            className="mt-6 inline-flex items-center text-sm font-medium text-cyan-400 hover:underline"
+            className="mt-6 inline-flex items-center text-sm font-medium text-link hover:underline"
           >
             {t("allSkills")}
           </Link>
@@ -417,8 +411,8 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
         {/* Hobbies */}
         <section className="reveal">
           <h2 className="mb-8 flex items-center gap-3 text-2xl font-bold">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10">
-              <Gamepad2 className="h-5 w-5 text-violet-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+              <Gamepad2 className="h-5 w-5 text-link" />
             </div>
             {t("hobbies")}
           </h2>
@@ -428,11 +422,11 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
 
               return (
                 <div key={hobby.name} className="reveal enter-scale">
-                  <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-violet-500/30 hover:bg-card">
+                  <Card className="group h-full border-border/50 bg-card/50 transition-all duration-300 hover:border-primary/40 hover:bg-card">
                     <CardContent className="flex h-full flex-col items-center justify-center space-y-3 p-6 text-center">
-                      <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-violet-500/10 to-cyan-500/10 transition-transform group-hover:scale-110">
+                      <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-muted transition-transform group-hover:scale-110">
                         {IconComponent ? (
-                          <IconComponent className="h-6 w-6 text-violet-400" />
+                          <IconComponent className="h-6 w-6 text-link" />
                         ) : (
                           <span className="text-2xl leading-none">{hobby.icon || "❤️"}</span>
                         )}
