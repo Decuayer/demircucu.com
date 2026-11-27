@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-27 (Faz 8B: PR #23 merge; analitik yolu taşınıyor, sonra admin mobil menüsü ve SEO). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-27 (Faz 8B: PR #24 merge; admin mobil menüsü PR #25 ve SEO PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -311,7 +311,19 @@ sayfaları.
   handler'ı yeniden dışa aktarıyor. **2026-12-27'den sonra bu dosya silinecek** (ayrı küçük PR).
   Yerelde tüm worker'larla E2E çalışınca ağır admin testleri yük kaynaklı zaman aşımına düşebiliyor
   (`admin-media`, admin axe, GitHub yayından kaldırma); ikisine süre verildi, `--workers=2` ile hepsi
-  geçiyor.
+  geçiyor. PR #24 merge; kullanıcı prod'da `/api/e` kayıtlarını doğruladı (2026-11-27).
+- **PR 7 (`feat/seo`):** `lib/seo/metadata.ts` (`pageMetadata`: canonical sayfa dilinde,
+  `alternates.languages` tr/en + `x-default` → **en** (kullanıcı kararı), Open Graph, Twitter
+  `summary_large_image`, ayarlarda X/Twitter varsa `creator`). Tüm public sayfalarda metadata;
+  giriş/kayıt, profil ve admin `noindex, nofollow` (layout'larda). `app/robots.ts`: production'da
+  `/api/`, `/*/admin`, `/*/auth`, `/*/profile` engelli + sitemap; diğer ortamlarda her şey engelli.
+  Sitemap'te `x-default`. OG görselleri `next/og` (koyu kart + violet, Geist TTF `assets/fonts`,
+  OFL): site geneli `app/[locale]/opengraph-image.tsx`; proje, blog, deneyim, skill için segment
+  dosyaları; proje dokümanı projenin kartını kullanır. Not: sayfanın kendi `openGraph`'ı üst
+  segmentin görselini ezer ve dosya tabanlı görsel yalnızca kendi segmentinde geçerli; bu yüzden
+  `pageMetadata` `image: "own" | { path }` alır. JSON-LD (`lib/seo/json-ld.ts`, `<`/`>`/`&`
+  kaçışlı): ana sayfa `WebSite` + `Person`, Hakkımda `ProfilePage`/`Person`, blog `BlogPosting`,
+  proje `SoftwareSourceCode`, detaylarda `BreadcrumbList`.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
