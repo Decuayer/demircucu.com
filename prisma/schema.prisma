@@ -64,6 +64,8 @@ model Tag {
   descriptionEn String?  @db.Text
   order         Int      @default(0)
   hidden        Boolean  @default(false)
+  /// Shown in the home page's "featured skills" (admin choice; usage counts are the fallback).
+  featured      Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
 
@@ -500,6 +502,9 @@ model SiteSettings {
   /// Turkish file.
   cvPathTr            String?
   cvPathEn            String?
+  /// Two or three sentences under the name on the home page.
+  heroIntroTr         String?
+  heroIntroEn         String?
   // Meta
   updatedAt           DateTime @updatedAt
 

@@ -130,6 +130,8 @@ export const siteSettingsSchema = z
     heroTitleEn: short,
     heroSubTr: short,
     heroSubEn: short,
+    heroIntroTr: optionalText(600),
+    heroIntroEn: optionalText(600),
     aboutBioTr: optionalRichText(RICH_TEXT_MAX),
     aboutBioEn: optionalRichText(RICH_TEXT_MAX),
     aboutPhotoPath: optionalMediaPath,

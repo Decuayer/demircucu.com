@@ -40,14 +40,21 @@
     "skipToContent": "İçeriğe geç"
   },
   "home": {
-    "heroTitle": "Merhaba, Ben",
     "heroSub": "Full-Stack Geliştirici & Yazılım Mühendisi",
     "heroCta": "Benimle İletişime Geç",
     "featuredProjects": "Öne Çıkan Projeler",
-    "latestPosts": "Son Blog Yazıları",
-    "aboutPreview": "Hakkımda",
-    "viewAll": "Tümünü Gör",
-    "readMore": "Devamını Oku"
+    "latestPosts": "Son yazılar",
+    "greeting": "Merhaba, ben",
+    "allProjects": "Tüm projeler",
+    "experience": "Deneyim",
+    "allExperience": "Tüm deneyimler",
+    "present": "Devam ediyor",
+    "years": "{count} yıl",
+    "months": "{count} ay",
+    "skills": "Öne çıkan yetenekler",
+    "allSkills": "Tüm yetenekler",
+    "allPosts": "Tüm yazılar",
+    "readingTime": "{minutes} dk okuma"
   },
   "about": {
     "photoAlt": "Profil fotoğrafı",
@@ -458,7 +465,11 @@
     "openFile": "Dosyayı yeni sekmede aç",
     "removeHobby": "Hobiyi kaldır",
     "cv": "Özgeçmiş (CV, PDF)",
-    "cvHint": "İngilizce sayfada EN dosyası yoksa TR dosyası gösterilir (ve tersi)."
+    "cvHint": "İngilizce sayfada EN dosyası yoksa TR dosyası gösterilir (ve tersi).",
+    "heroName": "Ad Soyad (hero)",
+    "heroNameHint": "Yalnızca adınızı yazın; \"Merhaba, ben\" selamı ana sayfada otomatik eklenir.",
+    "heroIntro": "Ana sayfa tanıtım metni",
+    "heroIntroHint": "Adınızın ve unvanınızın altında görünen 2–3 cümle: ne yaptığınız ve odak alanlarınız. Boş bırakılırsa gösterilmez."
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -601,7 +612,9 @@
       "TOPIC": "Konu"
     },
     "filteredBy": "<tag></tag> etiketiyle filtrelendi ({count} sonuç)",
-    "clearFilter": "Filtreyi kaldır"
+    "clearFilter": "Filtreyi kaldır",
+    "featured": "Öne çıkan",
+    "featuredHint": "Ana sayfadaki \"Öne çıkan yetenekler\"de gösterilir. Hiçbir skill işaretli değilse en çok kullanılan 12 skill gösterilir."
   },
   "skills": {
     "title": "Yetenekler",

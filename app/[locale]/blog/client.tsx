@@ -2,6 +2,7 @@
 
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "next-intl";
+import { readingMinutes } from "@/lib/reading-time";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import { TagChips } from "@/components/tags/tag-chips";
 type BlogPostWithTags = PublicPost;
 
 function PostCard({ post }: { post: BlogPostWithTags }) {
+  const t = useTranslations("blog");
   const params = useParams();
   const locale = params.locale as string;
   const content = getTranslated(post, "content", locale);
@@ -26,7 +28,9 @@ function PostCard({ post }: { post: BlogPostWithTags }) {
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              <span>{Math.max(1, Math.ceil(content.length / 1000))} dk</span>
+              <span>
+                {readingMinutes(content)} {t("readTime")}
+              </span>
             </div>
             <span>·</span>
             <div className="flex items-center gap-1">

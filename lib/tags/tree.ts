@@ -168,3 +168,17 @@ export function flattenForest(forest: SkillForest): SkillNode[] {
   walk([...forest.categories, ...forest.uncategorized]);
   return out;
 }
+
+/**
+ * Most used skills for the home page when the admin has marked none: every shown skill except
+ * the category roots, by distinct content (projects + experiences + posts), then by name.
+ */
+export function topSkills(forest: SkillForest, limit: number): SkillNode[] {
+  const roots = new Set(forest.categories.map((node) => node.id));
+  const total = (node: SkillNode) =>
+    node.counts.projects + node.counts.experiences + node.counts.posts;
+  return flattenForest(forest)
+    .filter((node) => !roots.has(node.id) && total(node) > 0)
+    .sort((a, b) => total(b) - total(a) || a.name.localeCompare(b.name))
+    .slice(0, limit);
+}

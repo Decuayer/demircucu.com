@@ -2,6 +2,7 @@
 
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "next-intl";
+import { readingMinutes } from "@/lib/reading-time";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -134,7 +135,7 @@ export default function BlogDetailClient({
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
                   <span>
-                    {Math.max(1, Math.ceil(content.length / 1000))} {t("readTime") || "dk"}
+                    {readingMinutes(content)} {t("readTime")}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
