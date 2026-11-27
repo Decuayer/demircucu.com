@@ -48,7 +48,10 @@ test("a visit is recorded without cookies, with engagement when the visitor move
   context,
 }) => {
   const utm = tag("visit");
+  // The tracker posts to the neutral path, not the former /api/track.
+  const beacon = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/e");
   await page.goto(`/tr/blog/hello-world?utm_source=${utm}`);
+  expect((await beacon).method()).toBe("POST");
   await expect.poll(async () => (await viewsWith(utm)).length).toBe(1);
   const [row] = await viewsWith(utm);
   expect(row).toMatchObject({ path: "/blog/hello-world", entityType: "BLOG" });
@@ -137,11 +140,13 @@ test("analytics pages and export reject anonymous visitors", async ({ page, requ
   await expect(page).toHaveURL(/\/tr\/auth\/login/);
   const csv = await request.get("/api/admin/analytics/export?scope=site");
   expect(csv.status()).toBe(401);
-  const track = await request.post("/api/track", {
-    data: { type: "view", id: crypto.randomUUID(), path: "/tr" },
-    headers: { origin: "https://evil.test" },
-  });
-  expect(track.status()).toBe(403);
+  for (const path of ["/api/e", "/api/track"]) {
+    const track = await request.post(path, {
+      data: { type: "view", id: crypto.randomUUID(), path: "/tr" },
+      headers: { origin: "https://evil.test" },
+    });
+    expect(track.status(), path).toBe(403);
+  }
 });
 
 test("the privacy policy is linked from the footer in both languages", async ({ page }) => {
