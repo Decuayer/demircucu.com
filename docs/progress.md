@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-26 (Faz 8B: PR #20 ve #21 merge; renk ve tema PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-26 (Faz 8B: PR #22 merge; ana sayfa migration'ı prod'da, arayüz PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -293,6 +293,17 @@ sayfaları.
   `--link` (1a), grafiklerde ikinci seri nötr + kesikli (2a). Kart/footer başlıkları `h2`, README
   `h1` → `h2[data-readme-h1]`, dark kod yorumu rengi CSS ile 5,3:1. Masaüstü menü 768 px'te taşmasın
   diye `lg`'den itibaren. Kullanıcı içeriğindeki başlık sırası (blog/deneyim gövdesi) içerik notu.
+  PR #22 merge; kullanıcı prod'da tema menüsünü, seçimin korunmasını ve input kenarlarını doğruladı.
+- **PR 4 (`feat/phase-8-home`):** kararlar (kullanıcı, 2026-11-26): 4a bölüm sırası, tanıtım için yeni
+  `heroIntroTr/En`, yalnızca öne çıkan projeler, `Tag.featured` (işaretli yoksa kullanım sayısına göre
+  ilk 12). Migration `20261128090000_phase8_home` (yedek, staging, prod; lockdown ok, diff boş).
+  Hero: selam bir kez (ayardaki başlık selamla başlıyorsa kırpılır), unvan, tanıtım, CTA'lar (İletişim,
+  CV, GitHub, LinkedIn). Projeler: kapak = admin görseli → README'nin ilk gerçek görseli → baş harfli
+  yer tutucu; logo/kare görseller `contain`; ızgara 1 = geniş kart, 2/4 = 2 sütun, 3 = 3 sütun (en
+  fazla 4). Deneyim: son 3, süre ve konum. Skill'ler: chip'ler. Yazılar: tarihe göre son 3, okuma
+  süresi kelime/200 (blog listesi ve detayda da). "Birlikte Çalışalım" ve Ayarlar'daki CTA kartı
+  kaldırıldı (kolonlar duruyor). Admin: "Ad Soyad (hero)" + ipucu, tanıtım metni, Etiketler'de
+  "Öne çıkan".
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
@@ -369,8 +380,12 @@ Kurallar:
 | `20261124120000_phase3_expand`                     | `migrate deploy` (onaylı), lockdown ok, drift yok                 | 2026-11-24 |
 | `20261125090000_phase3_contract`                   | `migrate deploy` (onaylı, kod deploy'dan sonra), ok               | 2026-11-24 |
 | `20261126090000_phase5_github`                     | `migrate deploy` (onaylı, merge'den önce), lockdown ok, drift yok |
-| `20261127090000_phase8_cv_location`                | `migrate deploy` (onaylı, merge'den önce), lockdown ok, diff boş  | 2026-11-24 |
+| `20261127090000_phase8_cv_location`                | `migrate deploy` (onaylı, merge'den önce), lockdown ok, diff boş  |
+| `20261128090000_phase8_home`                       | `migrate deploy` (onaylı, merge'den önce), lockdown ok, diff boş  | 2026-11-24 |
 
+- **Faz 8 ana sayfa yedeği:** `~/backups/demircucu/backup-2026-11-26-pre-phase8-home.dump` (592 KB,
+  mode 600, stderr boş; public 26, auth 27, storage 10 tablo verisi). Prod'da Tag 83 (görünür skill
+  70), SiteSettings 1. Staging dry-run (transaction + ROLLBACK), sonra uygulama; prod deploy.
 - **Faz 8 yedeği:** `~/backups/demircucu/backup-2026-11-26-pre-phase8.dump` (migration'dan hemen
   önce, 591 KB, mode 600; pg_dump stderr boş; `pg_restore --list`: public 26, auth 27, storage 10
   tablo verisi). Prod'da Experience 1, SiteSettings 1, MediaFile 22 satır. Staging'de transaction +
