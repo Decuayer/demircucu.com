@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-27 (Faz 8B: PR #23 merge; analitik yolu taşınıyor, sonra admin mobil menüsü ve SEO). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-27 (Faz 8B: PR #24 merge; admin mobil menüsü PR'ı açık, sonra SEO). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -311,7 +311,11 @@ sayfaları.
   handler'ı yeniden dışa aktarıyor. **2026-12-27'den sonra bu dosya silinecek** (ayrı küçük PR).
   Yerelde tüm worker'larla E2E çalışınca ağır admin testleri yük kaynaklı zaman aşımına düşebiliyor
   (`admin-media`, admin axe, GitHub yayından kaldırma); ikisine süre verildi, `--workers=2` ile hepsi
-  geçiyor.
+  geçiyor. PR #24 merge; kullanıcı prod'da `/api/e` kayıtlarını doğruladı (2026-11-27).
+- **PR 6 (`feat/admin-mobile-nav`):** `md` altında admin içeriğinin üstünde yapışkan çubuk ("Admin
+  menüsü" düğmesi + geçerli bölüm); soldan Sheet, aynı gezinme bileşeni (`aria-current`),
+  bağlantıda kapanır, Escape ile kapanıp odak düğmeye döner. Menüde sabit "Medya" metni i18n'e
+  geçti. Dashboard/analitik KPI kartları mobilde 2 sütun, tek kalan son kart iki sütuna yayılır.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
@@ -482,7 +486,15 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
   - (PR 5'te çözüldü: `/api/e`.) `/api/track` yolu reklam/takip engelleyicilerin filtre listelerine (`/track`, `/api/track`
     kalıpları) takılabilir; bu ziyaretçiler sayılmaz. Daha nötr bir yol (ör. `/api/v`) ve
     engellenme oranının ölçülmesi değerlendirilecek.
-- **Faz 9:** coverage.
+- **Faz 9:**
+  - Coverage hedefleri (lib ≥ %85, genel ≥ %70).
+  - E2E kararlılığı: yerelde tam paralel (tüm worker'lar) çalıştırmada ağır admin testleri yük
+    kaynaklı zaman aşımına düşüyor (10 sayfada axe, GitHub yayından kaldırma; PR #24'te süre
+    verildi). `admin-media` deneyim logosu testi Faz 4'ten beri kararsız (yükte 15 sn sınırını
+    aşabiliyor). CI'da 2 worker + 2 retry ile sorun yok. Faz 9'da: ağır admin testlerinin
+    hazırlığını (giriş, veri) `storageState` / fixture ile paylaşmak, sabit beklemeleri olay
+    tabanlı beklemelere çevirmek, yerel varsayılan worker sayısını sınırlamak veya ağır admin
+    testlerini ayrı bir projede seri çalıştırmak.
 
 ### Bilinen riskler
 
