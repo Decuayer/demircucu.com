@@ -119,7 +119,7 @@ describe("getHomePosts", () => {
 });
 
 describe("getHomeExperiences", () => {
-  it("returns the latest three with their length in months", async () => {
+  it("returns the latest three with their length in calendar months", async () => {
     await prisma.experience.deleteMany();
     for (const [company, start, end] of [
       ["A", "2020-01-01", "2020-07-01"],
@@ -141,9 +141,10 @@ describe("getHomeExperiences", () => {
     }
     const rows = await getHomeExperiences();
     expect(rows.map((row) => [row.company, row.months])).toEqual([
-      ["B", 1],
-      ["C", 12],
-      ["D", 1],
+      // Calendar months with both ends included (decision 1a).
+      ["B", 2],
+      ["C", 13],
+      ["D", 2],
     ]);
   });
 });

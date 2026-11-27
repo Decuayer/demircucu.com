@@ -8,7 +8,7 @@ import { TagChips } from "@/components/tags/tag-chips";
 import { cvUrlFor } from "@/lib/cv";
 import { formatDate } from "@/lib/format-date";
 import { getTranslated } from "@/lib/i18n-utils";
-import { splitMonths } from "@/lib/home/duration";
+import { useDurationLabel } from "@/components/experience/duration";
 import { stripGreeting } from "@/lib/home/hero";
 import { projectGrid } from "@/lib/home/layout";
 import { tagLabel } from "@/lib/tags/view";
@@ -236,6 +236,7 @@ function Projects({ projects }: { projects: HomeProject[] }) {
 function Experience({ experiences }: { experiences: HomeExperience[] }) {
   const t = useTranslations("home");
   const locale = useLocale();
+  const duration = useDurationLabel();
   if (experiences.length === 0) return null;
   return (
     <section aria-labelledby="experience-summary" className="container mx-auto px-4 py-16 md:px-6">
@@ -247,7 +248,6 @@ function Experience({ experiences }: { experiences: HomeExperience[] }) {
       />
       <ol className="relative space-y-8 border-l border-border pl-6">
         {experiences.map((exp) => {
-          const { years, months } = splitMonths(exp.months);
           const location =
             (locale === "en" ? exp.locationEn : exp.locationTr) || exp.locationTr || exp.locationEn;
           return (
@@ -288,12 +288,7 @@ function Experience({ experiences }: { experiences: HomeExperience[] }) {
                       {formatDate(exp.startDate, locale, MONTH_YEAR)} –{" "}
                       {exp.endDate ? formatDate(exp.endDate, locale, MONTH_YEAR) : t("present")}
                       {" · "}
-                      {[
-                        years > 0 ? t("years", { count: years }) : null,
-                        months > 0 ? t("months", { count: months }) : null,
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
+                      {duration(exp.months)}
                     </span>
                     {location && (
                       <span className="inline-flex items-center gap-1">

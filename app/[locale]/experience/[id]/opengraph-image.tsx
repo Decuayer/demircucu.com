@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { getPublishedExperience } from "@/lib/data/experiences";
 import { getTranslated } from "@/lib/i18n-utils";
+import { textBlocksToPlain } from "@/lib/text/blocks";
 import { OG_CONTENT_TYPE, OG_SIZE, ogCard } from "@/lib/seo/og";
 import { seoContext } from "@/lib/seo/site";
 
@@ -23,7 +24,9 @@ export default async function Image({
     locale,
     kicker: experience ? `${t("experience")} · ${experience.company}` : t("experience"),
     title: experience ? getTranslated(experience, "position", locale) : context.name,
-    description: experience ? getTranslated(experience, "description", locale) : null,
+    description: experience
+      ? textBlocksToPlain(getTranslated(experience, "description", locale))
+      : null,
     footer: `${context.name} · demircucu.com`,
   });
 }

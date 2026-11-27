@@ -49,8 +49,6 @@
     "experience": "Deneyim",
     "allExperience": "Tüm deneyimler",
     "present": "Devam ediyor",
-    "years": "{count} yıl",
-    "months": "{count} ay",
     "skills": "Öne çıkan yetenekler",
     "allSkills": "Tüm yetenekler",
     "allPosts": "Tüm yazılar",
@@ -69,9 +67,11 @@
   },
   "experience": {
     "title": "Deneyimlerim",
-    "present": "Devam Ediyor",
+    "present": "Devam ediyor",
     "details": "Detaylar",
-    "technologies": "Kullanılan Teknolojiler"
+    "technologies": "Kullanılan Teknolojiler",
+    "duration": "Süre",
+    "location": "Konum"
   },
   "projects": {
     "title": "Projelerim",
@@ -469,7 +469,8 @@
     "heroName": "Ad Soyad (hero)",
     "heroNameHint": "Yalnızca adınızı yazın; \"Merhaba, ben\" selamı ana sayfada otomatik eklenir.",
     "heroIntro": "Ana sayfa tanıtım metni",
-    "heroIntroHint": "Adınızın ve unvanınızın altında görünen 2–3 cümle: ne yaptığınız ve odak alanlarınız. Boş bırakılırsa gösterilmez."
+    "heroIntroHint": "Adınızın ve unvanınızın altında görünen 2–3 cümle: ne yaptığınız ve odak alanlarınız. Boş bırakılırsa gösterilmez.",
+    "summaryListHint": "Madde listesi için her satırı \"- \" ile başlatın."
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -858,5 +859,9 @@
       "document": "Doküman"
     },
     "home": "Ana sayfa"
+  },
+  "duration": {
+    "years": "{count} yıl",
+    "months": "{count} ay"
   }
 }

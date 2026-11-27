@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getTranslated } from "@/lib/i18n-utils";
+import { textBlocksToPlain } from "@/lib/text/blocks";
 import { breadcrumbs } from "@/lib/seo/json-ld";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { seoContext } from "@/lib/seo/site";
@@ -30,7 +31,7 @@ export async function generateMetadata({
     image: "own",
     path: `/experience/${experience.id}`,
     title: `${getTranslated(experience, "position", locale)} · ${experience.company}`,
-    description: getTranslated(experience, "description", locale),
+    description: textBlocksToPlain(getTranslated(experience, "description", locale)),
     twitterCreator: context.twitter,
   });
 }

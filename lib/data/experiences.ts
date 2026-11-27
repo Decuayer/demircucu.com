@@ -5,6 +5,13 @@ import { CacheTags } from "@/lib/cache/tags";
 import { sanitizeOptionalHtml } from "@/lib/sanitize/html";
 import { optimizeImagesIn } from "@/lib/data/html-images";
 import { presentExperience, publicExperienceQuery } from "@/lib/data/present";
+import { calendarMonths } from "@/lib/experience/duration";
+
+/** Length in calendar months; an ongoing role counts until today (cached for hours). */
+const withMonths = <T extends { startDate: Date; endDate: Date | null }>(row: T, now: Date) => ({
+  ...row,
+  months: calendarMonths(row.startDate, row.endDate ?? now),
+});
 
 export async function getPublishedExperiences() {
   "use cache: remote";
@@ -15,7 +22,8 @@ export async function getPublishedExperiences() {
     where: { published: true },
     orderBy: { startDate: "desc" },
   });
-  return rows.map(presentExperience);
+  const now = new Date();
+  return rows.map((row) => withMonths(presentExperience(row), now));
 }
 
 export async function getPublishedExperience(id: string) {
@@ -26,7 +34,7 @@ export async function getPublishedExperience(id: string) {
     ...publicExperienceQuery,
     where: { id, published: true },
   });
-  const experience = row && presentExperience(row);
+  const experience = row && withMonths(presentExperience(row), new Date());
   if (!experience) return null;
   return {
     ...experience,
