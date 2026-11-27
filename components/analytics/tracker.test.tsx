@@ -53,6 +53,7 @@ describe("<Analytics />", () => {
     });
     render(<Analytics />);
     expect(fetches).toHaveLength(1);
+    expect(vi.mocked(fetch).mock.calls[0]![0]).toBe("/api/e");
     expect(fetches[0]).toMatchObject({
       type: "view",
       path: "/tr/blog/hello",

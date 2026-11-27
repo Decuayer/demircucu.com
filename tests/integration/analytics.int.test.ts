@@ -21,7 +21,8 @@ const { totals, breakdown } = await import("@/lib/analytics/report");
 const { resetSaltMemo } = await import("@/lib/analytics/salt");
 const { getEntityAnalytics, getDashboard } = await import("@/lib/analytics/queries");
 const { parseRange } = await import("@/lib/analytics/range");
-const { POST } = await import("@/app/api/track/route");
+const { POST } = await import("@/app/api/e/route");
+const { POST: LEGACY_POST } = await import("@/app/api/track/route");
 const { GET: cron } = await import("@/app/api/cron/analytics/route");
 
 const UA =
@@ -172,9 +173,9 @@ describe("beacons", () => {
   });
 });
 
-describe("POST /api/track", () => {
+describe("POST /api/e", () => {
   function request(body: unknown, headers: Record<string, string> = {}) {
-    return new NextRequest("http://localhost:3000/api/track", {
+    return new NextRequest("http://localhost:3000/api/e", {
       method: "POST",
       body: typeof body === "string" ? body : JSON.stringify(body),
       headers: {
@@ -195,6 +196,14 @@ describe("POST /api/track", () => {
 
   it("records a view after the response", async () => {
     expect(await send(view("/tr/about"))).toBe(204);
+    expect(await prisma.pageView.count()).toBe(1);
+  });
+
+  it("still accepts beacons on the former /api/track path (until 2026-12-27)", async () => {
+    expect(LEGACY_POST).toBe(POST);
+    const response = await LEGACY_POST(request(view("/tr/blog/hello-world")));
+    for (const task of afterTasks.splice(0)) await task();
+    expect(response.status).toBe(204);
     expect(await prisma.pageView.count()).toBe(1);
   });
 

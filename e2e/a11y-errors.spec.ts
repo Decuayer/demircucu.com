@@ -95,6 +95,8 @@ test.describe("admin", () => {
   test("admin pages have named controls, labelled fields and no hydration errors", async ({
     page,
   }) => {
+    // Ten admin pages with an axe run each: about 15 s alone, more under a parallel run.
+    test.setTimeout(90_000);
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await login(page);

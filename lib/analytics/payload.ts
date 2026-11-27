@@ -3,7 +3,7 @@ import { OUTBOUND_TARGETS } from "./constants";
 
 export { OUTBOUND_TARGETS };
 
-/** Body of `POST /api/track`. The client generates the page view id so beacons can refer to it. */
+/** Body of `POST /api/e` (formerly `/api/track`). The client generates the page view id so beacons can refer to it. */
 
 const id = z.uuid();
 const path = z.string().min(1).max(512).startsWith("/");
