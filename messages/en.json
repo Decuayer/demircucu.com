@@ -40,14 +40,21 @@
     "skipToContent": "Skip to content"
   },
   "home": {
-    "heroTitle": "Hello, I am",
     "heroSub": "Full-Stack Developer & Software Engineer",
     "heroCta": "Get In Touch",
     "featuredProjects": "Featured Projects",
-    "latestPosts": "Latest Blog Posts",
-    "aboutPreview": "About Me",
-    "viewAll": "View All",
-    "readMore": "Read More"
+    "latestPosts": "Latest posts",
+    "greeting": "Hi, I'm",
+    "allProjects": "All projects",
+    "experience": "Experience",
+    "allExperience": "All experience",
+    "present": "Present",
+    "years": "{count, plural, one {# yr} other {# yrs}}",
+    "months": "{count, plural, one {# mo} other {# mos}}",
+    "skills": "Featured skills",
+    "allSkills": "All skills",
+    "allPosts": "All posts",
+    "readingTime": "{minutes} min read"
   },
   "about": {
     "photoAlt": "Profile photo",
@@ -458,7 +465,11 @@
     "openFile": "Open file in a new tab",
     "removeHobby": "Remove hobby",
     "cv": "Résumé (CV, PDF)",
-    "cvHint": "The English page shows the TR file when there is no EN file (and vice versa)."
+    "cvHint": "The English page shows the TR file when there is no EN file (and vice versa).",
+    "heroName": "Name (hero)",
+    "heroNameHint": "Enter your name only; the home page adds the \"Hi, I'm\" greeting.",
+    "heroIntro": "Home page intro",
+    "heroIntroHint": "Two or three sentences under your name and title: what you do and your focus areas. Hidden when empty."
   },
   "common": {
     "loading": "Loading...",
@@ -601,7 +612,9 @@
       "TOPIC": "Topic"
     },
     "filteredBy": "Filtered by <tag></tag> ({count} results)",
-    "clearFilter": "Clear filter"
+    "clearFilter": "Clear filter",
+    "featured": "Featured",
+    "featuredHint": "Shown in the home page's \"Featured skills\". When none is marked, the twelve most used skills are shown."
   },
   "skills": {
     "title": "Skills",

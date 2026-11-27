@@ -1,16 +1,22 @@
-import { getFeaturedProjects } from "@/lib/data/projects";
-import { getFeaturedPosts } from "@/lib/data/posts";
+import { getHomeExperiences, getHomePosts, getHomeProjects, getHomeSkills } from "@/lib/data/home";
 import { getSiteSettings } from "@/lib/data/settings";
 import HomeClient from "./client";
 
 export default async function HomePage() {
-  const [featuredProjects, latestPosts, settings] = await Promise.all([
-    getFeaturedProjects(),
-    getFeaturedPosts(3),
+  const [settings, projects, experiences, skills, posts] = await Promise.all([
     getSiteSettings(),
+    getHomeProjects(),
+    getHomeExperiences(),
+    getHomeSkills(),
+    getHomePosts(),
   ]);
-
   return (
-    <HomeClient featuredProjects={featuredProjects} latestPosts={latestPosts} settings={settings} />
+    <HomeClient
+      settings={settings}
+      projects={projects}
+      experiences={experiences}
+      skills={skills.skills}
+      posts={posts}
+    />
   );
 }
