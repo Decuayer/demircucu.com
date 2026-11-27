@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { monthsBetween, splitMonths } from "./duration";
+
 import { stripGreeting } from "./hero";
 import { MAX_FEATURED_PROJECTS, projectGrid } from "./layout";
 
@@ -24,15 +24,5 @@ describe("stripGreeting", () => {
 
   it("does not cut a name that only starts like the greeting", () => {
     expect(stripGreeting("Merhabaoğlu Ali", "Merhaba, ben", "tr")).toBe("Merhabaoğlu Ali");
-  });
-});
-
-describe("experience length", () => {
-  it("rounds to whole months, at least one", () => {
-    expect(monthsBetween(new Date("2025-06-16"), new Date("2025-07-11"))).toBe(1);
-    expect(monthsBetween(new Date("2025-06-16"), new Date("2025-06-17"))).toBe(1);
-    expect(monthsBetween(new Date("2023-09-01"), new Date("2025-03-01"))).toBe(18);
-    expect(splitMonths(18)).toEqual({ years: 1, months: 6 });
-    expect(splitMonths(1)).toEqual({ years: 0, months: 1 });
   });
 });

@@ -5,7 +5,7 @@ import { CacheTags } from "@/lib/cache/tags";
 import { mediaPathFromUrl, mediaUrl } from "@/lib/media/url";
 import { firstReadmeImagePath, pickCover, type CoverMedia } from "@/lib/projects/cover";
 import { MAX_FEATURED_PROJECTS } from "@/lib/home/layout";
-import { monthsBetween } from "@/lib/home/duration";
+import { calendarMonths } from "@/lib/experience/duration";
 import { readingMinutes } from "@/lib/reading-time";
 import { topSkills } from "@/lib/tags/tree";
 import {
@@ -64,7 +64,7 @@ export async function getHomeExperiences() {
   const now = new Date();
   return rows.map((row) => ({
     ...presentExperience(row),
-    months: monthsBetween(row.startDate, row.endDate ?? now),
+    months: calendarMonths(row.startDate, row.endDate ?? now),
   }));
 }
 
