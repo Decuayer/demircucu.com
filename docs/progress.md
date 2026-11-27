@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-27 (Faz 8B: PR #24 merge; admin mobil menüsü PR'ı açık, sonra SEO). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-27 (Faz 8B: PR #25 ve #26 merge; deneyim zaman çizelgesi PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -327,7 +327,19 @@ sayfaları.
   segmentin görselini ezer ve dosya tabanlı görsel yalnızca kendi segmentinde geçerli; bu yüzden
   `pageMetadata` `image: "own" | { path }` alır. JSON-LD (`lib/seo/json-ld.ts`, `<`/`>`/`&`
   kaçışlı): ana sayfa `WebSite` + `Person`, Hakkımda `ProfilePage`/`Person`, blog `BlogPosting`,
-  proje `SoftwareSourceCode`, detaylarda `BreadcrumbList`.
+  proje `SoftwareSourceCode`, detaylarda `BreadcrumbList`. PR #25 ve #26 merge; kullanıcı
+  LinkedIn Post Inspector, Rich Results Test ve schema validator ile doğruladı, sitemap Search
+  Console'a eklendi (2026-11-27).
+- **PR 8 (`feat/experience-timeline`):** kararlar 1a (süre takvim ayı, iki uç dahil, LinkedIn gibi:
+  Haz–Tem = 2 ay), 2a (aynı şirketteki roller ayrı kayıt), 3b (toplam süre yok); İngilizce
+  "1 yr 3 mos". `/experience` her genişlikte tek sütun: masaüstünde solda tarih/süre/konum, çizgi
+  ve nokta (devam eden dolu), sağda kart; mobilde bilgiler kartın üstünde. Süre
+  `lib/experience/duration.ts` (site saat dilimi), ana sayfa ve detay da aynısını kullanır;
+  `duration` mesaj namespace'i. Başarı maddeleri için migration yok (kullanıcı kararı): kısa
+  özette "- ", "* " veya "• " ile başlayan satırlar `ul/li` olur (`lib/text/blocks.ts`, HTML
+  parse edilmez); admin formunda ipucu. Detay sayfası özeti gösterir, boş "Detaylar" kartı
+  gizlenir. Seed: `seedTimelineSamples` (Atlas Yazılım devam eden + maddeli, Kuzey Mobil 12 ay)
+  yalnızca CLI seed'inde, staging'de çalışmaz; integration testlerinin `seed()`'i değişmedi.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
