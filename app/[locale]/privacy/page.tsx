@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { getPathname } from "@/i18n/navigation";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 const SECTIONS = [
   "controller",
@@ -18,11 +18,12 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/privacy">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "privacy" });
-  return {
+  return pageMetadata({
+    locale,
+    path: "/privacy",
     title: t("title"),
     description: t("description"),
-    alternates: { canonical: getPathname({ locale, href: "/privacy" }) },
-  };
+  });
 }
 
 /** Privacy policy. Static text from messages/*.json (privacy.*). */

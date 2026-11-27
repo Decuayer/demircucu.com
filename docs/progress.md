@@ -316,6 +316,18 @@ sayfaları.
   menüsü" düğmesi + geçerli bölüm); soldan Sheet, aynı gezinme bileşeni (`aria-current`),
   bağlantıda kapanır, Escape ile kapanıp odak düğmeye döner. Menüde sabit "Medya" metni i18n'e
   geçti. Dashboard/analitik KPI kartları mobilde 2 sütun, tek kalan son kart iki sütuna yayılır.
+- **PR 7 (`feat/seo`):** `lib/seo/metadata.ts` (`pageMetadata`: canonical sayfa dilinde,
+  `alternates.languages` tr/en + `x-default` → **en** (kullanıcı kararı), Open Graph, Twitter
+  `summary_large_image`, ayarlarda X/Twitter varsa `creator`). Tüm public sayfalarda metadata;
+  giriş/kayıt, profil ve admin `noindex, nofollow` (layout'larda). `app/robots.ts`: production'da
+  `/api/`, `/*/admin`, `/*/auth`, `/*/profile` engelli + sitemap; diğer ortamlarda her şey engelli.
+  Sitemap'te `x-default`. OG görselleri `next/og` (koyu kart + violet, Geist TTF `assets/fonts`,
+  OFL): site geneli `app/[locale]/opengraph-image.tsx`; proje, blog, deneyim, skill için segment
+  dosyaları; proje dokümanı projenin kartını kullanır. Not: sayfanın kendi `openGraph`'ı üst
+  segmentin görselini ezer ve dosya tabanlı görsel yalnızca kendi segmentinde geçerli; bu yüzden
+  `pageMetadata` `image: "own" | { path }` alır. JSON-LD (`lib/seo/json-ld.ts`, `<`/`>`/`&`
+  kaçışlı): ana sayfa `WebSite` + `Person`, Hakkımda `ProfilePage`/`Person`, blog `BlogPosting`,
+  proje `SoftwareSourceCode`, detaylarda `BreadcrumbList`.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 

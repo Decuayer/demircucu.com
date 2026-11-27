@@ -1,3 +1,7 @@
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/lib/seo/json-ld";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { seoContext } from "@/lib/seo/site";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -29,7 +33,14 @@ export async function generateMetadata({
   const { locale, id, docId } = await params;
   const result = await load(id, docId);
   if (result.kind !== "found") return {};
-  return { title: `${result.document.title} · ${getTranslated(result.project, "title", locale)}` };
+  const projectTitle = getTranslated(result.project, "title", locale);
+  return pageMetadata({
+    locale,
+    path: `/projects/${result.project.slug}/docs/${docId}`,
+    title: `${result.document.title} · ${projectTitle}`,
+    description: getTranslated(result.project, "summary", locale),
+    image: { path: `/projects/${result.project.slug}` },
+  });
 }
 
 export default async function ProjectDocumentPage({
@@ -42,10 +53,21 @@ export default async function ProjectDocumentPage({
   }
   if (result.kind === "notFound") notFound();
   const { project, document } = result;
-  const t = await getTranslations({ locale, namespace: "projects" });
+  const [t, context] = await Promise.all([
+    getTranslations({ locale, namespace: "projects" }),
+    seoContext(locale),
+  ]);
+  const projectTitle = getTranslated(project, "title", locale);
 
   return (
     <div className="py-12 md:py-16">
+      <JsonLd
+        data={breadcrumbs(context.base, locale, [
+          { name: t("title"), path: "/projects" },
+          { name: projectTitle, path: `/projects/${project.slug}` },
+          { name: document.title, path: `/projects/${project.slug}/docs/${docId}` },
+        ])}
+      />
       <div className="container mx-auto max-w-5xl space-y-6 px-4 md:px-6">
         <Link href={`/projects/${project.slug}`}>
           <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
