@@ -4,6 +4,7 @@ import { routing } from "@/i18n/routing";
 import { getPathname } from "@/i18n/navigation";
 import { CacheTags } from "@/lib/cache/tags";
 import { getAppUrl } from "@/lib/env/app-url";
+import { X_DEFAULT_LOCALE } from "@/lib/seo/metadata";
 import { getPublishedExperienceIds } from "@/lib/data/experiences";
 import { getPublishedPostSlugs } from "@/lib/data/posts";
 import { getPublishedProjectSlugs } from "@/lib/data/projects";
@@ -42,12 +43,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return paths.map((href) => ({
     url: new URL(getPathname({ locale: routing.defaultLocale, href }), base).toString(),
     alternates: {
-      languages: Object.fromEntries(
-        routing.locales.map((locale) => [
-          locale,
-          new URL(getPathname({ locale, href }), base).toString(),
-        ]),
-      ),
+      languages: {
+        ...Object.fromEntries(
+          routing.locales.map((locale) => [
+            locale,
+            new URL(getPathname({ locale, href }), base).toString(),
+          ]),
+        ),
+        "x-default": new URL(getPathname({ locale: X_DEFAULT_LOCALE, href }), base).toString(),
+      },
     },
   }));
 }

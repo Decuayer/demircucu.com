@@ -51,6 +51,9 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
     title: { default: title, template: `%s | ${title}` },
     description,
     metadataBase: getAppUrl(),
+    // Defaults for every page; public pages refine them with pageMetadata (lib/seo/metadata.ts).
+    openGraph: { siteName: title, type: "website", locale: locale === "tr" ? "tr_TR" : "en_US" },
+    twitter: { card: "summary_large_image" },
     icons: {
       icon: settings?.faviconUrl || "/favicon.ico",
       apple: settings?.faviconUrl || "/favicon.ico",

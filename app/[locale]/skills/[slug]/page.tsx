@@ -1,3 +1,7 @@
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/lib/seo/json-ld";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { seoContext } from "@/lib/seo/site";
 import { SITE_TIME_ZONE } from "@/lib/format-date";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
@@ -36,11 +40,13 @@ export async function generateMetadata({
       experiences: experiences.length,
       posts: posts.length,
     });
-  return {
+  return pageMetadata({
+    locale,
+    image: "own",
+    path: `/skills/${tag.slug}`,
     title: name,
     description,
-    alternates: { canonical: getPathname({ locale, href: `/skills/${tag.slug}` }) },
-  };
+  });
 }
 
 export default async function SkillPage({ params }: PageProps<"/[locale]/skills/[slug]">) {
@@ -61,8 +67,18 @@ export default async function SkillPage({ params }: PageProps<"/[locale]/skills/
   });
   const { firstUsed, lastUsed, ongoing } = result.skill;
 
+  const context = await seoContext(locale);
+  const crumbs = [
+    { name: t("title"), path: "/skills" },
+    ...ancestors.map((ancestor) => ({
+      name: tagLabel(ancestor, locale),
+      path: `/skills/${ancestor.slug}`,
+    })),
+    { name: tagLabel(tag, locale), path: `/skills/${tag.slug}` },
+  ];
   return (
     <div className="py-16 md:py-24">
+      <JsonLd data={breadcrumbs(context.base, locale, crumbs)} />
       <div className="container mx-auto max-w-4xl px-4 md:px-6">
         <Link
           href="/skills"

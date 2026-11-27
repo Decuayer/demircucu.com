@@ -1,7 +1,10 @@
 import { Suspense } from "react";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { PageSpinner } from "@/components/layout/page-spinner";
+import { PRIVATE_PAGE_METADATA } from "@/lib/seo/metadata";
 import AdminClientLayout from "./client-layout";
+
+export const metadata = PRIVATE_PAGE_METADATA;
 
 async function AdminGate({ children, params }: LayoutProps<"/[locale]/admin">) {
   const { locale } = await params;

@@ -842,5 +842,21 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "seo": {
+    "about": "An overview of Demir Cücü's background, focus areas, skills and projects.",
+    "experience": "Work and internship experience: roles, companies, durations and the technologies used.",
+    "projects": "Software projects in web, mobile, AI and embedded systems, with source code and documents.",
+    "blog": "Posts on software, AI and engineering.",
+    "contact": "Contact form for projects, collaboration or questions.",
+    "kind": {
+      "project": "Project",
+      "blog": "Blog",
+      "experience": "Experience",
+      "skill": "Skill",
+      "page": "demircucu.com",
+      "document": "Document"
+    },
+    "home": "Home"
   }
 }

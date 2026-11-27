@@ -842,5 +842,21 @@
     "light": "Açık",
     "dark": "Koyu",
     "system": "Sistem"
+  },
+  "seo": {
+    "about": "Demir Cücü'nün geçmişi, odak alanları, yetenekleri ve projelerine genel bakış.",
+    "experience": "İş ve staj deneyimleri: roller, şirketler, süreler ve kullanılan teknolojiler.",
+    "projects": "Yazılım projeleri: web, mobil, yapay zeka ve gömülü sistemler; kaynak kodları ve dokümanlarıyla.",
+    "blog": "Yazılım, yapay zeka ve mühendislik üzerine yazılar.",
+    "contact": "Proje, iş birliği veya sorularınız için iletişim formu.",
+    "kind": {
+      "project": "Proje",
+      "blog": "Blog",
+      "experience": "Deneyim",
+      "skill": "Yetenek",
+      "page": "demircucu.com",
+      "document": "Doküman"
+    },
+    "home": "Ana sayfa"
   }
 }
