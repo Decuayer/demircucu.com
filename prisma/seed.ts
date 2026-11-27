@@ -197,12 +197,55 @@ export async function seed(prisma: PrismaClient): Promise<void> {
   });
 }
 
+/**
+ * Extra experiences for local development and E2E (phase 8 timeline): an ongoing role with a
+ * bulleted summary and a twelve-month role. Kept out of `seed()` so integration tests keep their
+ * counts, and skipped on staging.
+ */
+export async function seedTimelineSamples(prisma: PrismaClient): Promise<void> {
+  const timelineSamples = [
+    {
+      company: "Atlas Yazılım",
+      positionTr: "Yazılım Mühendisi",
+      positionEn: "Software Engineer",
+      descriptionTr:
+        "Şarj istasyonu yönetim platformunun arka uç ekibi.\n- Ödeme servisini yeniden yazdı\n- OCPP 2.0.1 desteği ekledi\n- Test kapsamını %40'tan %85'e çıkardı",
+      descriptionEn:
+        "Back-end team of a charging station management platform.\n- Rewrote the payment service\n- Added OCPP 2.0.1 support\n- Raised test coverage from 40% to 85%",
+      startDate: new Date("2025-09-01"),
+      endDate: null,
+      locationTr: "İzmir, Türkiye",
+      locationEn: "Izmir, Türkiye",
+    },
+    {
+      company: "Kuzey Mobil",
+      positionTr: "Mobil Geliştirici",
+      positionEn: "Mobile Developer",
+      descriptionTr: "Flutter ile iki tüketici uygulaması geliştirdi ve yayımladı.",
+      descriptionEn: "Built and shipped two consumer apps with Flutter.",
+      startDate: new Date("2024-01-01"),
+      endDate: new Date("2024-12-31"),
+      locationTr: "İstanbul, Türkiye (uzaktan)",
+      locationEn: "Istanbul, Türkiye (remote)",
+    },
+  ];
+  for (const sample of timelineSamples) {
+    const existing = await prisma.experience.findFirst({ where: { company: sample.company } });
+    if (!existing) {
+      await prisma.experience.create({
+        data: { ...sample, published: true, tags: tagLinks("python") },
+      });
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
   const pool = new Pool({ connectionString });
   const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
   try {
     await seed(prisma);
+    if (process.env.DB_TARGET !== "staging") await seedTimelineSamples(prisma);
     console.log("Seed completed.");
   } finally {
     await prisma.$disconnect();

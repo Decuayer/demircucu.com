@@ -78,14 +78,14 @@ test("CV upload and experience location reach the public pages", async ({ page }
     `SELECT id FROM public."Experience" WHERE published ORDER BY "createdAt" LIMIT 1`,
   );
   await page.goto(`/tr/admin/experiences/${experience!.id}/edit`);
-  await page.locator("#experience-location-tr").fill("İzmir, Türkiye");
+  await page.locator("#experience-location-tr").fill("Manisa, Türkiye");
   await page.locator("form button[type=submit]").click();
   await expect(page.locator("[data-sonner-toast][data-type=success]").last()).toBeVisible();
   await expectEventually(page, "/tr/experience", async () =>
-    page.locator("main").getByText("İzmir, Türkiye").isVisible(),
+    page.locator("main").getByText("Manisa, Türkiye").isVisible(),
   );
   await expectEventually(page, `/en/experience/${experience!.id}`, async () =>
-    page.locator("main").getByText("İzmir, Türkiye").isVisible(),
+    page.locator("main").getByText("Manisa, Türkiye").isVisible(),
   );
 
   // Restore.
