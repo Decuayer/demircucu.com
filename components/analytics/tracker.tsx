@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { isUntrackedArea } from "@/lib/analytics/paths";
 import { OUTBOUND_TARGETS } from "@/lib/analytics/constants";
 
-const ENDPOINT = "/api/track";
+/** Neutral path: "/track"-style paths are on ad / tracking blocker lists (docs/analytics.md). */
+const ENDPOINT = "/api/e";
 
 interface CurrentView {
   id: string;
