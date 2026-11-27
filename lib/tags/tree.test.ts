@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { buildSkillForest, flattenForest, subtreeIds, subtreeSlugMap, type TreeTag } from "./tree";
+import {
+  buildSkillForest,
+  flattenForest,
+  subtreeIds,
+  subtreeSlugMap,
+  topSkills,
+  type TreeTag,
+} from "./tree";
 
 let n = 0;
 const tag = (slug: string, over: Partial<TreeTag> = {}): TreeTag => ({
@@ -95,5 +102,24 @@ describe("subtrees", () => {
     const map = subtreeSlugMap(tags);
     expect(map.react?.sort()).toEqual(["nextjs", "react"]);
     expect(map.ml).toBeUndefined();
+  });
+});
+
+describe("topSkills", () => {
+  it("ranks shown skills by distinct content and skips category roots and unused skills", () => {
+    const graph = [
+      tag("cat", { id: "cat", kind: "DOMAIN" }),
+      tag("typescript", { id: "ts", parentId: "cat" }),
+      tag("python", { id: "py" }),
+      tag("go", { id: "go" }),
+    ];
+    const links = [
+      { tagId: "ts", type: "project" as const, entityId: "p1" },
+      { tagId: "ts", type: "post" as const, entityId: "b1" },
+      { tagId: "py", type: "project" as const, entityId: "p2" },
+    ];
+    const forest = buildSkillForest(graph, links);
+    expect(topSkills(forest, 12).map((node) => node.slug)).toEqual(["typescript", "python"]);
+    expect(topSkills(forest, 1)).toHaveLength(1);
   });
 });
