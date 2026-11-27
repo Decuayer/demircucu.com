@@ -9,7 +9,7 @@ third-party service and no new environment variable; the nightly job uses the ex
 
 ```
 browser                         server                                   database
-<Analytics /> ── POST /api/track ──> validate, filter ──> after(): record ──> PageView
+<Analytics /> ── POST /api/e ──────> validate, filter ──> after(): record ──> PageView
    (view, engagement, outbound)       (204 always)                          OutboundClick
                                                                             AnalyticsSalt
 Vercel Schedule 00:15 UTC ── GET /api/cron/analytics ──> aggregate finished days ──> DailyStat
@@ -34,7 +34,11 @@ Mounted once in the locale layout (inside `Suspense`, `usePathname` can suspend)
 Nothing is sent when `navigator.doNotTrack === "1"` or `navigator.globalPrivacyControl` is set,
 and nothing on `/admin`, `/auth` or `/profile`. No cookie or storage is used.
 
-### Endpoint (`app/api/track/route.ts`)
+### Endpoint (`app/api/e/route.ts`)
+
+`/api/e` is a neutral path: blocker filter lists match paths such as `/track` or `/analytics`
+(decision 8a, phase 8). `/api/track` re-exports the same handler until 2026-12-27 for pages that
+were cached or open before the move; remove `app/api/track/route.ts` after that date.
 
 Order of checks; anything filtered still gets `204` so a client cannot tell why:
 

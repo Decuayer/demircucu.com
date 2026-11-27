@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-26 (Faz 8B: PR #22 merge; ana sayfa migration'ı prod'da, arayüz PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-27 (Faz 8B: PR #23 merge; analitik yolu taşınıyor, sonra admin mobil menüsü ve SEO). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -303,7 +303,15 @@ sayfaları.
   fazla 4). Deneyim: son 3, süre ve konum. Skill'ler: chip'ler. Yazılar: tarihe göre son 3, okuma
   süresi kelime/200 (blog listesi ve detayda da). "Birlikte Çalışalım" ve Ayarlar'daki CTA kartı
   kaldırıldı (kolonlar duruyor). Admin: "Ad Soyad (hero)" + ipucu, tanıtım metni, Etiketler'de
-  "Öne çıkan".
+  "Öne çıkan". PR #23 merge; kullanıcı içerik ayarlarını admin'den yaptı (2026-11-27).
+- **SEO planı (onaylı, 2026-11-27):** üç küçük PR: analitik yolu, admin mobil menüsü, SEO. Kararlar:
+  yol `/api/e`, eski `/api/track` 30 gün çalışır, OG görseli koyu kart + violet, Geist TTF repoda,
+  hreflang `x-default` → `en`.
+- **PR 5 (`feat/analytics-endpoint-path`):** tracker `POST /api/e`; `app/api/track/route.ts` aynı
+  handler'ı yeniden dışa aktarıyor. **2026-12-27'den sonra bu dosya silinecek** (ayrı küçük PR).
+  Yerelde tüm worker'larla E2E çalışınca ağır admin testleri yük kaynaklı zaman aşımına düşebiliyor
+  (`admin-media`, admin axe, GitHub yayından kaldırma); ikisine süre verildi, `--workers=2` ile hepsi
+  geçiyor.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
@@ -471,7 +479,7 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
   - Hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i.
   - Admin paneli mobilde menüsüz: kenar menüsü `md` altında gizli, mobil gezinme yok (Faz 7'de fark
     edildi).
-  - `/api/track` yolu reklam/takip engelleyicilerin filtre listelerine (`/track`, `/api/track`
+  - (PR 5'te çözüldü: `/api/e`.) `/api/track` yolu reklam/takip engelleyicilerin filtre listelerine (`/track`, `/api/track`
     kalıpları) takılabilir; bu ziyaretçiler sayılmaz. Daha nötr bir yol (ör. `/api/v`) ve
     engellenme oranının ölçülmesi değerlendirilecek.
 - **Faz 9:** coverage.
