@@ -157,6 +157,11 @@ export default function AdminTagsClient({ tags }: { tags: AdminTag[] }) {
                           {t("notSkill")}
                         </Badge>
                       )}
+                      {tag.featured && tag.isSkill && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          {t("featured")}
+                        </Badge>
+                      )}
                       {tag.hidden && (
                         <EyeOff
                           className="h-3 w-3 text-muted-foreground"
@@ -247,6 +252,7 @@ function TagEditor({ tag, tags, pending, run, onDeleted }: TagEditorProps) {
     parentId: tag.parentId ?? "",
     isSkill: tag.isSkill,
     hidden: tag.hidden,
+    featured: tag.featured,
     icon: tag.icon ?? "",
     descriptionTr: tag.descriptionTr ?? "",
     descriptionEn: tag.descriptionEn ?? "",
@@ -335,7 +341,20 @@ function TagEditor({ tag, tags, pending, run, onDeleted }: TagEditorProps) {
             />
             <Label htmlFor="edit-hidden">{t("hidden")}</Label>
           </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="edit-featured"
+              checked={form.featured}
+              disabled={!form.isSkill}
+              onCheckedChange={(v) => set("featured", v)}
+              aria-describedby="edit-featured-hint"
+            />
+            <Label htmlFor="edit-featured">{t("featured")}</Label>
+          </div>
         </div>
+        <p id="edit-featured-hint" className="text-xs text-muted-foreground">
+          {t("featuredHint")}
+        </p>
         <Field label={t("descriptionTr")} id="edit-desc-tr">
           <Textarea
             id="edit-desc-tr"

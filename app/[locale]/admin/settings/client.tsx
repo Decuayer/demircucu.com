@@ -240,10 +240,8 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
     initialSettings?.socialStackoverflow || "",
   );
 
-  const [ctaTitleTr, setCtaTitleTr] = useState(initialSettings?.ctaTitleTr || "");
-  const [ctaTitleEn, setCtaTitleEn] = useState(initialSettings?.ctaTitleEn || "");
-  const [ctaDescriptionTr, setCtaDescriptionTr] = useState(initialSettings?.ctaDescriptionTr || "");
-  const [ctaDescriptionEn, setCtaDescriptionEn] = useState(initialSettings?.ctaDescriptionEn || "");
+  const [heroIntroTr, setHeroIntroTr] = useState(initialSettings?.heroIntroTr || "");
+  const [heroIntroEn, setHeroIntroEn] = useState(initialSettings?.heroIntroEn || "");
 
   const [footerTitleTr, setFooterTitleTr] = useState(initialSettings?.footerTitleTr || "");
   const [footerTitleEn, setFooterTitleEn] = useState(initialSettings?.footerTitleEn || "");
@@ -293,10 +291,8 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
         socialYoutube,
         socialMedium,
         socialStackoverflow,
-        ctaTitleTr,
-        ctaTitleEn,
-        ctaDescriptionTr,
-        ctaDescriptionEn,
+        heroIntroTr,
+        heroIntroEn,
         footerTitleTr,
         footerTitleEn,
         footerDescriptionTr,
@@ -366,23 +362,25 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
               </h2>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="settings-field-1">{t("mainTitle")} (TR)</Label>
+                  <Label htmlFor="settings-field-1">{t("heroName")} (TR)</Label>
                   <Input
                     id="settings-field-1"
                     value={heroTitleTr}
                     onChange={(e) => setHeroTitleTr(e.target.value)}
                     className="bg-accent/30"
-                    placeholder="Merhaba, Ben..."
+                    placeholder="Demir Cücü"
+                    aria-describedby="settings-hero-name-hint"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="settings-field-2">{t("mainTitle")} (EN)</Label>
+                  <Label htmlFor="settings-field-2">{t("heroName")} (EN)</Label>
                   <Input
                     id="settings-field-2"
                     value={heroTitleEn}
                     onChange={(e) => setHeroTitleEn(e.target.value)}
                     className="bg-accent/30"
-                    placeholder="Hello, I am..."
+                    placeholder="Demir Cücü"
+                    aria-describedby="settings-hero-name-hint"
                   />
                 </div>
               </div>
@@ -408,58 +406,34 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
                   />
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/50 bg-card/50">
-            <CardContent className="space-y-4 p-6">
-              <h2 className="text-lg font-semibold">
-                {t("cta")} ({t("footer")})
-              </h2>
+              <p id="settings-hero-name-hint" className="text-xs text-muted-foreground">
+                {t("heroNameHint")}
+              </p>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="settings-field-5">{t("ctaTitle")} (TR)</Label>
-                  <Input
-                    id="settings-field-5"
-                    value={ctaTitleTr}
-                    onChange={(e) => setCtaTitleTr(e.target.value)}
+                  <Label htmlFor="settings-hero-intro-tr">{t("heroIntro")} (TR)</Label>
+                  <Textarea
+                    id="settings-hero-intro-tr"
+                    value={heroIntroTr}
+                    onChange={(e) => setHeroIntroTr(e.target.value)}
                     className="bg-accent/30"
-                    placeholder="Birlikte Çalışalım"
+                    rows={4}
+                    maxLength={600}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="settings-field-6">{t("ctaTitle")} (EN)</Label>
-                  <Input
-                    id="settings-field-6"
-                    value={ctaTitleEn}
-                    onChange={(e) => setCtaTitleEn(e.target.value)}
+                  <Label htmlFor="settings-hero-intro-en">{t("heroIntro")} (EN)</Label>
+                  <Textarea
+                    id="settings-hero-intro-en"
+                    value={heroIntroEn}
+                    onChange={(e) => setHeroIntroEn(e.target.value)}
                     className="bg-accent/30"
-                    placeholder="Let's Work Together"
+                    rows={4}
+                    maxLength={600}
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="settings-field-7">{t("ctaDescription")} (TR)</Label>
-                  <Textarea
-                    id="settings-field-7"
-                    value={ctaDescriptionTr}
-                    onChange={(e) => setCtaDescriptionTr(e.target.value)}
-                    className="bg-accent/30"
-                    rows={3}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="settings-field-8">{t("ctaDescription")} (EN)</Label>
-                  <Textarea
-                    id="settings-field-8"
-                    value={ctaDescriptionEn}
-                    onChange={(e) => setCtaDescriptionEn(e.target.value)}
-                    className="bg-accent/30"
-                    rows={3}
-                  />
-                </div>
-              </div>
+              <p className="text-xs text-muted-foreground">{t("heroIntroHint")}</p>
             </CardContent>
           </Card>
 

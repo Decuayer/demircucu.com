@@ -293,6 +293,8 @@ export interface AdminTag extends TagOption {
   order: number;
   descriptionTr: string | null;
   descriptionEn: string | null;
+  /** Shown among the home page's featured skills. */
+  featured: boolean;
   /** Links on any content, published or not. */
   usage: { projects: number; experiences: number; posts: number };
 }
@@ -305,6 +307,7 @@ export async function adminListTags(): Promise<AdminTag[]> {
       ...tagOptionSelect,
       icon: true,
       order: true,
+      featured: true,
       descriptionTr: true,
       descriptionEn: true,
       _count: { select: { projectTags: true, experienceTags: true, blogPostTags: true } },
@@ -315,6 +318,7 @@ export async function adminListTags(): Promise<AdminTag[]> {
     ...toTagOption(row),
     icon: row.icon,
     order: row.order,
+    featured: row.featured,
     descriptionTr: row.descriptionTr,
     descriptionEn: row.descriptionEn,
     usage: {

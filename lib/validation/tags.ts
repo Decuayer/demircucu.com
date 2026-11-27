@@ -48,6 +48,7 @@ export const updateTagSchema = z
     parentId: id.nullable(),
     isSkill: z.boolean(),
     hidden: z.boolean(),
+    featured: z.boolean(),
     icon: iconSlug,
     descriptionTr: optionalText(2000),
     descriptionEn: optionalText(2000),
