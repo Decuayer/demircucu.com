@@ -37,6 +37,8 @@ const nextConfig: NextConfig = {
     },
   },
   images: buildImagesConfig(process.env.NEXT_PUBLIC_SUPABASE_URL),
+  // Open Graph images read the Geist TTF files at runtime (lib/seo/og.tsx).
+  outputFileTracingIncludes: { "/**/opengraph-image*": ["./assets/fonts/*.ttf"] },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
