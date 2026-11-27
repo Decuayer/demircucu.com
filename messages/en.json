@@ -49,8 +49,6 @@
     "experience": "Experience",
     "allExperience": "All experience",
     "present": "Present",
-    "years": "{count, plural, one {# yr} other {# yrs}}",
-    "months": "{count, plural, one {# mo} other {# mos}}",
     "skills": "Featured skills",
     "allSkills": "All skills",
     "allPosts": "All posts",
@@ -71,7 +69,9 @@
     "title": "Experience",
     "present": "Present",
     "details": "Details",
-    "technologies": "Technologies Used"
+    "technologies": "Technologies Used",
+    "duration": "Duration",
+    "location": "Location"
   },
   "projects": {
     "title": "Projects",
@@ -469,7 +469,8 @@
     "heroName": "Name (hero)",
     "heroNameHint": "Enter your name only; the home page adds the \"Hi, I'm\" greeting.",
     "heroIntro": "Home page intro",
-    "heroIntroHint": "Two or three sentences under your name and title: what you do and your focus areas. Hidden when empty."
+    "heroIntroHint": "Two or three sentences under your name and title: what you do and your focus areas. Hidden when empty.",
+    "summaryListHint": "For a bulleted list, start each line with \"- \"."
   },
   "common": {
     "loading": "Loading...",
@@ -858,5 +859,9 @@
       "document": "Document"
     },
     "home": "Home"
+  },
+  "duration": {
+    "years": "{count, plural, one {# yr} other {# yrs}}",
+    "months": "{count, plural, one {# mo} other {# mos}}"
   }
 }

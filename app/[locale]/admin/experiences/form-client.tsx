@@ -211,9 +211,10 @@ export default function ExperienceFormClient({
                     id="experience-field-4"
                     value={descriptionTr}
                     onChange={(e) => setDescriptionTr(e.target.value)}
+                    aria-describedby="experience-summary-hint"
                     required
                     className="bg-accent/30"
-                    rows={3}
+                    rows={5}
                   />
                 </div>
                 <div className="space-y-2">
@@ -222,11 +223,18 @@ export default function ExperienceFormClient({
                     id="experience-field-5"
                     value={descriptionEn}
                     onChange={(e) => setDescriptionEn(e.target.value)}
+                    aria-describedby="experience-summary-hint"
                     required
                     className="bg-accent/30"
-                    rows={3}
+                    rows={5}
                   />
                 </div>
+                <p
+                  id="experience-summary-hint"
+                  className="text-xs text-muted-foreground md:col-span-2"
+                >
+                  {t("summaryListHint")}
+                </p>
               </div>
             </CardContent>
           </Card>

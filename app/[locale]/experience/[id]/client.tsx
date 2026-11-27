@@ -9,17 +9,27 @@ import { Link } from "@/i18n/navigation";
 import { getTranslated } from "@/lib/i18n-utils";
 import { attachmentHref, toAttachments } from "@/lib/media/attachments";
 
-import type { PublicExperience } from "@/lib/types/content";
+import type { getPublishedExperience } from "@/lib/data/experiences";
+import { useDurationLabel } from "@/components/experience/duration";
+import { TextBlocks } from "@/components/experience/text-blocks";
+import { isoMonth } from "@/lib/experience/duration";
 import { TagChips } from "@/components/tags/tag-chips";
 import { FileIcon } from "lucide-react";
 
+const MONTH_YEAR: Intl.DateTimeFormatOptions = { month: "short", year: "numeric" };
+
 interface ExperienceDetailClientProps {
-  experience: PublicExperience;
+  experience: NonNullable<Awaited<ReturnType<typeof getPublishedExperience>>>;
 }
 
 export default function ExperienceDetailClient({ experience }: ExperienceDetailClientProps) {
   const t = useTranslations("experience");
   const locale = useLocale();
+  const duration = useDurationLabel();
+  const html = getTranslated(experience, "details", locale) ?? "";
+  // The editor leaves "<p></p>" behind when cleared; treat markup without text or media as empty.
+  const details =
+    html.replace(/<[^>]*>|&nbsp;/g, "").trim() || /<(img|video|iframe)\b/i.test(html) ? html : null;
 
   return (
     <div className="py-16 md:py-24">
@@ -57,17 +67,32 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
+                <Calendar aria-hidden className="h-4 w-4" />
                 <span>
-                  {formatDate(experience.startDate, locale)} —{" "}
-                  {experience.endDate ? formatDate(experience.endDate, locale) : t("present")}
+                  <time dateTime={isoMonth(experience.startDate)}>
+                    {formatDate(experience.startDate, locale, MONTH_YEAR)}
+                  </time>
+                  {" – "}
+                  {experience.endDate ? (
+                    <time dateTime={isoMonth(experience.endDate)}>
+                      {formatDate(experience.endDate, locale, MONTH_YEAR)}
+                    </time>
+                  ) : (
+                    t("present")
+                  )}
+                  <span data-testid="experience-duration">
+                    {" · "}
+                    <span className="sr-only">{t("duration")}: </span>
+                    {duration(experience.months)}
+                  </span>
                 </span>
               </div>
               {(experience.locationTr || experience.locationEn) && (
                 <div className="flex items-center gap-1">
                   <MapPin aria-hidden className="h-4 w-4" />
+                  <span className="sr-only">{t("location")}: </span>
                   <span>
                     {(locale === "en" ? experience.locationEn : experience.locationTr) ||
                       experience.locationTr ||
@@ -78,19 +103,22 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
             </div>
           </div>
 
+          <TextBlocks
+            text={getTranslated(experience, "description", locale)}
+            className="mb-8 text-base"
+          />
+
           {/* Tags */}
           <TagChips tags={experience.tags} locale={locale} className="mb-8" />
 
-          {/* Details */}
-          <Card className="mb-8 border-border/50 bg-card/50">
-            <CardContent className="prose prose-sm max-w-none p-8 dark:prose-invert">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: getTranslated(experience, "details", locale) || "",
-                }}
-              />
-            </CardContent>
-          </Card>
+          {/* Details (rich text; omitted when the admin left it empty). */}
+          {details && (
+            <Card className="mb-8 border-border/50 bg-card/50">
+              <CardContent className="prose prose-sm max-w-none p-8 dark:prose-invert">
+                <div dangerouslySetInnerHTML={{ __html: details }} />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Files */}
           {experience.files && Array.isArray(experience.files) && experience.files.length > 0 && (
