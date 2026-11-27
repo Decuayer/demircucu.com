@@ -246,7 +246,8 @@ test("admin project list shows the sync panel and GitHub projects cannot be dele
     await expect(row.getByRole("button", { name: "README'yi yeniden işle" })).toBeVisible();
 
     await row.getByRole("button", { name: "Yayından Kaldır" }).click();
-    await expect(row.getByText("Taslak")).toBeVisible();
+    // A server action and list refresh; slower than 5 s when the whole suite runs in parallel.
+    await expect(row.getByText("Taslak")).toBeVisible({ timeout: 15_000 });
     const [state] = await sql<{ published: boolean }>(
       `SELECT published FROM public."Project" WHERE id = $1`,
       [project!.id],
