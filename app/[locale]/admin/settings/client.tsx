@@ -4,6 +4,11 @@ import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import type { AdminSiteSettings } from "@/lib/types/content";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import {
+  UnsavedBadge,
+  useFormBaseline,
+  useUnsavedChanges,
+} from "@/components/admin/unsaved-changes";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -262,54 +267,57 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
   );
   const [faviconUrl, setFaviconUrl] = useState(initialSettings?.faviconPath || "");
 
+  const payload = {
+    heroTitleTr,
+    heroTitleEn,
+    heroSubTr,
+    heroSubEn,
+    aboutBioTr,
+    aboutBioEn,
+    aboutPhotoPath: aboutPhoto,
+    aboutLocationTr,
+    cvPathTr,
+    cvPathEn,
+    aboutLocationEn,
+    aboutExperienceTr,
+    aboutExperienceEn,
+    hobbies,
+    contactEmail,
+    contactPhone,
+    contactAddress,
+    socialGithub,
+    socialLinkedin,
+    socialTwitter,
+    socialInstagram,
+    socialYoutube,
+    socialMedium,
+    socialStackoverflow,
+    heroIntroTr,
+    heroIntroEn,
+    footerTitleTr,
+    footerTitleEn,
+    footerDescriptionTr,
+    footerDescriptionEn,
+    siteTitleTr,
+    siteTitleEn,
+    siteDescriptionTr,
+    siteDescriptionEn,
+    faviconPath: faviconUrl,
+  };
+  const { dirty, markSaved } = useFormBaseline(payload);
+  useUnsavedChanges(dirty);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     startTransition(async () => {
-      const payload = {
-        heroTitleTr,
-        heroTitleEn,
-        heroSubTr,
-        heroSubEn,
-        aboutBioTr,
-        aboutBioEn,
-        aboutPhotoPath: aboutPhoto,
-        aboutLocationTr,
-        cvPathTr,
-        cvPathEn,
-        aboutLocationEn,
-        aboutExperienceTr,
-        aboutExperienceEn,
-        hobbies,
-        contactEmail,
-        contactPhone,
-        contactAddress,
-        socialGithub,
-        socialLinkedin,
-        socialTwitter,
-        socialInstagram,
-        socialYoutube,
-        socialMedium,
-        socialStackoverflow,
-        heroIntroTr,
-        heroIntroEn,
-        footerTitleTr,
-        footerTitleEn,
-        footerDescriptionTr,
-        footerDescriptionEn,
-        siteTitleTr,
-        siteTitleEn,
-        siteDescriptionTr,
-        siteDescriptionEn,
-        faviconPath: faviconUrl,
-      };
-
       const res = await updateSiteSettings(payload);
 
       if (res.error) {
         toast.error(errorMessage(res.error));
       } else {
-        toast.success(t("settingsSaved") || "Ayarlar başarıyla kaydedildi!");
+        markSaved();
+        toast.success(t("settingsSaved"));
       }
     });
   };
@@ -334,14 +342,17 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
           <Settings className="h-6 w-6 text-link" />
           {t("siteSettings")}
         </h1>
-        <Button
-          onClick={handleSubmit}
-          disabled={isPending}
-          className="border-0 bg-primary text-primary-foreground"
-        >
-          <Save className="mr-2 h-4 w-4" />
-          {isPending ? "Kaydediliyor..." : t("save")}
-        </Button>
+        <div className="flex items-center gap-3">
+          <UnsavedBadge dirty={dirty} />
+          <Button
+            onClick={handleSubmit}
+            disabled={isPending}
+            className="border-0 bg-primary text-primary-foreground"
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {isPending ? t("saving") : t("save")}
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="general" className="w-full">

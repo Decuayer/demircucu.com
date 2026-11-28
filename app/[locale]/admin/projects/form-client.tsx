@@ -19,6 +19,11 @@ import { toAttachments, type Attachment } from "@/lib/media/attachments";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { createProject, updateProject } from "@/app/actions/admin";
 import { useTranslations } from "next-intl";
+import {
+  UnsavedBadge,
+  useFormBaseline,
+  useUnsavedChanges,
+} from "@/components/admin/unsaved-changes";
 
 interface ProjectFormClientProps {
   initialData?: AdminProject | null;
@@ -68,6 +73,25 @@ export default function ProjectFormClient({
   // Files
   const [files, setFiles] = useState<Attachment[]>(() => toAttachments(initialData?.files));
 
+  const payload = {
+    titleTr,
+    titleEn,
+    slug,
+    summaryTr,
+    summaryEn,
+    descriptionTr,
+    descriptionEn,
+    logoPath: logo,
+    githubUrl,
+    liveUrl,
+    published,
+    featured,
+    ...toTagPayload(tags),
+    filesList: files,
+  };
+  const { dirty } = useFormBaseline(payload);
+  const { confirmLeave, leave } = useUnsavedChanges(dirty);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -75,23 +99,6 @@ export default function ProjectFormClient({
       toast.error(t("required_fields"));
       return;
     }
-
-    const payload = {
-      titleTr,
-      titleEn,
-      slug,
-      summaryTr,
-      summaryEn,
-      descriptionTr,
-      descriptionEn,
-      logoPath: logo,
-      githubUrl,
-      liveUrl,
-      published,
-      featured,
-      ...toTagPayload(tags),
-      filesList: files,
-    };
 
     startTransition(async () => {
       let res;
@@ -105,7 +112,7 @@ export default function ProjectFormClient({
         toast.error(errorMessage(res.error));
       } else {
         toast.success(isEdit ? t("projectUpdated") : t("projectCreated"));
-        router.push(`/${locale}/admin/projects`);
+        leave(() => router.push(`/${locale}/admin/projects`));
       }
     });
   };
@@ -114,8 +121,9 @@ export default function ProjectFormClient({
     <form onSubmit={handleSubmit} className="max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{isEdit ? t("editProject") : t("addProject")}</h1>
-        <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()}>
+        <div className="flex items-center gap-3">
+          <UnsavedBadge dirty={dirty} />
+          <Button type="button" variant="outline" onClick={() => confirmLeave(() => router.back())}>
             {t("cancel")}
           </Button>
           <Button
