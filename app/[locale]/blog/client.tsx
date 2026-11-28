@@ -51,7 +51,7 @@ function PostCard({ post }: { post: BlogPostWithTags }) {
           </p>
           <TagChips tags={post.tags} locale={locale} chipClassName="text-xs" />
           <div className="flex items-center pt-1 text-sm font-medium text-link">
-            Devamını Oku{" "}
+            {t("readMore")}{" "}
             <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" />
           </div>
         </CardContent>

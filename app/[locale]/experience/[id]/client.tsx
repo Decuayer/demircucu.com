@@ -126,7 +126,7 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
           <div className="mb-8 space-y-4">
             <h2 className="flex items-center gap-2 text-h4">
               <FileIcon className="h-5 w-5 text-link" />
-              Ekli Dosyalar
+              {t("attachments")}
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {toAttachments(experience.files).map((file, i) => (

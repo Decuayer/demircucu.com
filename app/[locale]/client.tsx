@@ -69,13 +69,22 @@ function Hero({ settings }: { settings: PublicSiteSettings | null }) {
       className="container mx-auto px-4 pt-16 pb-8 md:px-6 md:pt-24 md:pb-12"
     >
       <div className="enter max-w-3xl space-y-6">
-        <h1 id="hero-title" className="text-display text-balance">
-          <span className="mb-2 block text-lead font-medium tracking-normal text-muted-foreground md:text-xl">
-            {greeting}
-          </span>
-          <span className="text-link">{name || "Demir Cücü"}</span>
-        </h1>
-        <p className="text-h3 font-medium tracking-normal md:text-h2">{role}</p>
+        {/* Without a name in the settings the role is the title (no placeholder name). */}
+        {name ? (
+          <>
+            <h1 id="hero-title" className="text-display text-balance">
+              <span className="mb-2 block text-lead font-medium tracking-normal text-muted-foreground md:text-xl">
+                {greeting}
+              </span>
+              <span className="text-link">{name}</span>
+            </h1>
+            <p className="text-h3 font-medium tracking-normal md:text-h2">{role}</p>
+          </>
+        ) : (
+          <h1 id="hero-title" className="text-display text-balance">
+            {role}
+          </h1>
+        )}
         {intro && (
           <p className="max-w-2xl text-lead text-pretty whitespace-pre-line text-muted-foreground">
             {intro}

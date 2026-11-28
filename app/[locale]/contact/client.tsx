@@ -50,31 +50,32 @@ export default function ContactClient({ settings }: ContactClientProps) {
     if (res.error) {
       toast.error(errorMessage(res.error));
     } else {
-      toast.success(t("success") || "Mesajınız başarıyla gönderildi!");
+      toast.success(t("success"));
       (e.target as HTMLFormElement).reset();
     }
   };
 
+  // Only what the site settings hold; nothing is shown in place of an empty field.
   const contactInfo = [
-    {
+    settings?.contactEmail && {
       icon: Mail,
-      label: "Email",
-      value: settings?.contactEmail || "info@demircucu.com",
-      href: `mailto:${settings?.contactEmail || "info@demircucu.com"}`,
+      label: t("email"),
+      value: settings.contactEmail,
+      href: `mailto:${settings.contactEmail}`,
     },
-    {
+    settings?.contactAddress && {
       icon: MapPin,
-      label: "Konum",
-      value: settings?.contactAddress || "İstanbul, Türkiye",
+      label: t("location"),
+      value: settings.contactAddress,
       href: null,
     },
-    {
+    settings?.contactPhone && {
       icon: Phone,
-      label: "Telefon",
-      value: settings?.contactPhone || "+90 (5XX) XXX XX XX",
-      href: null,
+      label: t("phone"),
+      value: settings.contactPhone,
+      href: `tel:${settings.contactPhone.replace(/[^\d+]/g, "")}`,
     },
-  ];
+  ].filter((info) => !!info);
 
   const socialLinks = [];
   if (settings?.socialGithub)
@@ -125,7 +126,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                       name="name"
                       required
                       className="bg-accent/30"
-                      placeholder="John Doe"
+                      placeholder={t("namePlaceholder")}
                     />
                   </div>
                   <div className="space-y-2">
@@ -136,7 +137,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                       type="email"
                       required
                       className="bg-accent/30"
-                      placeholder="john@example.com"
+                      placeholder={t("emailPlaceholder")}
                     />
                   </div>
                 </div>
@@ -146,7 +147,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                     id="subject"
                     name="subject"
                     className="bg-accent/30"
-                    placeholder="Proje hakkında..."
+                    placeholder={t("subjectPlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
@@ -157,7 +158,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                     required
                     rows={6}
                     className="resize-none bg-accent/30"
-                    placeholder="Mesajınızı buraya yazın..."
+                    placeholder={t("messagePlaceholder")}
                   />
                 </div>
                 <Button
@@ -166,7 +167,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                   className="w-full border-0 bg-primary text-primary-foreground"
                 >
                   {loading ? (
-                    <span className="animate-pulse">Gönderiliyor...</span>
+                    <span className="animate-pulse">{t("sending")}</span>
                   ) : (
                     <>
                       <Send className="mr-2 h-4 w-4" />
@@ -182,33 +183,35 @@ export default function ContactClient({ settings }: ContactClientProps) {
         {/* Contact Info */}
         <div className="reveal enter-from-right space-y-6 lg:col-span-2">
           {/* Info Cards */}
-          <Card className="border-border/50 bg-card/50">
-            <CardContent className="space-y-6 p-6">
-              <h2 className="text-h4">{t("info")}</h2>
-              <div className="space-y-4">
-                {contactInfo.map((info) => (
-                  <div key={info.label} className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                      <info.icon className="h-5 w-5 text-link" />
+          {contactInfo.length > 0 && (
+            <Card className="border-border/50 bg-card/50">
+              <CardContent className="space-y-6 p-6">
+                <h2 className="text-h4">{t("info")}</h2>
+                <div className="space-y-4">
+                  {contactInfo.map((info) => (
+                    <div key={info.label} className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                        <info.icon className="h-5 w-5 text-link" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">{info.label}</p>
+                        {info.href ? (
+                          <a
+                            href={info.href}
+                            className="text-sm font-medium transition-colors hover:text-link"
+                          >
+                            {info.value}
+                          </a>
+                        ) : (
+                          <p className="text-sm font-medium">{info.value}</p>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">{info.label}</p>
-                      {info.href ? (
-                        <a
-                          href={info.href}
-                          className="text-sm font-medium transition-colors hover:text-link"
-                        >
-                          {info.value}
-                        </a>
-                      ) : (
-                        <p className="text-sm font-medium">{info.value}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Social Links */}
           {socialLinks.length > 0 && (

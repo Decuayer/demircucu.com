@@ -55,9 +55,7 @@ export default function Footer({ settings, year }: FooterProps) {
     });
 
   if (settings?.contactEmail) {
-    socialLinks.push({ icon: Mail, href: `mailto:${settings.contactEmail}`, label: "Email" });
-  } else {
-    socialLinks.push({ icon: Mail, href: "mailto:info@demircucu.com", label: "Email" });
+    socialLinks.push({ icon: Mail, href: `mailto:${settings.contactEmail}`, label: t("email") });
   }
 
   return (
@@ -70,8 +68,7 @@ export default function Footer({ settings, year }: FooterProps) {
               {getTranslated(settings, "footerTitle", locale) || "demircucu.com"}
             </span>
             <p className="max-w-xs text-sm text-muted-foreground">
-              {getTranslated(settings, "footerDescription", locale) ||
-                "Full-Stack Developer & Software Engineer. Yazılım, projeler ve teknoloji dünyasından yazılar."}
+              {getTranslated(settings, "footerDescription", locale) || t("footerDescription")}
             </p>
           </div>
 
@@ -92,30 +89,32 @@ export default function Footer({ settings, year }: FooterProps) {
           </div>
 
           {/* Social */}
-          <div className="space-y-4">
-            <h2 className="text-eyebrow text-muted-foreground uppercase">{t("socialmedia")}</h2>
-            <div className="flex gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/50 text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
-                  aria-label={social.label}
-                >
-                  <social.icon className="h-4 w-4" />
-                </a>
-              ))}
+          {socialLinks.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-eyebrow text-muted-foreground uppercase">{t("socialmedia")}</h2>
+              <div className="flex gap-3">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/50 text-muted-foreground transition-all hover:bg-accent hover:text-foreground"
+                    aria-label={social.label}
+                  >
+                    <social.icon className="h-4 w-4" />
+                  </a>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <Separator className="my-8 opacity-50" />
 
         <div className="flex flex-col items-center justify-between gap-4 text-xs text-muted-foreground md:flex-row">
           <p>
-            © {year} demircucu.com. {t("copyright") || "Tüm hakları saklıdır."}
+            © {year} demircucu.com. {t("copyright")}
           </p>
           <Link href="/privacy" className="transition-colors hover:text-foreground">
             {t("privacy")}
