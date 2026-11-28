@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Code2 } from "lucide-react";
 import { describe, expect, it } from "vitest";
 import { PageHeader, PageShell, SectionHeading } from "./page-header";
-import { Prose } from "../prose";
+import { Prose, focusableCodeBlocks } from "../prose";
 
 describe("page layout", () => {
   it("PageShell sets the page padding and width", () => {
@@ -43,5 +43,14 @@ describe("page layout", () => {
     expect(html).toMatch(/class="(prose prose-site|prose-site prose)"/);
     expect(html).toContain("<p>Merhaba</p>");
     expect(renderToStaticMarkup(<Prose html="" />)).toContain('data-size="default"');
+  });
+
+  it("code blocks can be reached with the keyboard", () => {
+    expect(focusableCodeBlocks('<pre><code>a</code></pre><pre class="x">b</pre>')).toBe(
+      '<pre tabindex="0"><code>a</code></pre><pre tabindex="0" class="x">b</pre>',
+    );
+    expect(focusableCodeBlocks('<pre tabindex="-1">c</pre><p>pre</p>')).toBe(
+      '<pre tabindex="-1">c</pre><p>pre</p>',
+    );
   });
 });

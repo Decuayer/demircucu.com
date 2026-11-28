@@ -23,7 +23,8 @@ export interface ReadmeHeading {
   level: 2 | 3;
 }
 
-const decodeEntities = (value: string) =>
+/** Decodes the entities a sanitized HTML serializer emits (numeric, quot, lt, gt, amp). */
+export const decodeEntities = (value: string) =>
   value
     .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) =>
       String.fromCodePoint(Number.parseInt(hex, 16)),

@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-28 (Faz 8B: PR #27 merge; tipografi ve boşluk PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-28 (Faz 8B: PR #28 merge; blog okuma özellikleri PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -357,7 +357,23 @@ sayfaları.
   (2/6/10 px) ve `text-[10px]` public arayüzden kalktı; `components/layout/type-scale.test.ts`
   geri dönüşü engeller. Hakkımda'da kısa biyografide fotoğraf float'u sonraki bölüme taşıyordu
   (`flow-root`). Seed: `seedTypographySample` (uzun örnek yazı, yalnızca CLI seed'i). Ekran
-  görüntüleri `docs/design-audit/typography/`.
+  görüntüleri `docs/design-audit/typography/`. PR #28 merge; kullanıcı
+  Preview'da blog, Hakkımda, ana sayfa ve README'yi kontrol etti (2026-11-28).
+- **PR 10 (`feat/blog-reading`):** kararlar (kullanıcı, 2026-11-28): 1a paylaşım X + LinkedIn + link
+  kopyala + mobilde yerel paylaşım, 2a önceki/sonraki tüm yazılarda tarih sırası, 3a içindekiler
+  h2 + h3 ve en az 3 başlık, 4a boş ayar = öğe gizli (uydurma yedek yok). Başlık id'leri sayfa
+  oluşurken eklenir (`lib/blog/toc.ts`, Türkçe harf katlamalı slug, tekrarlar `-2`; içerik ve
+  şema değişmedi). İçindekiler 1280 px'ten itibaren yazı sütununun sağında yapışkan (okunan bölüm
+  `aria-current`), altında katlanır `<details>`. İlerleme çubuğu header altında, yazı gövdesine
+  göre (Tailwind v4 `scale-*` ayrı `scale` özelliği kullandığından satır içi `transform`).
+  Önceki/sonraki `getAdjacentPosts` (`posts` cache tag'i). Paylaşım URL'si canonical +
+  `utm_source=share`. Prose'daki `<pre>` klavye ile odaklanabilir (`tabindex="0"`). i18n: "Ekli
+  dosyalar", "Devamını oku", yorum/beğeni yedekleri, iletişim etiketleri ve yer tutucuları, footer
+  açıklama ve telif. Kaldırılan uydurma yedekler: Hakkımda biyografi, "Fotoğrafçılık" hobisi,
+  konum, "5+ Yıl Deneyim", GitHub linki; iletişim e-posta/telefon/adres; footer e-postası; ana
+  sayfa ad yedeği (ad yoksa unvan başlık olur). Hakkımda başlığında ayara yazılmış selam tekrar
+  etmez. Koruyucu: `components/layout/hardcoded-text.test.ts`. Seed: `short-notes` (eski, iki
+  başlık). Ekran görüntüleri `docs/design-audit/blog/`.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 

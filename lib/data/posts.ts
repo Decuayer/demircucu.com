@@ -5,6 +5,7 @@ import { CacheTags } from "@/lib/cache/tags";
 import { sanitizeHtml } from "@/lib/sanitize/html";
 import { optimizeImagesIn } from "@/lib/data/html-images";
 import { presentPost, publicPostQuery } from "@/lib/data/present";
+import { adjacentPosts } from "@/lib/blog/adjacent";
 
 export async function getPublishedPosts() {
   "use cache: remote";
@@ -58,4 +59,17 @@ export async function getPublishedPostSlugs(): Promise<string[]> {
     select: { slug: true },
   });
   return rows.map((row) => row.slug);
+}
+
+/** The older and newer published post around `slug` (by publication date). */
+export async function getAdjacentPosts(slug: string) {
+  "use cache: remote";
+  cacheTag(CacheTags.posts);
+  cacheLife("hours");
+  const rows = await prisma.blogPost.findMany({
+    where: { published: true },
+    select: { slug: true, titleTr: true, titleEn: true, createdAt: true },
+    orderBy: [{ createdAt: "desc" }, { slug: "asc" }],
+  });
+  return adjacentPosts(rows, slug);
 }

@@ -32,12 +32,13 @@
     "updatePassword": "Update Password",
     "save": "Save",
     "name": "Full Name",
-    "email": "E-mail",
+    "email": "Email",
     "switchLanguage": "Türkçe'ye geç",
     "privacy": "Privacy",
     "openMenu": "Open menu",
     "mainNav": "Main navigation",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "footerDescription": "Writing on software, projects and technology."
   },
   "home": {
     "heroSub": "Full-Stack Developer & Software Engineer",
@@ -71,7 +72,8 @@
     "details": "Details",
     "technologies": "Technologies Used",
     "duration": "Duration",
-    "location": "Location"
+    "location": "Location",
+    "attachments": "Attachments"
   },
   "projects": {
     "title": "Projects",
@@ -154,7 +156,20 @@
     "loginToLike": "You must be logged in to like a post.",
     "likeError": "Failed to like the post.",
     "submitting": "Sending...",
-    "anonymousUser": "User"
+    "anonymousUser": "User",
+    "attachments": "Attachments",
+    "readMore": "Read more",
+    "toc": "Contents",
+    "share": "Share",
+    "shareThisPost": "Share this post",
+    "shareOn": "Share on {network}",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied",
+    "copyFailed": "Could not copy the link",
+    "shareNative": "Share…",
+    "postNavigation": "More posts",
+    "previousPost": "Previous post",
+    "nextPost": "Next post"
   },
   "contact": {
     "title": "Contact",
@@ -168,7 +183,14 @@
     "info": "Contact Information",
     "social": "Social Media",
     "requiredFields": "Please fill in the required fields.",
-    "submissionError": "An error occurred while submitting the message."
+    "submissionError": "An error occurred while submitting the message.",
+    "location": "Location",
+    "phone": "Phone",
+    "namePlaceholder": "Your name",
+    "emailPlaceholder": "you@example.com",
+    "subjectPlaceholder": "About a project...",
+    "messagePlaceholder": "Write your message here...",
+    "sending": "Sending..."
   },
   "auth": {
     "loginTitle": "Sign In",

@@ -37,7 +37,8 @@
     "privacy": "Gizlilik",
     "openMenu": "Menüyü aç",
     "mainNav": "Ana gezinme",
-    "skipToContent": "İçeriğe geç"
+    "skipToContent": "İçeriğe geç",
+    "footerDescription": "Yazılım, projeler ve teknoloji üzerine yazılar."
   },
   "home": {
     "heroSub": "Full-Stack Geliştirici & Yazılım Mühendisi",
@@ -71,7 +72,8 @@
     "details": "Detaylar",
     "technologies": "Kullanılan Teknolojiler",
     "duration": "Süre",
-    "location": "Konum"
+    "location": "Konum",
+    "attachments": "Ekli dosyalar"
   },
   "projects": {
     "title": "Projelerim",
@@ -154,7 +156,20 @@
     "loginToLike": "Beğenmek için giriş yapmalısınız.",
     "likeError": "Beğeni işlemi başarısız oldu.",
     "submitting": "Gönderiliyor...",
-    "anonymousUser": "Kullanıcı"
+    "anonymousUser": "Kullanıcı",
+    "attachments": "Ekli dosyalar",
+    "readMore": "Devamını oku",
+    "toc": "İçindekiler",
+    "share": "Paylaş",
+    "shareThisPost": "Bu yazıyı paylaş",
+    "shareOn": "{network} üzerinde paylaş",
+    "copyLink": "Linki kopyala",
+    "linkCopied": "Link kopyalandı",
+    "copyFailed": "Link kopyalanamadı",
+    "shareNative": "Paylaş…",
+    "postNavigation": "Diğer yazılar",
+    "previousPost": "Önceki yazı",
+    "nextPost": "Sonraki yazı"
   },
   "contact": {
     "title": "İletişim",
@@ -168,7 +183,14 @@
     "info": "İletişim Bilgileri",
     "social": "Sosyal Medya",
     "requiredFields": "Lütfen gerekli tüm alanları doldurun.",
-    "submissionError": "Mesajınız gönderilirken bir hata oluştu."
+    "submissionError": "Mesajınız gönderilirken bir hata oluştu.",
+    "location": "Konum",
+    "phone": "Telefon",
+    "namePlaceholder": "Adınız Soyadınız",
+    "emailPlaceholder": "ornek@eposta.com",
+    "subjectPlaceholder": "Proje hakkında...",
+    "messagePlaceholder": "Mesajınızı buraya yazın...",
+    "sending": "Gönderiliyor..."
   },
   "auth": {
     "loginTitle": "Giriş Yap",
