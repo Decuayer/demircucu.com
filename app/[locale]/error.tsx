@@ -24,7 +24,7 @@ export default function PageError({
       className="container mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center px-4 py-24 text-center"
     >
       <AlertTriangle aria-hidden className="mb-6 h-10 w-10 text-muted-foreground" />
-      <h1 className="mb-3 text-3xl font-bold">{t("errorTitle")}</h1>
+      <h1 className="mb-4 text-h1 text-balance">{t("errorTitle")}</h1>
       <p className="mb-2 text-muted-foreground">{t("errorText")}</p>
       {error.digest && (
         <p className="mb-8 font-mono text-xs text-muted-foreground">

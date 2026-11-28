@@ -254,6 +254,10 @@ kenarlık zinc-700, input kenarı zinc-600 (muted zemin zinc-800 üstünde kaybo
 - Ölçek 12 / 14 / 16 / 18 / 20 / 24 / 30 / 36 / 48 (rem token'ları); gövde 16 px, satır
   yüksekliği 1,6; okuma genişliği ~68 karakter.
 - Başlık seviyeleri semantik ve görsel olarak eşlenir.
+- **Uygulandı (8B, PR 9):** oran 1.25; `display` 40→64, `h1` 32→48, `h2` 24→30, `h3` 20, `h4` 18,
+  `lead` 18, gövde 16 / 1,6, blog metni 17 / 1,75, en fazla ~68 karakter (`30em`). Önce/sonra:
+  `design-audit/typography/` (ana sayfa, Hakkımda, blog yazısı açık/koyu, proje, deneyim; 1440 ve
+  375 px).
 
 ### Boşluk ve düzen
 

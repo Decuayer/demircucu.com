@@ -27,7 +27,7 @@ const linkStyles: Record<Variant, { base: string; active: string; idle: string }
     idle: "text-muted-foreground",
   },
   mobile: {
-    base: "rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+    base: "rounded-md px-3 py-2 text-sm font-medium transition-colors",
     active: "bg-accent text-foreground",
     idle: "text-muted-foreground hover:bg-accent hover:text-foreground",
   },

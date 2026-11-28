@@ -60,7 +60,7 @@ export default async function ProjectDocumentPage({
   const projectTitle = getTranslated(project, "title", locale);
 
   return (
-    <div className="py-12 md:py-16">
+    <div className="py-16 md:py-24">
       <JsonLd
         data={breadcrumbs(context.base, locale, [
           { name: t("title"), path: "/projects" },
@@ -76,14 +76,14 @@ export default async function ProjectDocumentPage({
           </Button>
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold break-words md:text-3xl">{document.title}</h1>
+          <h1 className="text-h1 text-balance break-words">{document.title}</h1>
           <a
             href={document.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
           >
-            {t("viewGithub")} <ExternalLink className="h-3.5 w-3.5" />
+            {t("viewGithub")} <ExternalLink aria-hidden className="h-4 w-4" />
           </a>
         </div>
         {document.url ? (

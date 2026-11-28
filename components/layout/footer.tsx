@@ -77,9 +77,7 @@ export default function Footer({ settings, year }: FooterProps) {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h2 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-              {t("fastlinks")}
-            </h2>
+            <h2 className="text-eyebrow text-muted-foreground uppercase">{t("fastlinks")}</h2>
             <nav aria-label={t("fastlinks")} className="flex flex-col gap-2">
               {footerLinks.map((link) => (
                 <Link
@@ -95,9 +93,7 @@ export default function Footer({ settings, year }: FooterProps) {
 
           {/* Social */}
           <div className="space-y-4">
-            <h2 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-              {t("socialmedia")}
-            </h2>
+            <h2 className="text-eyebrow text-muted-foreground uppercase">{t("socialmedia")}</h2>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <a

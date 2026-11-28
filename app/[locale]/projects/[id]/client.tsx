@@ -24,6 +24,8 @@ import { attachmentHref, toAttachments } from "@/lib/media/attachments";
 import { languageShares, type ReadmeHeading } from "@/lib/projects/readme";
 import type { ProjectPage } from "@/lib/data/projects";
 import { TagChips } from "@/components/tags/tag-chips";
+import { PageShell } from "@/components/layout/page-header";
+import { Prose } from "@/components/prose";
 import { ReadmeView } from "@/components/projects/readme-view";
 import { ProjectDocuments } from "@/components/projects/documents";
 import { ProjectGallery } from "@/components/projects/gallery";
@@ -101,17 +103,17 @@ export default function ProjectDetailClient({
     <div className="space-y-8">
       {description && (
         <Card className="border-border/50 bg-card/50">
-          <CardContent className="prose prose-sm max-w-none p-8 dark:prose-invert">
-            <div dangerouslySetInnerHTML={{ __html: description }} />
+          <CardContent className="p-6 md:p-8">
+            <Prose html={description} />
           </CardContent>
         </Card>
       )}
       {attachments.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="flex items-center gap-2 text-lg font-semibold">
-            <FileIcon className="h-5 w-5 text-link" />
+        <div className="space-y-4">
+          <h2 className="flex items-center gap-2 text-h4">
+            <FileIcon aria-hidden className="h-5 w-5 text-link" />
             {t("attachments")}
-          </h3>
+          </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {attachments.map((file, i) => (
               <a
@@ -143,133 +145,129 @@ export default function ProjectDetailClient({
   };
 
   return (
-    <div className="py-16 md:py-24">
-      <div className="container mx-auto max-w-6xl px-4 md:px-6">
-        <div className="enter">
-          <Link href="/projects">
-            <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("allProjects")}
-            </Button>
-          </Link>
+    <PageShell width="wide">
+      <div className="enter">
+        <Link href="/projects">
+          <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t("allProjects")}
+          </Button>
+        </Link>
 
-          <header className="mb-8 max-w-4xl">
-            <div className="mb-4 flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-muted">
-                {project.logoUrl ? (
-                  <Image
-                    src={project.logoUrl}
-                    alt={title}
-                    width={40}
-                    height={40}
-                    loading="eager"
-                    className="h-10 w-10 rounded object-contain"
-                  />
-                ) : (
-                  <Code2 className="h-8 w-8 text-link" />
-                )}
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-3xl font-bold break-words md:text-4xl">{title}</h1>
-                {project.isArchived && (
-                  <Badge
-                    variant="outline"
-                    className="mt-2 gap-1 border-amber-500/40 text-amber-700 dark:text-amber-400"
-                  >
-                    <Archive className="h-3 w-3" />
-                    {t("archived")}
-                  </Badge>
-                )}
-              </div>
+        <header className="mb-8 max-w-4xl">
+          <div className="mb-4 flex items-center gap-4">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-muted">
+              {project.logoUrl ? (
+                <Image
+                  src={project.logoUrl}
+                  alt={title}
+                  width={40}
+                  height={40}
+                  loading="eager"
+                  className="h-10 w-10 rounded object-contain"
+                />
+              ) : (
+                <Code2 className="h-8 w-8 text-link" />
+              )}
             </div>
-            <p className="text-lg text-muted-foreground">
-              {getTranslated(project, "summary", locale)}
-            </p>
-          </header>
-
-          <div className="mb-8 flex flex-wrap gap-3">
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-track="github"
-              >
-                <Button variant="outline" className="border-border/50">
-                  <GithubIcon className="mr-2 h-4 w-4" />
-                  {t("viewGithub")}
-                </Button>
-              </a>
-            )}
-            {project.liveUrl && (
-              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-track="live">
-                <Button className="border-0 bg-primary text-primary-foreground">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  {t("liveSite")}
-                </Button>
-              </a>
-            )}
+            <div className="min-w-0">
+              <h1 className="text-h1 text-balance break-words">{title}</h1>
+              {project.isArchived && (
+                <Badge
+                  variant="outline"
+                  className="mt-2 gap-1 border-amber-500/40 text-amber-700 dark:text-amber-400"
+                >
+                  <Archive className="h-3 w-3" />
+                  {t("archived")}
+                </Badge>
+              )}
+            </div>
           </div>
+          <p className="text-lead text-pretty text-muted-foreground">
+            {getTranslated(project, "summary", locale)}
+          </p>
+        </header>
 
-          {project.source === "GITHUB" && (
-            <div className="mb-8 max-w-4xl space-y-4">
-              <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                <li className="inline-flex items-center gap-1.5">
-                  <Star className="h-4 w-4" />
-                  {t("meta.stars", { count: project.stars })}
-                </li>
-                <li className="inline-flex items-center gap-1.5">
-                  <GitFork className="h-4 w-4" />
-                  {t("meta.forks", { count: project.forks })}
-                </li>
-                {project.license && (
-                  <li className="inline-flex items-center gap-1.5">
-                    <Scale className="h-4 w-4" />
-                    {project.license}
-                  </li>
-                )}
-                {project.pushedAt && (
-                  <li className="inline-flex items-center gap-1.5">
-                    <History className="h-4 w-4" />
-                    {t("meta.updated", {
-                      date: formatDate(project.pushedAt, locale),
-                    })}
-                  </li>
-                )}
-              </ul>
-              <LanguageBar shares={shares} label={t("meta.languages")} />
-            </div>
+        <div className="mb-8 flex flex-wrap gap-3">
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="github"
+            >
+              <Button variant="outline" className="border-border/50">
+                <GithubIcon className="mr-2 h-4 w-4" />
+                {t("viewGithub")}
+              </Button>
+            </a>
           )}
-
-          {project.tags.length > 0 && (
-            <div className="mb-10 max-w-4xl">
-              <h2 className="mb-3 text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-                {t("techStack")}
-              </h2>
-              <TagChips tags={project.tags} locale={locale} />
-            </div>
-          )}
-
-          {sections.length > 1 ? (
-            <Tabs defaultValue={sections[0]!.id}>
-              <TabsList className="mb-6 flex-wrap">
-                {sections.map((s) => (
-                  <TabsTrigger key={s.id} value={s.id}>
-                    {s.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {sections.map((s) => (
-                <TabsContent key={s.id} value={s.id}>
-                  {content[s.id]}
-                </TabsContent>
-              ))}
-            </Tabs>
-          ) : (
-            sections[0] && content[sections[0].id]
+          {project.liveUrl && (
+            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-track="live">
+              <Button className="border-0 bg-primary text-primary-foreground">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                {t("liveSite")}
+              </Button>
+            </a>
           )}
         </div>
+
+        {project.source === "GITHUB" && (
+          <div className="mb-8 max-w-4xl space-y-4">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <li className="inline-flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                {t("meta.stars", { count: project.stars })}
+              </li>
+              <li className="inline-flex items-center gap-2">
+                <GitFork className="h-4 w-4" />
+                {t("meta.forks", { count: project.forks })}
+              </li>
+              {project.license && (
+                <li className="inline-flex items-center gap-2">
+                  <Scale className="h-4 w-4" />
+                  {project.license}
+                </li>
+              )}
+              {project.pushedAt && (
+                <li className="inline-flex items-center gap-2">
+                  <History className="h-4 w-4" />
+                  {t("meta.updated", {
+                    date: formatDate(project.pushedAt, locale),
+                  })}
+                </li>
+              )}
+            </ul>
+            <LanguageBar shares={shares} label={t("meta.languages")} />
+          </div>
+        )}
+
+        {project.tags.length > 0 && (
+          <div className="mb-12 max-w-4xl">
+            <h2 className="mb-3 text-eyebrow text-muted-foreground uppercase">{t("techStack")}</h2>
+            <TagChips tags={project.tags} locale={locale} />
+          </div>
+        )}
+
+        {sections.length > 1 ? (
+          <Tabs defaultValue={sections[0]!.id}>
+            <TabsList className="mb-6 flex-wrap">
+              {sections.map((s) => (
+                <TabsTrigger key={s.id} value={s.id}>
+                  {s.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {sections.map((s) => (
+              <TabsContent key={s.id} value={s.id}>
+                {content[s.id]}
+              </TabsContent>
+            ))}
+          </Tabs>
+        ) : (
+          sections[0] && content[sections[0].id]
+        )}
       </div>
-    </div>
+    </PageShell>
   );
 }

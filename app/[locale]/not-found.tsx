@@ -12,7 +12,7 @@ export default function NotFound() {
     <section className="container mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center px-4 py-24 text-center">
       <FileQuestion aria-hidden className="mb-6 h-10 w-10 text-muted-foreground" />
       <p className="mb-2 font-mono text-sm text-muted-foreground">404</p>
-      <h1 className="mb-3 text-3xl font-bold">{t("notFoundTitle")}</h1>
+      <h1 className="mb-4 text-h1 text-balance">{t("notFoundTitle")}</h1>
       <p className="mb-8 text-muted-foreground">{t("notFoundText")}</p>
       <div className="flex flex-wrap justify-center gap-3">
         <Link href="/" className={buttonVariants()}>

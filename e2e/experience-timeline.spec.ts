@@ -103,6 +103,8 @@ for (const scheme of ["light", "dark"] as const) {
       );
       for (const path of ["/tr/experience", "/en/experience", `/tr/experience/${atlas!.id}`]) {
         await page.goto(path);
+        // Streamed pages: let the content arrive before axe looks at it.
+        await expect(page.locator("main h1").filter({ visible: true })).toHaveCount(1);
         const result = await new AxeBuilder({ page })
           .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"])
           .analyze();

@@ -14,6 +14,8 @@ import { useDurationLabel } from "@/components/experience/duration";
 import { TextBlocks } from "@/components/experience/text-blocks";
 import { isoMonth } from "@/lib/experience/duration";
 import { TagChips } from "@/components/tags/tag-chips";
+import { PageShell } from "@/components/layout/page-header";
+import { Prose } from "@/components/prose";
 import { FileIcon } from "lucide-react";
 
 const MONTH_YEAR: Intl.DateTimeFormatOptions = { month: "short", year: "numeric" };
@@ -32,134 +34,132 @@ export default function ExperienceDetailClient({ experience }: ExperienceDetailC
     html.replace(/<[^>]*>|&nbsp;/g, "").trim() || /<(img|video|iframe)\b/i.test(html) ? html : null;
 
   return (
-    <div className="py-16 md:py-24">
-      <div className="container mx-auto max-w-4xl px-4 md:px-6">
-        <div className="enter">
-          {/* Back button */}
-          <Link href="/experience">
-            <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("title")}
-            </Button>
-          </Link>
+    <PageShell width="narrow">
+      <div className="enter">
+        {/* Back button */}
+        <Link href="/experience">
+          <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t("title")}
+          </Button>
+        </Link>
 
-          {/* Header */}
-          <div className="mb-12">
-            <div className="mb-4 flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border/50 bg-muted">
-                {experience.logoUrl ? (
-                  <Image
-                    src={experience.logoUrl}
-                    alt={experience.company}
-                    width={40}
-                    height={40}
-                    loading="eager"
-                    className="h-10 w-10 rounded object-contain"
-                  />
-                ) : (
-                  <Building2 className="h-8 w-8 text-link" />
-                )}
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold md:text-4xl">{experience.company}</h1>
-                <p className="text-lg text-muted-foreground">
-                  {getTranslated(experience, "position", locale)}
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Calendar aria-hidden className="h-4 w-4" />
-                <span>
-                  <time dateTime={isoMonth(experience.startDate)}>
-                    {formatDate(experience.startDate, locale, MONTH_YEAR)}
-                  </time>
-                  {" – "}
-                  {experience.endDate ? (
-                    <time dateTime={isoMonth(experience.endDate)}>
-                      {formatDate(experience.endDate, locale, MONTH_YEAR)}
-                    </time>
-                  ) : (
-                    t("present")
-                  )}
-                  <span data-testid="experience-duration">
-                    {" · "}
-                    <span className="sr-only">{t("duration")}: </span>
-                    {duration(experience.months)}
-                  </span>
-                </span>
-              </div>
-              {(experience.locationTr || experience.locationEn) && (
-                <div className="flex items-center gap-1">
-                  <MapPin aria-hidden className="h-4 w-4" />
-                  <span className="sr-only">{t("location")}: </span>
-                  <span>
-                    {(locale === "en" ? experience.locationEn : experience.locationTr) ||
-                      experience.locationTr ||
-                      experience.locationEn}
-                  </span>
-                </div>
+        {/* Header */}
+        <header className="mb-12">
+          <div className="mb-4 flex items-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border/50 bg-muted">
+              {experience.logoUrl ? (
+                <Image
+                  src={experience.logoUrl}
+                  alt={experience.company}
+                  width={40}
+                  height={40}
+                  loading="eager"
+                  className="h-10 w-10 rounded object-contain"
+                />
+              ) : (
+                <Building2 className="h-8 w-8 text-link" />
               )}
             </div>
-          </div>
-
-          <TextBlocks
-            text={getTranslated(experience, "description", locale)}
-            className="mb-8 text-base"
-          />
-
-          {/* Tags */}
-          <TagChips tags={experience.tags} locale={locale} className="mb-8" />
-
-          {/* Details (rich text; omitted when the admin left it empty). */}
-          {details && (
-            <Card className="mb-8 border-border/50 bg-card/50">
-              <CardContent className="prose prose-sm max-w-none p-8 dark:prose-invert">
-                <div dangerouslySetInnerHTML={{ __html: details }} />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Files */}
-          {experience.files && Array.isArray(experience.files) && experience.files.length > 0 && (
-            <div className="mb-8 space-y-3">
-              <h3 className="flex items-center gap-2 text-lg font-semibold">
-                <FileIcon className="h-5 w-5 text-link" />
-                Ekli Dosyalar
-              </h3>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {toAttachments(experience.files).map((file, i) => (
-                  <a
-                    key={i}
-                    href={attachmentHref(file) ?? undefined}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-primary/40 hover:bg-card">
-                      <CardContent className="flex items-center justify-between p-4">
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <FileIcon className="h-4 w-4 shrink-0 text-link" />
-                          <p className="truncate text-sm font-medium">{file.name}</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </a>
-                ))}
-              </div>
+            <div>
+              <h1 className="text-h1 text-balance">{experience.company}</h1>
+              <p className="mt-1 text-lead text-muted-foreground">
+                {getTranslated(experience, "position", locale)}
+              </p>
             </div>
-          )}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Calendar aria-hidden className="h-4 w-4" />
+              <span>
+                <time dateTime={isoMonth(experience.startDate)}>
+                  {formatDate(experience.startDate, locale, MONTH_YEAR)}
+                </time>
+                {" – "}
+                {experience.endDate ? (
+                  <time dateTime={isoMonth(experience.endDate)}>
+                    {formatDate(experience.endDate, locale, MONTH_YEAR)}
+                  </time>
+                ) : (
+                  t("present")
+                )}
+                <span data-testid="experience-duration">
+                  {" · "}
+                  <span className="sr-only">{t("duration")}: </span>
+                  {duration(experience.months)}
+                </span>
+              </span>
+            </div>
+            {(experience.locationTr || experience.locationEn) && (
+              <div className="flex items-center gap-2">
+                <MapPin aria-hidden className="h-4 w-4" />
+                <span className="sr-only">{t("location")}: </span>
+                <span>
+                  {(locale === "en" ? experience.locationEn : experience.locationTr) ||
+                    experience.locationTr ||
+                    experience.locationEn}
+                </span>
+              </div>
+            )}
+          </div>
+        </header>
 
-          {/* GitHub Link */}
-          {experience.githubUrl && (
-            <a href={experience.githubUrl} target="_blank" rel="noopener noreferrer">
-              <Button className="border-0 bg-primary text-primary-foreground">
-                <GithubIcon className="mr-2 h-4 w-4" />
-                GitHub
-              </Button>
-            </a>
-          )}
-        </div>
+        <TextBlocks
+          text={getTranslated(experience, "description", locale)}
+          className="mb-8 text-base"
+        />
+
+        {/* Tags */}
+        <TagChips tags={experience.tags} locale={locale} className="mb-8" />
+
+        {/* Details (rich text; omitted when the admin left it empty). */}
+        {details && (
+          <Card className="mb-8 border-border/50 bg-card/50">
+            <CardContent className="p-6 md:p-8">
+              <Prose html={details} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Files */}
+        {experience.files && Array.isArray(experience.files) && experience.files.length > 0 && (
+          <div className="mb-8 space-y-4">
+            <h2 className="flex items-center gap-2 text-h4">
+              <FileIcon className="h-5 w-5 text-link" />
+              Ekli Dosyalar
+            </h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {toAttachments(experience.files).map((file, i) => (
+                <a
+                  key={i}
+                  href={attachmentHref(file) ?? undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Card className="cursor-pointer border-border/50 bg-card/50 transition-all hover:border-primary/40 hover:bg-card">
+                    <CardContent className="flex items-center justify-between p-4">
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <FileIcon className="h-4 w-4 shrink-0 text-link" />
+                        <p className="truncate text-sm font-medium">{file.name}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* GitHub Link */}
+        {experience.githubUrl && (
+          <a href={experience.githubUrl} target="_blank" rel="noopener noreferrer">
+            <Button className="border-0 bg-primary text-primary-foreground">
+              <GithubIcon className="mr-2 h-4 w-4" />
+              GitHub
+            </Button>
+          </a>
+        )}
       </div>
-    </div>
+    </PageShell>
   );
 }

@@ -38,8 +38,8 @@ function SectionHeading({
   linkLabel: string;
 }) {
   return (
-    <div className="mb-8 flex items-end justify-between gap-4">
-      <h2 id={id} className="text-2xl font-bold tracking-tight md:text-3xl">
+    <div className="mb-6 flex items-end justify-between gap-4">
+      <h2 id={id} className="text-h2">
         {title}
       </h2>
       <Link
@@ -66,18 +66,18 @@ function Hero({ settings }: { settings: PublicSiteSettings | null }) {
   return (
     <section
       aria-labelledby="hero-title"
-      className="container mx-auto px-4 pt-16 pb-20 md:px-6 md:pt-24"
+      className="container mx-auto px-4 pt-16 pb-8 md:px-6 md:pt-24 md:pb-12"
     >
       <div className="enter max-w-3xl space-y-6">
-        <h1 id="hero-title" className="text-4xl font-extrabold tracking-tight md:text-6xl">
-          <span className="mb-2 block text-lg font-medium text-muted-foreground md:text-xl">
+        <h1 id="hero-title" className="text-display text-balance">
+          <span className="mb-2 block text-lead font-medium tracking-normal text-muted-foreground md:text-xl">
             {greeting}
           </span>
           <span className="text-link">{name || "Demir Cücü"}</span>
         </h1>
-        <p className="text-xl font-medium md:text-2xl">{role}</p>
+        <p className="text-h3 font-medium tracking-normal md:text-h2">{role}</p>
         {intro && (
-          <p className="max-w-2xl text-lg leading-relaxed whitespace-pre-line text-muted-foreground">
+          <p className="max-w-2xl text-lead text-pretty whitespace-pre-line text-muted-foreground">
             {intro}
           </p>
         )}
@@ -178,7 +178,10 @@ function Projects({ projects }: { projects: HomeProject[] }) {
   if (projects.length === 0) return null;
   const grid = projectGrid(projects.length);
   return (
-    <section aria-labelledby="featured-projects" className="container mx-auto px-4 py-16 md:px-6">
+    <section
+      aria-labelledby="featured-projects"
+      className="container mx-auto px-4 py-8 md:px-6 md:py-12"
+    >
       <SectionHeading
         id="featured-projects"
         title={t("featuredProjects")}
@@ -207,7 +210,7 @@ function Projects({ projects }: { projects: HomeProject[] }) {
               >
                 <ProjectCover project={project} title={title} wide={wide} />
                 <div className="space-y-3 p-6">
-                  <h3 className="text-lg font-semibold">
+                  <h3 className="text-h3">
                     <Link
                       href={`/projects/${project.slug}`}
                       className="group-hover:text-link after:absolute after:inset-0"
@@ -239,7 +242,10 @@ function Experience({ experiences }: { experiences: HomeExperience[] }) {
   const duration = useDurationLabel();
   if (experiences.length === 0) return null;
   return (
-    <section aria-labelledby="experience-summary" className="container mx-auto px-4 py-16 md:px-6">
+    <section
+      aria-labelledby="experience-summary"
+      className="container mx-auto px-4 py-8 md:px-6 md:py-12"
+    >
       <SectionHeading
         id="experience-summary"
         title={t("experience")}
@@ -274,7 +280,7 @@ function Experience({ experiences }: { experiences: HomeExperience[] }) {
                   </span>
                 )}
                 <div className="min-w-0 space-y-1">
-                  <h3 className="font-semibold">
+                  <h3 className="text-h4">
                     <Link
                       href={`/experience/${exp.id}`}
                       className="hover:text-link hover:underline"
@@ -292,7 +298,7 @@ function Experience({ experiences }: { experiences: HomeExperience[] }) {
                     </span>
                     {location && (
                       <span className="inline-flex items-center gap-1">
-                        <MapPin aria-hidden className="h-3.5 w-3.5" /> {location}
+                        <MapPin aria-hidden className="h-4 w-4" /> {location}
                       </span>
                     )}
                   </p>
@@ -311,7 +317,10 @@ function Skills({ skills }: { skills: HomeSkill[] }) {
   const locale = useLocale();
   if (skills.length === 0) return null;
   return (
-    <section aria-labelledby="featured-skills" className="container mx-auto px-4 py-16 md:px-6">
+    <section
+      aria-labelledby="featured-skills"
+      className="container mx-auto px-4 py-8 md:px-6 md:py-12"
+    >
       <SectionHeading
         id="featured-skills"
         title={t("skills")}
@@ -339,7 +348,10 @@ function Posts({ posts }: { posts: HomePost[] }) {
   const locale = useLocale();
   if (posts.length === 0) return null;
   return (
-    <section aria-labelledby="latest-posts" className="container mx-auto px-4 py-16 md:px-6">
+    <section
+      aria-labelledby="latest-posts"
+      className="container mx-auto px-4 py-8 md:px-6 md:py-12"
+    >
       <SectionHeading
         id="latest-posts"
         title={t("latestPosts")}
@@ -356,7 +368,7 @@ function Posts({ posts }: { posts: HomePost[] }) {
               {" · "}
               {t("readingTime", { minutes: locale === "en" ? post.minutesEn : post.minutesTr })}
             </p>
-            <h3 className="text-lg font-semibold">
+            <h3 className="text-h3">
               <Link
                 href={`/blog/${post.slug}`}
                 className="group-hover:text-link after:absolute after:inset-0"
@@ -377,7 +389,7 @@ function Posts({ posts }: { posts: HomePost[] }) {
 /** Home page: short hero, featured projects, experience, skills and the newest posts. */
 export default function HomeClient({ settings, projects, experiences, skills, posts }: HomeProps) {
   return (
-    <div>
+    <div className="pb-8 md:pb-12">
       <Hero settings={settings} />
       <Projects projects={projects} />
       <Experience experiences={experiences} />
