@@ -240,8 +240,9 @@ export async function seedTimelineSamples(prisma: PrismaClient): Promise<void> {
 }
 
 /**
- * A long-form post for local development and E2E (phase 8 typography): headings, lists, code,
- * a quote, a table and a link, in both languages, so prose styles and line length can be checked.
+ * Posts for local development and E2E (phase 8): a long-form one with headings, lists, code, a
+ * quote, a table and a link in both languages (prose styles, line length, table of contents), and
+ * an older short one (previous / next post).
  * Kept out of `seed()` like the timeline samples, and skipped on staging.
  */
 export async function seedTypographySample(prisma: PrismaClient): Promise<void> {
@@ -292,6 +293,26 @@ export async function seedTypographySample(prisma: PrismaClient): Promise<void> 
       published: true,
       authorId: SEED_ADMIN_ID,
       createdAt: new Date("2025-01-15T09:00:00Z"),
+    },
+  });
+  // An older, short post: the long one gets both a previous and a next post, and this one has
+  // too few headings for a table of contents.
+  await prisma.blogPost.upsert({
+    where: { slug: "short-notes" },
+    update: {},
+    create: {
+      slug: "short-notes",
+      titleTr: "Kısa notlar",
+      titleEn: "Short notes",
+      excerptTr: "İki başlıklı kısa bir yazı.",
+      excerptEn: "A short post with two headings.",
+      contentTr:
+        "<p>Kısa bir giriş.</p><h2>Birinci not</h2><p>İlk not.</p><h2>İkinci not</h2><p>İkinci not.</p>",
+      contentEn:
+        "<p>A short introduction.</p><h2>First note</h2><p>The first note.</p><h2>Second note</h2><p>The second note.</p>",
+      published: true,
+      authorId: SEED_ADMIN_ID,
+      createdAt: new Date("2024-11-01T09:00:00Z"),
     },
   });
 }
