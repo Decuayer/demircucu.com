@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-28 (Faz 8B: PR #28 merge; blog okuma özellikleri PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-28 (Faz 8B: PR #29 merge; kaydedilmemiş değişiklik uyarısı PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -373,7 +373,19 @@ sayfaları.
   konum, "5+ Yıl Deneyim", GitHub linki; iletişim e-posta/telefon/adres; footer e-postası; ana
   sayfa ad yedeği (ad yoksa unvan başlık olur). Hakkımda başlığında ayara yazılmış selam tekrar
   etmez. Koruyucu: `components/layout/hardcoded-text.test.ts`. Seed: `short-notes` (eski, iki
-  başlık). Ekran görüntüleri `docs/design-audit/blog/`.
+  başlık). Ekran görüntüleri `docs/design-audit/blog/`. PR #29 merge; kullanıcı admin
+  ayarlarını doldurdu, prod'da blog, iletişim/Hakkımda ve /en sayfalarını kontrol etti (2026-11-28).
+- **PR 11 (`feat/unsaved-changes`):** kararlar (kullanıcı, 2026-11-28): 1a geri düğmesi engellenmez
+  (Activity form durumunu korur, E2E ile doğrulandı; form listeden uygulama içi açıldığında), 2a
+  etiket panelinde başka etikete geçerken onay, 3a kaydet yanında "Kaydedilmemiş değişiklikler".
+  `components/admin/unsaved-changes.tsx`: admin layout'unda sağlayıcı; belge düzeyinde (capture)
+  aynı kökenli link tıklamaları onaya bağlanır (site header'ı dahil; yeni sekme, indirme, hash ve
+  dış link hariç), `beforeunload` yenileme/kapatmada; formlar `useFormBaseline` (değer anlık
+  görüntüsü, `lib/forms/dirty.ts`) ve `useUnsavedChanges` ile kaydolur; "İptal" `confirmLeave`,
+  kayıttan sonra yönlendirme `leave`. Gizli (Activity) sayfanın efektleri çalışmadığından ayrılan
+  form koruma yapmaz. Kapsam: blog, proje, deneyim, ayarlar, etiket paneli. Ortak `Button`
+  `destructive` dark zemini `/10` (4,21 → ~5,4:1; admin silme düğmeleri de düzeldi). Yeni yazıda
+  "güncellendi" yerine "eklendi" mesajı. Ekran görüntüleri `docs/design-audit/unsaved/`.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 

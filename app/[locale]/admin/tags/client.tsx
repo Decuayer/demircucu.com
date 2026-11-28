@@ -25,6 +25,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ParentOptions, selectClass, TagCreateDialog } from "@/components/admin/tag-create-dialog";
 import {
+  UnsavedBadge,
+  useFormBaseline,
+  useLeaveConfirm,
+  useUnsavedChanges,
+} from "@/components/admin/unsaved-changes";
+import {
   addTagAlias,
   deleteTag,
   mergeTag,
@@ -82,6 +88,7 @@ export default function AdminTagsClient({ tags }: { tags: AdminTag[] }) {
   const [isPending, startTransition] = useTransition();
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { confirmLeave } = useLeaveConfirm();
   const [creating, setCreating] = useState(false);
 
   const rows = useMemo(() => treeRows(tags), [tags]);
@@ -144,7 +151,7 @@ export default function AdminTagsClient({ tags }: { tags: AdminTag[] }) {
                     <button
                       type="button"
                       className="flex min-w-0 flex-1 items-center gap-2 text-left"
-                      onClick={() => setSelectedId(tag.id)}
+                      onClick={() => confirmLeave(() => setSelectedId(tag.id))}
                     >
                       <span
                         className={`truncate font-medium ${tag.hidden ? "line-through opacity-60" : ""}`}
@@ -224,7 +231,7 @@ export default function AdminTagsClient({ tags }: { tags: AdminTag[] }) {
           initialName=""
           options={tags}
           onCreated={(tag) => {
-            setSelectedId(tag.id);
+            confirmLeave(() => setSelectedId(tag.id));
             router.refresh();
           }}
         />
@@ -257,6 +264,8 @@ function TagEditor({ tag, tags, pending, run, onDeleted }: TagEditorProps) {
     descriptionTr: tag.descriptionTr ?? "",
     descriptionEn: tag.descriptionEn ?? "",
   });
+  const { dirty, markSaved } = useFormBaseline(form);
+  useUnsavedChanges(dirty);
   const [alias, setAlias] = useState("");
   const [mergeInto, setMergeInto] = useState("");
   const [confirm, setConfirm] = useState<"merge" | "delete" | null>(null);
@@ -266,7 +275,11 @@ function TagEditor({ tag, tags, pending, run, onDeleted }: TagEditorProps) {
   const mergeTarget = tags.find((x) => x.id === mergeInto);
 
   const save = () =>
-    run(() => updateTag(tag.id, { ...form, parentId: form.parentId || null }), t("saved"));
+    run(
+      () => updateTag(tag.id, { ...form, parentId: form.parentId || null }),
+      t("saved"),
+      markSaved,
+    );
 
   return (
     <Card className="border-border/50 bg-card/50">
@@ -369,9 +382,12 @@ function TagEditor({ tag, tags, pending, run, onDeleted }: TagEditorProps) {
             onChange={(e) => set("descriptionEn", e.target.value)}
           />
         </Field>
-        <Button type="button" onClick={save} disabled={pending}>
-          {t("save")}
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button type="button" onClick={save} disabled={pending}>
+            {t("save")}
+          </Button>
+          <UnsavedBadge dirty={dirty} />
+        </div>
 
         <section className="space-y-2 border-t border-border/40 pt-4">
           <h3 className="text-sm font-semibold">{t("aliases")}</h3>

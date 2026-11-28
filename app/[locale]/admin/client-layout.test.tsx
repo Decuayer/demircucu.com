@@ -31,6 +31,11 @@ vi.mock("@/i18n/navigation", () => ({
   usePathname: () => nav.pathname,
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), back: vi.fn() }),
+  usePathname: () => `/tr${nav.pathname}`,
+}));
+
 afterEach(cleanup);
 
 const renderLayout = () =>

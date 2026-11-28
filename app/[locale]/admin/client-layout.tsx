@@ -1,5 +1,6 @@
 "use client";
 
+import { UnsavedChangesProvider } from "@/components/admin/unsaved-changes";
 import { useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -115,19 +116,23 @@ function MobileAdminBar() {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  // The unsaved-changes guard listens on the whole document, so the site header's links are held
+  // too while an admin form is dirty.
   return (
-    <div className="flex min-h-[calc(100vh-4rem)]">
-      <aside className="hidden w-64 flex-col border-r border-border/40 bg-card/30 md:flex">
-        <div className="border-b border-border/40 p-6">
-          <PanelHeading />
-        </div>
-        <AdminNav />
-      </aside>
+    <UnsavedChangesProvider>
+      <div className="flex min-h-[calc(100vh-4rem)]">
+        <aside className="hidden w-64 flex-col border-r border-border/40 bg-card/30 md:flex">
+          <div className="border-b border-border/40 p-6">
+            <PanelHeading />
+          </div>
+          <AdminNav />
+        </aside>
 
-      <div className="min-w-0 flex-1">
-        <MobileAdminBar />
-        <div className="overflow-auto p-4 md:p-8">{children}</div>
+        <div className="min-w-0 flex-1">
+          <MobileAdminBar />
+          <div className="overflow-auto p-4 md:p-8">{children}</div>
+        </div>
       </div>
-    </div>
+    </UnsavedChangesProvider>
   );
 }

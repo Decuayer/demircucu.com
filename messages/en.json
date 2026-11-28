@@ -492,7 +492,12 @@
     "heroNameHint": "Enter your name only; the home page adds the \"Hi, I'm\" greeting.",
     "heroIntro": "Home page intro",
     "heroIntroHint": "Two or three sentences under your name and title: what you do and your focus areas. Hidden when empty.",
-    "summaryListHint": "For a bulleted list, start each line with \"- \"."
+    "summaryListHint": "For a bulleted list, start each line with \"- \".",
+    "unsavedTitle": "You have unsaved changes",
+    "unsavedDescription": "If you leave this page, your changes will not be saved.",
+    "unsavedStay": "Stay on page",
+    "unsavedLeave": "Leave without saving",
+    "unsavedBadge": "Unsaved changes"
   },
   "common": {
     "loading": "Loading...",

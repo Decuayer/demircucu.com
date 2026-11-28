@@ -492,7 +492,12 @@
     "heroNameHint": "Yalnızca adınızı yazın; \"Merhaba, ben\" selamı ana sayfada otomatik eklenir.",
     "heroIntro": "Ana sayfa tanıtım metni",
     "heroIntroHint": "Adınızın ve unvanınızın altında görünen 2–3 cümle: ne yaptığınız ve odak alanlarınız. Boş bırakılırsa gösterilmez.",
-    "summaryListHint": "Madde listesi için her satırı \"- \" ile başlatın."
+    "summaryListHint": "Madde listesi için her satırı \"- \" ile başlatın.",
+    "unsavedTitle": "Kaydedilmemiş değişiklikler var",
+    "unsavedDescription": "Bu sayfadan ayrılırsanız yaptığınız değişiklikler kaydedilmeyecek.",
+    "unsavedStay": "Sayfada kal",
+    "unsavedLeave": "Kaydetmeden çık",
+    "unsavedBadge": "Kaydedilmemiş değişiklikler"
   },
   "common": {
     "loading": "Yükleniyor...",

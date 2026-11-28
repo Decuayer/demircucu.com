@@ -19,6 +19,11 @@ import { toAttachments, type Attachment } from "@/lib/media/attachments";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { createExperience, updateExperience } from "@/app/actions/admin";
 import { useTranslations } from "next-intl";
+import {
+  UnsavedBadge,
+  useFormBaseline,
+  useUnsavedChanges,
+} from "@/components/admin/unsaved-changes";
 
 interface ExperienceFormClientProps {
   initialData?: AdminExperience | null;
@@ -67,6 +72,26 @@ export default function ExperienceFormClient({
   // Files
   const [files, setFiles] = useState<Attachment[]>(() => toAttachments(initialData?.files));
 
+  const payload = {
+    company,
+    positionTr,
+    positionEn,
+    logoPath: logo,
+    locationTr,
+    locationEn,
+    descriptionTr,
+    descriptionEn,
+    detailsTr,
+    detailsEn,
+    startDate: new Date(startDate),
+    endDate: endDate ? new Date(endDate) : undefined,
+    published,
+    ...toTagPayload(tags),
+    filesList: files,
+  };
+  const { dirty } = useFormBaseline(payload);
+  const { confirmLeave, leave } = useUnsavedChanges(dirty);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -74,24 +99,6 @@ export default function ExperienceFormClient({
       toast.error(t("required_fields"));
       return;
     }
-
-    const payload = {
-      company,
-      positionTr,
-      positionEn,
-      logoPath: logo,
-      locationTr,
-      locationEn,
-      descriptionTr,
-      descriptionEn,
-      detailsTr,
-      detailsEn,
-      startDate: new Date(startDate),
-      endDate: endDate ? new Date(endDate) : undefined,
-      published,
-      ...toTagPayload(tags),
-      filesList: files,
-    };
 
     startTransition(async () => {
       let res;
@@ -105,7 +112,7 @@ export default function ExperienceFormClient({
         toast.error(errorMessage(res.error));
       } else {
         toast.success(isEdit ? t("experience_updated") : t("experience_created"));
-        router.push(`/${locale}/admin/experiences`);
+        leave(() => router.push(`/${locale}/admin/experiences`));
       }
     });
   };
@@ -114,8 +121,9 @@ export default function ExperienceFormClient({
     <form onSubmit={handleSubmit} className="max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{isEdit ? t("editExperience") : t("addExperience")}</h1>
-        <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()}>
+        <div className="flex items-center gap-3">
+          <UnsavedBadge dirty={dirty} />
+          <Button type="button" variant="outline" onClick={() => confirmLeave(() => router.back())}>
             {t("cancel")}
           </Button>
           <Button
