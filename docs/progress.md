@@ -1,25 +1,25 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-28 (Faz 8B: PR #29 merge; kaydedilmemiş değişiklik uyarısı PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-28 (Faz 8 kapanışı: PR #30 ve kapanış dokümanı merge bekliyor). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
 ## 1. Durum özeti
 
-| Faz / iş                         | Durum                                                                | Branch / PR                                                                     |
-| -------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Faz 0: Keşif                     | Tamamlandı, onaylandı                                                | (PR #1 açıklamasında)                                                           |
-| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                         | `chore/phase-1-test-infra`, PR #1                                               |
-| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı               | `fix/db-connection-pool`, PR #2                                                 |
-| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı       | `feat/phase-2-security-auth`                                                    |
-| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor           | —                                                                               |
-| Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod      | `feat/phase-3-*`                                                                |
-| Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da             | `feat/phase-4-tags`, PR #8                                                      |
-| Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
-| Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14, #15 merge; prod'da doğrulandı      | `feat/phase-6-images-perf`, PR #14; `docs/phase-6-close`, PR #15                |
-| Faz 7: Analitik ve dashboard     | **Kapandı** (2026-11-26): PR #16, #17 merge; prod'da doğrulandı      | `feat/phase-7-analytics`, `chore/vercel-schedules`                              |
-| Faz 8: Tasarım denetimi          | 8A PR #18; 8B küçük PR'larla sürüyor                                 | `feat/phase-8-design`                                                           |
-| Faz 9–10                         | Başlamadı                                                            | —                                                                               |
+| Faz / iş                         | Durum                                                                     | Branch / PR                                                                     |
+| -------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Faz 0: Keşif                     | Tamamlandı, onaylandı                                                     | (PR #1 açıklamasında)                                                           |
+| Faz 1: Test altyapısı ve araçlar | Tamamlandı, **merge edildi**                                              | `chore/phase-1-test-infra`, PR #1                                               |
+| Hotfix: DB bağlantı havuzu       | Tamamlandı, **merge edildi**, production'da doğrulandı                    | `fix/db-connection-pool`, PR #2                                                 |
+| Faz 2: Güvenlik ve auth          | Tamamlandı, **merge edildi** (PR #3), production'da doğrulandı            | `feat/phase-2-security-auth`                                                    |
+| Frankfurt taşıması               | **İptal** (kullanıcı kararı): Seul + Vercel `icn1` kalıyor                | —                                                                               |
+| Faz 3: Veri modeli               | **Kapandı**: PR #5 (genişletme) ve PR #6 (daraltma) merge, prod           | `feat/phase-3-*`                                                                |
+| Faz 4: Etiket / skill sistemi    | **Kapandı**: PR #8 merge, `migrate-tags --apply` prod'da                  | `feat/phase-4-tags`, PR #8                                                      |
+| Faz 5: GitHub entegrasyonu       | **Kapandı** (2026-11-25): PR #10, #11, #12 merge; prod'da doğrulandı      | `feat/phase-5-github`, `fix/phase-5-pdf-legacy-dates`, `fix/pdf-safari-streams` |
+| Faz 6: Görsel ve performans      | **Kapandı** (2026-11-25): PR #14, #15 merge; prod'da doğrulandı           | `feat/phase-6-images-perf`, PR #14; `docs/phase-6-close`, PR #15                |
+| Faz 7: Analitik ve dashboard     | **Kapandı** (2026-11-26): PR #16, #17 merge; prod'da doğrulandı           | `feat/phase-7-analytics`, `chore/vercel-schedules`                              |
+| Faz 8: Tasarım denetimi          | **Kapanıyor** (2026-11-28): 8A #18; 8B #19–#30, kapanış PR #30 merge'üyle | `feat/phase-8-*`, `docs/phase-8-close`                                          |
+| Faz 9–10                         | Başlamadı                                                                 | —                                                                               |
 
 ## 2. Tamamlanan işler
 
@@ -549,13 +549,26 @@ loglarıyla doğrulanmalı (Vercel bölgesi `icn1`, Seul'e yakın).
 
 ### Sonraki planlar
 
-- **Faz 8:**
-  - Hardcoded metin kuralı; footer'daki uydurma e-posta fallback'i.
-  - Admin paneli mobilde menüsüz: kenar menüsü `md` altında gizli, mobil gezinme yok (Faz 7'de fark
-    edildi).
-  - (PR 5'te çözüldü: `/api/e`.) `/api/track` yolu reklam/takip engelleyicilerin filtre listelerine (`/track`, `/api/track`
-    kalıpları) takılabilir; bu ziyaretçiler sayılmaz. Daha nötr bir yol (ör. `/api/v`) ve
-    engellenme oranının ölçülmesi değerlendirilecek.
+- **Faz 8 kapanışı:** madde madde durum `docs/design-audit.md` → "Kapanış durumu". Faz 8'in
+  kendi maddeleri (hardcoded metin kuralı, uydurma e-posta, admin mobil menü, `/api/e`) çözüldü.
+- **Faz 9 için önerilen açık 8A maddeleri** (öncelik sırasıyla):
+  1. Proje listesi kartı (bulgu 8): ana sayfadaki kapak bileşenini (`ProjectCover`) listede de
+     kullan, kartı tek link yap, ayrı "Projeyi Görüntüle" linkini kaldır.
+  2. Proje detayı (bulgu 7): sıfır yıldız/fork'u gizle; tek dilli projede tam genişlik çubuk
+     yerine tek satır dil bilgisi.
+  3. Footer'a "Deneyimlerim" linki (2.3).
+  4. Sayfa başlığı rozeti: rozet = başlık olan 5 sayfada kaldır ya da farklı bilgi göster (ör.
+     kayıt sayısı); Hakkımda başlığını ana sayfadan ayır (ör. "Hakkımda" + kısa özet).
+  5. Admin: public header'ı admin'de sadeleştir; listeleri tek tablo/liste düzenine getir;
+     `admin.dashboard` TR çevirisi; admin'de kalan hardcoded metinler (blog formu toast'ı, ayar ve
+     deneyim yer tutucuları) i18n'e ve `hardcoded-text` koruyucusunu admin'i de kapsayacak şekilde
+     genişlet.
+  6. pdf.js WebAssembly CSP uyarısı: `'wasm-unsafe-eval'`'ı yalnızca doküman sayfasında açmanın
+     güvenlik değerlendirmesi (kullanıcı kararı gerektirir).
+  7. Küçükler: chip sayaçlarına açıklama (`title`/sr-only), az yazıda "En çok okunanlar"
+     sekmesini gizleme, boş arama / içeriksiz skill sayfası tasarımı, 375 px dokunma hedeflerinin
+     ölçümle doğrulanması.
+  8. Temizlik: kullanılmayan `getFeaturedPosts`; `app/api/track/route.ts` 2026-12-27'den sonra.
 - **Faz 9:**
   - Coverage hedefleri (lib ≥ %85, genel ≥ %70).
   - E2E kararlılığı: yerelde tam paralel (tüm worker'lar) çalıştırmada ağır admin testleri yük
