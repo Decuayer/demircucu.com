@@ -323,3 +323,75 @@ formlarında uyarı, 10 hobiler küçültülmüş kalır. İçerik notlarını k
 8. `/api/track` yolunun değiştirilmesi.
 9. Admin'de kaydedilmemiş değişiklik uyarısının kapsamı.
 10. Hobiler bölümü.
+
+## Kapanış durumu (Faz 8, 2026-11-28)
+
+8B on bir PR'da uygulandı: #19 (erişilebilirlik, 404/hata/yükleme, hydration), #20 (CV, deneyim
+konumu), #22 (tema ve renk token'ları), #23 (ana sayfa), #24 (`/api/e`), #25 (admin mobil menü),
+#26 (SEO), #27 (deneyim zaman çizelgesi), #28 (tipografi ve boşluk), #29 (blog okuma özellikleri,
+i18n), #30 (kaydedilmemiş değişiklik uyarısı; kapanışta açık). Durumlar 2026-11-28'de kodda
+doğrulandı. **Çözüldü** / **Kısmen** / **Açık**; içerik maddeleri kullanıcınındır.
+
+### Öne çıkan 12 bulgu
+
+| #   | Bulgu                                     | Durum       | Nerede / kalan                                                                                                       |
+| --- | ----------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| 1   | Varsayılan 404                            | **Çözüldü** | #19: iki dilli `not-found`, catch-all, `error`, `global-error`, `loading`                                            |
+| 2   | Mobil menü ve giriş ikonunun adı yok      | **Çözüldü** | #19                                                                                                                  |
+| 3   | Admin mobilde menüsüz, KPI tek sütun      | **Çözüldü** | #25: Sheet menü, KPI 2 sütun                                                                                         |
+| 4   | Admin hydration hatası                    | **Çözüldü** | #19: `formatDate`, sabit saat dilimi                                                                                 |
+| 5   | Hero tekrarı ve boşluğu, CTA yok          | **Çözüldü** | #23 (selam bir kez, tanıtım, CTA'lar), #28 (`display` ölçeği)                                                        |
+| 6   | 3 sütunda 2 öğe; "Test" yazısı            | **Çözüldü** | #23: öğe sayısına göre ızgara. "Test" yazısı içerik notu                                                             |
+| 7   | Proje detayında iki `h1`; dil çubuğu; 0/0 | **Kısmen**  | #22: README `h1` → `h2`. **Açık:** tek dilli projede tam genişlik tek renk çubuk; "0 yıldız · 0 fork" hâlâ görünüyor |
+| 8   | Proje listesi kartları                    | **Kısmen**  | Kapak yalnızca ana sayfada (#23). **Açık:** listede aynı `</>` ikonu, kapak yok, ayrı "Projeyi Görüntüle" linki      |
+| 9   | Violet–cyan gradyan her yerde             | **Çözüldü** | #22: tek violet vurgu, gradyan yok                                                                                   |
+| 10  | Okuma süresi ve tarih biçimleri           | **Çözüldü** | #23 (kelime / 200, "min read"), #19 (`formatDate` her yerde)                                                         |
+| 11  | Deneyim: tek kart, süre ve konum yok      | **Çözüldü** | #20 (konum), #27 (zaman çizelgesi, takvim ayı süresi)                                                                |
+| 12  | `Permissions-Policy` konsol uyarıları     | **Çözüldü** | #19                                                                                                                  |
+
+### Site geneli ve sayfa bazında
+
+| Konu                                                  | Durum       | Not                                                                                                                       |
+| ----------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Tipografi ölçeği, 4/8 px boşluk, prose                | **Çözüldü** | #28; koruyucu test `components/layout/type-scale.test.ts`                                                                 |
+| Kontrast (`muted/70`, yükleme ipucu, Shiki)           | **Çözüldü** | #22; #30'da ortak `destructive` düğmenin dark kontrastı (4,21 → ~5,4)                                                     |
+| axe kuralları tablosu (12 kural)                      | **Çözüldü** | #19 (yerelde 0, prod'da `link-name` 66 → 0, `button-name` → 0 #20 ile); sonraki PR'larda her sayfa E2E'de axe ile denetli |
+| "Ana içeriğe atla", focus halkaları                   | **Çözüldü** | #19                                                                                                                       |
+| `heading-order`                                       | **Çözüldü** | #22 (kart başlıkları `h2`); #29'da "Ekli dosyalar" `h2`                                                                   |
+| README kod bloklarına klavye odağı                    | **Çözüldü** | #19; blog/prose kod blokları #29                                                                                          |
+| Hardcoded metin                                       | **Kısmen**  | Public sayfalar #29 (koruyucu test). **Açık:** admin'de bir toast ve yer tutucular ("Demir Cücü", "İstanbul, Türkiye"…)   |
+| Sayfa başlığı rozeti başlığı tekrarlıyor              | **Açık**    | #28'de `PageHeader`'a taşındı ama Projeler/Blog/Deneyim/Yetenekler/İletişim'de rozet = başlık                             |
+| Hakkımda hero'su ana sayfayı tekrarlıyor              | **Kısmen**  | #29: selam tekrarı ve uydurma yedekler kalktı. Başlık + unvan yapısı ana sayfayla hâlâ aynı                               |
+| Kart dili                                             | **Kısmen**  | Ana sayfa, blog ve deneyim kartları tek dilde (#23, #27); proje listesi kartı farklı (bulgu 8)                            |
+| Dil çubuğu rengi                                      | **Açık**    | Bulgu 7                                                                                                                   |
+| Chip sayaçları ("Python 3") açıklamasız               | **Açık**    | Küçük                                                                                                                     |
+| Admin'de public header + admin menüsü                 | **Açık**    | #25 mobil menüyü ekledi; public header admin'de aynı                                                                      |
+| Admin listeleri farklı düzenlerde                     | **Açık**    | Kart listesi / tablo karışık                                                                                              |
+| Kaydedilmemiş değişiklik uyarısı                      | **Çözüldü** | #30 (merge bekliyor)                                                                                                      |
+| Boş durumlar                                          | **Kısmen**  | Tek kayıtlı zaman çizelgesi #27. **Açık:** proje araması boşsa ve içeriksiz skill sayfası için ayrı tasarım yok           |
+| 375 px dokunma hedefleri (chip, footer)               | **Kısmen**  | 20 px yükseklik, 8 px aralıkla WCAG 2.5.8 aralık istisnası kapsamında; ayrı ölçüm yapılmadı                               |
+| Gereksiz öğeler                                       | **Kısmen**  | Scroll ikonu ve CTA kutusu (#23), fotoğraftaki dünya ikonu (#22) kalktı. **Açık:** "Projeyi Görüntüle", 0 yıldız/fork     |
+| pdf.js WebAssembly CSP uyarısı                        | **Açık**    | `'wasm-unsafe-eval'` yok; PDF görünüyor, renkler bazı PDF'lerde yaklaşık                                                  |
+| TipTap çift `link` uyarısı                            | **Çözüldü** | #19                                                                                                                       |
+| Blog: ilerleme, içindekiler, önceki/sonraki, paylaşım | **Çözüldü** | #29                                                                                                                       |
+| Blog "En çok okunanlar" sekmesi (az yazıda)           | **Açık**    | Küçük                                                                                                                     |
+| Admin "Dashboard" başlığı TR'de İngilizce             | **Açık**    | `admin.dashboard` çevirisi                                                                                                |
+
+### Bölüm 2.3 maddeleri (güncel)
+
+| Madde                                         | Durum                                                                  |
+| --------------------------------------------- | ---------------------------------------------------------------------- |
+| Hero'da `heroSub` tekrarı, başlık fallback'i  | **Çözüldü** (#23, #29)                                                 |
+| "Son Blog Yazıları" `viewCount`'a göre        | **Çözüldü** (#23, tarihe göre). `getFeaturedPosts` artık kullanılmıyor |
+| Okuma süresi karakter / 1000                  | **Çözüldü** (#23)                                                      |
+| Tarih biçimleri tutarsız                      | **Çözüldü** (#19)                                                      |
+| Footer: "Deneyimlerim" linki, uydurma e-posta | E-posta **çözüldü** (#29); **"Deneyimlerim" linki açık**               |
+| Hardcoded Türkçe metinler                     | **Kısmen** (public çözüldü #29; admin'de kalanlar var)                 |
+| Büyük harfli proje slug'ları                  | İçerik (kullanıcı)                                                     |
+| `not-found` / `error` / `loading`             | **Çözüldü** (#19)                                                      |
+| `robots.ts`, OpenGraph, JSON-LD, hreflang     | **Çözüldü** (#26)                                                      |
+| `next-themes` sağlayıcısı                     | **Çözüldü** (#22)                                                      |
+| Admin sidebar mobilde gizli                   | **Çözüldü** (#25)                                                      |
+
+İçerik notları (yukarıdaki tablo) kullanıcınındır; site ayarları 2026-11-28'de dolduruldu, diğer
+notların durumunu kullanıcı doğrular.
