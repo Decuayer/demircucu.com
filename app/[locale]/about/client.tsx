@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { PageHeader, PageShell, SectionHeading } from "@/components/layout/page-header";
 import { Prose } from "@/components/prose";
-import { stripGreeting } from "@/lib/home/hero";
+import { hasText, stripGreetings } from "@/lib/home/hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cvUrlFor } from "@/lib/cv";
@@ -218,11 +218,11 @@ export default function AboutClient({ settings, skillForest }: AboutClientProps)
 
   // Only what the site settings hold: an empty field hides its element (no placeholder text).
   const bioHtml = getTranslated(settings, "aboutBio", locale);
-  const hasBio = bioHtml.replace(/<[^>]*>|&nbsp;/g, "").trim() !== "";
+  const hasBio = hasText(bioHtml);
   // The settings field holds the name; drop a greeting typed into it (the home page's or ours).
-  const name = stripGreeting(
-    stripGreeting(getTranslated(settings, "heroTitle", locale), tHome("greeting"), locale),
-    t("heroTitle"),
+  const name = stripGreetings(
+    getTranslated(settings, "heroTitle", locale),
+    [tHome("greeting"), t("heroTitle")],
     locale,
   );
   const aboutLocation = getTranslated(settings, "aboutLocation", locale);

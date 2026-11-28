@@ -17,3 +17,16 @@ export function stripGreeting(title: string, greeting: string, locale: string): 
   }
   return title.trim();
 }
+
+/**
+ * The name from the hero setting with any of the given greetings removed from its start, in
+ * order (the About page drops both the home greeting, "Hi, I'm", and its own, "Hello, I am").
+ */
+export function stripGreetings(title: string, greetings: string[], locale: string): string {
+  return greetings.reduce((name, greeting) => stripGreeting(name, greeting, locale), title.trim());
+}
+
+/** Whether stored rich text has visible text (an emptied editor leaves "<p></p>" or &nbsp;). */
+export function hasText(html: string | null | undefined): boolean {
+  return !!html && html.replace(/<[^>]*>|&nbsp;/g, "").trim() !== "";
+}
