@@ -12,7 +12,7 @@ export function LanguageBar({ shares, label }: { shares: LanguageShare[]; label:
       </div>
       <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
         {shares.map((s) => (
-          <li key={s.name} className="inline-flex items-center gap-1.5">
+          <li key={s.name} className="inline-flex items-center gap-2">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
             <span className="font-medium text-foreground">{s.name}</span>
             {s.percent}%

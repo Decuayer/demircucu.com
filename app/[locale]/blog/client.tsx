@@ -4,12 +4,12 @@ import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "next-intl";
 import { readingMinutes } from "@/lib/reading-time";
 import { Link } from "@/i18n/navigation";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Newspaper, Eye, Clock, ArrowRight, TrendingUp } from "lucide-react";
 import { getTranslated } from "@/lib/i18n-utils";
 import { useParams } from "next/navigation";
+import { PageHeader, PageShell } from "@/components/layout/page-header";
 
 import type { PublicPost } from "@/lib/types/content";
 import { TagChips } from "@/components/tags/tag-chips";
@@ -40,7 +40,7 @@ function PostCard({ post }: { post: BlogPostWithTags }) {
             <span>·</span>
             <time>{formatDate(post.createdAt, locale)}</time>
           </div>
-          <h2 className="text-lg font-semibold transition-colors group-hover:text-link">
+          <h2 className="text-h3 transition-colors group-hover:text-link">
             {/* Stretched link: the whole card opens the post; tag chips sit above it. */}
             <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
               {getTranslated(post, "title", locale)}
@@ -74,52 +74,40 @@ export default function BlogClient({ posts, filter }: BlogClientProps) {
   );
 
   return (
-    <div className="py-16 md:py-24">
-      <div className="container mx-auto max-w-5xl px-4 md:px-6">
-        {/* Title */}
-        <div className="enter mb-16 text-center">
-          <Badge
-            variant="secondary"
-            className="mb-4 border-primary/40 bg-muted px-4 py-1.5 text-link"
-          >
-            <Newspaper className="mr-1 h-3 w-3" />
-            {t("title")}
-          </Badge>
-          <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
-        </div>
+    <PageShell>
+      <PageHeader eyebrow={t("title")} icon={Newspaper} title={t("title")} />
 
-        {filter}
+      {filter}
 
-        {/* Tabs */}
-        <Tabs defaultValue="latest" className="w-full">
-          <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2 bg-accent/50">
-            <TabsTrigger value="latest" className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              {t("latest")}
-            </TabsTrigger>
-            <TabsTrigger value="popular" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              {t("mostRead")}
-            </TabsTrigger>
-          </TabsList>
+      {/* Tabs */}
+      <Tabs defaultValue="latest" className="w-full">
+        <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2 bg-accent/50">
+          <TabsTrigger value="latest" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            {t("latest")}
+          </TabsTrigger>
+          <TabsTrigger value="popular" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            {t("mostRead")}
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="latest">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {latest.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
-          </TabsContent>
+        <TabsContent value="latest">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {latest.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        </TabsContent>
 
-          <TabsContent value="popular">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {mostRead.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+        <TabsContent value="popular">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {mostRead.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </PageShell>
   );
 }

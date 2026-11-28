@@ -15,7 +15,7 @@ export function TextBlocks({ text, className }: { text: string; className?: stri
         ) : (
           <ul key={i} className="list-disc space-y-1 pl-5 marker:text-link">
             {block.items.map((item, j) => (
-              <li key={j} className="pl-0.5">
+              <li key={j} className="pl-1">
                 {item}
               </li>
             ))}

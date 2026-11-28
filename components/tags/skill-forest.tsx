@@ -25,14 +25,11 @@ function SkillChip({ node, locale }: { node: SkillNode; locale: string }) {
     <Link
       href={`/skills/${node.slug}`}
       title={label || undefined}
-      className={cn(
-        badgeVariants({ variant: "secondary" }),
-        "gap-1.5 bg-accent/50 hover:bg-accent",
-      )}
+      className={cn(badgeVariants({ variant: "secondary" }), "gap-2 bg-accent/50 hover:bg-accent")}
     >
       {tagLabel(node, locale)}
       {label && (
-        <span className="text-[10px] text-muted-foreground tabular-nums">
+        <span className="text-xs text-muted-foreground tabular-nums">
           {node.counts.projects + node.counts.experiences + node.counts.posts}
         </span>
       )}
@@ -98,7 +95,7 @@ export function SkillForestView({
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
       {sections.map((section) => (
         <section key={section.id} className="space-y-3">
-          <Heading className="text-lg font-semibold">
+          <Heading className="text-h4">
             {section.slug ? (
               <Link href={`/skills/${section.slug}`} className="hover:underline">
                 {section.title}

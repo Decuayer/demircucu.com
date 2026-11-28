@@ -72,7 +72,7 @@ export function TagFilterBar({ active, count }: { active: ActiveTagFilter | null
       </span>
       <Link
         href={pathname}
-        className="inline-flex items-center gap-1 rounded-full border border-border/50 px-2 py-0.5 text-xs hover:bg-accent"
+        className="inline-flex items-center gap-1 rounded-full border border-border/50 px-2 py-1 text-xs hover:bg-accent"
       >
         <X className="h-3 w-3" />
         {t("clearFilter")}

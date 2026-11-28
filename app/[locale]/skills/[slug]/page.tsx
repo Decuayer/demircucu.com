@@ -88,7 +88,7 @@ export default async function SkillPage({ params }: PageProps<"/[locale]/skills/
           {t("title")}
         </Link>
 
-        <header className="mb-10 space-y-3">
+        <header className="mb-12 space-y-4">
           {ancestors.length > 0 && (
             <nav aria-label={t("breadcrumb")} className="text-sm text-muted-foreground">
               {ancestors.map((a, i) => (
@@ -101,8 +101,10 @@ export default async function SkillPage({ params }: PageProps<"/[locale]/skills/
               ))}
             </nav>
           )}
-          <h1 className="text-3xl font-bold md:text-5xl">{tagLabel(tag, locale)}</h1>
-          {description && <p className="text-lg text-muted-foreground">{description}</p>}
+          <h1 className="text-h1 text-balance">{tagLabel(tag, locale)}</h1>
+          {description && (
+            <p className="text-lead text-pretty text-muted-foreground">{description}</p>
+          )}
           <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
             <div className="flex gap-1">
               <dt>{t("usage")}:</dt>
@@ -125,10 +127,8 @@ export default async function SkillPage({ params }: PageProps<"/[locale]/skills/
         </header>
 
         {children.length > 0 && (
-          <section className="mb-10">
-            <h2 className="mb-3 text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-              {t("subSkills")}
-            </h2>
+          <section className="mb-12">
+            <h2 className="mb-3 text-eyebrow text-muted-foreground uppercase">{t("subSkills")}</h2>
             <TagChips tags={children} locale={locale} />
           </section>
         )}
@@ -166,9 +166,7 @@ export default async function SkillPage({ params }: PageProps<"/[locale]/skills/
 
         {related.length > 0 && (
           <section className="mt-12">
-            <h2 className="mb-3 text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-              {t("related")}
-            </h2>
+            <h2 className="mb-3 text-eyebrow text-muted-foreground uppercase">{t("related")}</h2>
             <TagChips tags={related} locale={locale} />
           </section>
         )}
@@ -188,8 +186,8 @@ function ContentSection({
 }) {
   if (children.length === 0) return null;
   return (
-    <section className="mb-10">
-      <h2 className="mb-4 flex items-center gap-3 text-xl font-bold">
+    <section className="mb-12">
+      <h2 className="mb-4 flex items-center gap-3 text-h3">
         {icon}
         {title}
       </h2>
@@ -201,8 +199,8 @@ function ContentSection({
 function ItemCard({ href, title, text }: { href: string; title: string; text: string }) {
   return (
     <Card className="relative border-border/50 bg-card/50 transition-colors hover:bg-card">
-      <CardContent className="space-y-2 p-5">
-        <h3 className="font-semibold">
+      <CardContent className="space-y-2 p-6">
+        <h3 className="text-h4">
           <Link href={href} className="after:absolute after:inset-0">
             {title}
           </Link>

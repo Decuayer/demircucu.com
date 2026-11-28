@@ -3,13 +3,13 @@
 import { useActionErrorMessage } from "@/lib/actions/use-action-error";
 import type { PublicSiteSettings } from "@/lib/types/content";
 import { useTranslations } from "next-intl";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
+import { PageHeader, PageShell } from "@/components/layout/page-header";
 import {
   GithubIcon,
   LinkedinIcon,
@@ -97,158 +97,143 @@ export default function ContactClient({ settings }: ContactClientProps) {
     });
 
   return (
-    <div className="py-16 md:py-24">
-      <div className="container mx-auto max-w-5xl px-4 md:px-6">
-        {/* Title */}
-        <div className="enter mb-16 text-center">
-          <Badge
-            variant="secondary"
-            className="mb-4 border-primary/40 bg-muted px-4 py-1.5 text-link"
-          >
-            <Mail className="mr-1 h-3 w-3" />
-            {t("title")}
-          </Badge>
-          <h1 className="text-3xl font-bold md:text-5xl">{t("title")}</h1>
+    <PageShell>
+      <PageHeader eyebrow={t("title")} icon={Mail} title={t("title")} />
+
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+        {/* Contact Form */}
+        <div className="reveal enter-from-left lg:col-span-3">
+          <Card className="border-border/50 bg-card/50">
+            <CardContent className="p-6 md:p-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Honeypot: invisible to people and screen readers, filled by naive bots. */}
+                <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                  <label htmlFor="contact-website">Website</label>
+                  <input
+                    id="contact-website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">{t("name")}</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      required
+                      className="bg-accent/30"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">{t("email")}</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      className="bg-accent/30"
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="subject">{t("subject")}</Label>
+                  <Input
+                    id="subject"
+                    name="subject"
+                    className="bg-accent/30"
+                    placeholder="Proje hakkında..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="message">{t("message")}</Label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    required
+                    rows={6}
+                    className="resize-none bg-accent/30"
+                    placeholder="Mesajınızı buraya yazın..."
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full border-0 bg-primary text-primary-foreground"
+                >
+                  {loading ? (
+                    <span className="animate-pulse">Gönderiliyor...</span>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      {t("send")}
+                    </>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-          {/* Contact Form */}
-          <div className="reveal enter-from-left lg:col-span-3">
-            <Card className="border-border/50 bg-card/50">
-              <CardContent className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Honeypot: invisible to people and screen readers, filled by naive bots. */}
-                  <div
-                    aria-hidden="true"
-                    className="absolute -left-[9999px] h-0 w-0 overflow-hidden"
-                  >
-                    <label htmlFor="contact-website">Website</label>
-                    <input
-                      id="contact-website"
-                      name="website"
-                      type="text"
-                      tabIndex={-1}
-                      autoComplete="off"
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">{t("name")}</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        required
-                        className="bg-accent/30"
-                        placeholder="John Doe"
-                      />
+        {/* Contact Info */}
+        <div className="reveal enter-from-right space-y-6 lg:col-span-2">
+          {/* Info Cards */}
+          <Card className="border-border/50 bg-card/50">
+            <CardContent className="space-y-6 p-6">
+              <h2 className="text-h4">{t("info")}</h2>
+              <div className="space-y-4">
+                {contactInfo.map((info) => (
+                  <div key={info.label} className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                      <info.icon className="h-5 w-5 text-link" />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">{t("email")}</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        className="bg-accent/30"
-                        placeholder="john@example.com"
-                      />
+                    <div>
+                      <p className="text-xs text-muted-foreground">{info.label}</p>
+                      {info.href ? (
+                        <a
+                          href={info.href}
+                          className="text-sm font-medium transition-colors hover:text-link"
+                        >
+                          {info.value}
+                        </a>
+                      ) : (
+                        <p className="text-sm font-medium">{info.value}</p>
+                      )}
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">{t("subject")}</Label>
-                    <Input
-                      id="subject"
-                      name="subject"
-                      className="bg-accent/30"
-                      placeholder="Proje hakkında..."
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="message">{t("message")}</Label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      required
-                      rows={6}
-                      className="resize-none bg-accent/30"
-                      placeholder="Mesajınızı buraya yazın..."
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full border-0 bg-primary text-primary-foreground"
-                  >
-                    {loading ? (
-                      <span className="animate-pulse">Gönderiliyor...</span>
-                    ) : (
-                      <>
-                        <Send className="mr-2 h-4 w-4" />
-                        {t("send")}
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Contact Info */}
-          <div className="reveal enter-from-right space-y-6 lg:col-span-2">
-            {/* Info Cards */}
+          {/* Social Links */}
+          {socialLinks.length > 0 && (
             <Card className="border-border/50 bg-card/50">
-              <CardContent className="space-y-6 p-6">
-                <h2 className="text-lg font-semibold">{t("info")}</h2>
-                <div className="space-y-4">
-                  {contactInfo.map((info) => (
-                    <div key={info.label} className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                        <info.icon className="h-5 w-5 text-link" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">{info.label}</p>
-                        {info.href ? (
-                          <a
-                            href={info.href}
-                            className="text-sm font-medium transition-colors hover:text-link"
-                          >
-                            {info.value}
-                          </a>
-                        ) : (
-                          <p className="text-sm font-medium">{info.value}</p>
-                        )}
-                      </div>
-                    </div>
+              <CardContent className="space-y-4 p-6">
+                <h2 className="text-h4">{t("social")}</h2>
+                <div className="flex gap-3">
+                  {socialLinks.map((social) => (
+                    <a
+                      key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/50 text-muted-foreground transition-all hover:scale-105 hover:bg-accent hover:text-foreground"
+                      aria-label={social.label}
+                    >
+                      <social.icon className="h-5 w-5" />
+                    </a>
                   ))}
                 </div>
               </CardContent>
             </Card>
-
-            {/* Social Links */}
-            {socialLinks.length > 0 && (
-              <Card className="border-border/50 bg-card/50">
-                <CardContent className="space-y-4 p-6">
-                  <h2 className="text-lg font-semibold">{t("social")}</h2>
-                  <div className="flex gap-3">
-                    {socialLinks.map((social) => (
-                      <a
-                        key={social.label}
-                        href={social.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/50 text-muted-foreground transition-all hover:scale-105 hover:bg-accent hover:text-foreground"
-                        aria-label={social.label}
-                      >
-                        <social.icon className="h-5 w-5" />
-                      </a>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          )}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
