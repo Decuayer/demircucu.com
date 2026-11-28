@@ -1,6 +1,6 @@
 # İlerleme Notları (devir notu)
 
-Son güncelleme: 2026-11-27 (Faz 8B: PR #25 ve #26 merge; deneyim zaman çizelgesi PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
+Son güncelleme: 2026-11-28 (Faz 8B: PR #27 merge; tipografi ve boşluk PR'ı açık). Görev dokümanı: `docs/claude-code-task.md`
 (gitignored). Bu dosya oturumlar arası devir içindir. Secret değeri **içermez**; sadece hangi
 dosyada veya ortamda olduklarını belirtir.
 
@@ -339,7 +339,25 @@ sayfaları.
   özette "- ", "* " veya "• " ile başlayan satırlar `ul/li` olur (`lib/text/blocks.ts`, HTML
   parse edilmez); admin formunda ipucu. Detay sayfası özeti gösterir, boş "Detaylar" kartı
   gizlenir. Seed: `seedTimelineSamples` (Atlas Yazılım devam eden + maddeli, Kuzey Mobil 12 ay)
-  yalnızca CLI seed'inde, staging'de çalışmaz; integration testlerinin `seed()`'i değişmedi.
+  yalnızca CLI seed'inde, staging'de çalışmaz; integration testlerinin `seed()`'i değişmedi. PR #27
+  merge; kullanıcı deneyimleri admin'den ekledi ve prod'da doğruladı (2026-11-28).
+- **PR 9 (`feat/typography-spacing`):** kararlar (kullanıcı, 2026-11-28): oran 1.25, blog metni
+  17 px / 1,75, README GitHub görünümünde kalır (yalnızca 16 px ve token'lara hizalandı), hero
+  display 40 → 64 px. `app/globals.css` `@theme` token'ları: `text-display` (40→64, `clamp`),
+  `text-h1` (32→48), `text-h2` (24→30), `text-h3` 20, `text-h4` 18, `text-lead` 18,
+  `text-eyebrow` 12; her biri boyut + satır yüksekliği + harf aralığı + kalınlık. `text-base/sm/xs`
+  satır yüksekliği 1,6 / 1,5 / 1,4 (global; admin'e etkisi en fazla 1–2 px). `cn()` bu token'ları
+  boyut sayar (tailwind-merge yapılandırması; yoksa `text-lead` renk sanılıp siliniyordu).
+  Ortak bileşenler: `components/layout/page-header.tsx` (`PageShell` 64/96 px dikey boşluk,
+  `PageHeader` başlık bloğu, içerikten 48/64 px; `SectionHeading` h2, içerikten 24 px) ve
+  `components/prose.tsx` (`.prose-site`: tema token'ları, prose-invert yok; başlık üstü ≈ 3× altı;
+  `article` boyutu 17 px, en fazla `30em` ≈ 68 karakter: Geist'te `ch` ("0" genişliği) ortalama
+  harften ~%50 geniş, 68ch ~99 karakter veriyordu). Ana sayfada bölümler arası 64 / 96 px (eskiden
+  128); az öğeli bölümlerde ekran görüntüsünde boşluk sorunu görülmedi, 96 px kaldı. Yarım adımlar
+  (2/6/10 px) ve `text-[10px]` public arayüzden kalktı; `components/layout/type-scale.test.ts`
+  geri dönüşü engeller. Hakkımda'da kısa biyografide fotoğraf float'u sonraki bölüme taşıyordu
+  (`flow-root`). Seed: `seedTypographySample` (uzun örnek yazı, yalnızca CLI seed'i). Ekran
+  görüntüleri `docs/design-audit/typography/`.
 
 ## 3. Dokümandan sapmalar (onaylandı veya bu fazda raporlandı)
 
